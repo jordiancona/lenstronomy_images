@@ -1,0 +1,8 @@
+
+# files
+ds9
+ds9.zip
+*.py
+
+# directories
+images/
