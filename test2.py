@@ -89,7 +89,7 @@ print(rho0_clump, Rs_clump, c_clump, r200_clump, M200_clump)
 path = os.getcwd()
 dirpath, _ = os.path.split(path)
 module_path, _ = os.path.split(dirpath)
-ngc_filename = os.path.join(module_path, "Master/lenstronomy/"+file)
+ngc_filename = os.path.join(module_path, "lenstronomy/lenstronomy_images/images/images_1/"+file)
 
 ngc_data = imageio.imread(ngc_filename, mode = 'F', pilmode=None) # as_gray = True
 
@@ -168,7 +168,7 @@ ax.autoscale(False)
 '''
 # Image lensed
 #ax = axes[0]
-im = ax.matshow(source_lensed, origin='lower')
+im = ax.matshow(source_lensed, origin = 'lower')
 #ax.set_title("lensed source")
 ax.get_xaxis().set_visible(False)
 ax.get_yaxis().set_visible(False)
