@@ -173,7 +173,7 @@ im = ax.matshow(source_lensed, origin = 'lower')
 ax.get_xaxis().set_visible(False)
 ax.get_yaxis().set_visible(False)
 ax.autoscale(False)
-plt.savefig(f'fits/mock_{file_name}.png')
+plt.savefig(f'mock_{file_name}.png')
 
 # and plot the convergence of the lens model
 #plt.matshow(np.log10(kappa), origin = 'lower')
