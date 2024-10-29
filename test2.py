@@ -59,10 +59,10 @@ for i in range(num_subhalo):
                             })
 
 lensModel = LensModel(lens_model_list)
-# we set up a grid in coordinates and evaluate basic lensing quantities on it
+
 x_grid, y_grid = util.make_grid(numPix = 100, deltapix = 0.05)
 kappa = lensModel.kappa(x_grid, y_grid, kwargs_lens_list)
-# we make a 2d array out of the 1d grid points
+
 kappa = util.array2image(kappa)
 
 z_lens = 0.5
