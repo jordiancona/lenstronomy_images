@@ -1,9 +1,31 @@
-import lenstronomy as ln
+
 import numpy as np
+from random import uniform
+import os
+
+try:
+    import lenstronomy as ln
+except:
+    print("Lenstronomy not installed!")
 
 class lens:
     def __init__(self, total_images = 1000, model = 'SIE') -> None:
         self.total_images = total_images
         self.model = model
     
+    def Generate_Images(self, theta_E = 1, images_path = './images/', fits_path = './fits/', **kwargs):
+        self.__dict__.update(kwargs)
+
+        for _ in range(self.total_images):
+            gamma1, gamma2 = uniform(-0.5,0.5), uniform(-0.5,0.5)
+            e1, e2 = uniform(-0.5,0.5), uniform(-0.5,0.5)
+            center_x, center_y = uniform(-100,100), uniform(-100,100)
+        
+    def Read_FITS(self, path):
+        self.files = []
+        
+        self.path = path
+        for file in os.listdir(self.path):
+            if file.endswith('.fits'):
+                self.files.append(file)
 
