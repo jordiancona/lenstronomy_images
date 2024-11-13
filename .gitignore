@@ -10,3 +10,4 @@ plots.py
 images/
 kids_images/
 .vscode
+pyautolens_test.py
