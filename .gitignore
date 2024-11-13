@@ -11,3 +11,4 @@ images/
 kids_images/
 .vscode
 pyautolens_test.py
+root.log
