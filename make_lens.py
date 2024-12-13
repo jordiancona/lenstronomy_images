@@ -6,34 +6,28 @@ except:
 
 import numpy as np
 import matplotlib.pyplot as plt
-import matplotlib as mpl
-from mpl_toolkits.axes_grid1 import make_axes_locatable
 from lenstronomy.Util import util
 from lenstronomy.Data.pixel_grid import PixelGrid
-import lenstronomy.Util.simulation_util as sim_util
 import lenstronomy.Util.image_util as image_util
-from lenstronomy.Util import param_util
+#from lenstronomy.Util import param_util
 from lenstronomy.ImSim.image_model import ImageModel
 from lenstronomy.PointSource.point_source import PointSource
 from lenstronomy.LensModel.lens_model import LensModel
 from lenstronomy.LensModel.Solver.lens_equation_solver import LensEquationSolver
 from lenstronomy.LightModel.light_model import LightModel
-from lenstronomy.Sampling.parameters import Param
-from lenstronomy.Data.imaging_data import ImageData
 from lenstronomy.Data.psf import PSF
 from astropy.cosmology import FlatLambdaCDM
 from astropy.constants import c, G
 
-
 # lens parameters
 f = 0.7
 sigmav = 200.
-pa = np.pi/4.0 # position angle in radians
+pa = np.pi/3.0 # position angle in radians
 zl = 0.3 # lens redshift
 zs = 1.5 # source redshift
 
 # lens Einstein radius
-co = FlatLambdaCDM(H0 = 70, Om0  =0.3)
+co = FlatLambdaCDM(H0 = 70, Om0 = 0.3)
 dl = co.angular_diameter_distance(zl)
 ds = co.angular_diameter_distance(zs)
 dls = co.angular_diameter_distance_z1z2(zl,zs)
@@ -50,7 +44,7 @@ lens_model_list = ['SIE', 'SHEAR']
 lensModel = LensModel(lens_model_list = lens_model_list)
 
 # define parameter values of lens models #
-kwargs_spep = {'theta_E': thetaE, 'e1': e1, 'e2': e2, 'center_x': 0.1, 'center_y': 0}
+kwargs_spep = {'theta_E': thetaE, 'e1': e1, 'e2': e2, 'center_x': 0, 'center_y': 0}
 kwargs_shear = {'gamma1': -0.01, 'gamma2': .03}
 kwargs_lens = [kwargs_spep, kwargs_shear]
 
@@ -83,8 +77,8 @@ lightModel_lens = LightModel(light_model_list=lens_light_model_list)
 # define the parameters #
 kwargs_light_source = [{'amp': 100, 'R_sersic': 0.1, 'n_sersic': 1.5, 'center_x': beta_ra, 'center_y': beta_dec}]
 
-#e1, e2 = param_util.phi_q2_ellipticity(phi=0.5, q=0.7)
-kwargs_light_lens = [{'amp': 1000, 'R_sersic': 0.1, 'n_sersic': 2.5, 'e1': e1, 'e2': e2, 'center_x': 0.1, 'center_y': 0}]
+##e1, e2 = param_util.phi_q2_ellipticity(phi=0.5, q=0.7)
+kwargs_light_lens = [{'amp': 1000, 'R_sersic': 0.1, 'n_sersic': 2.5, 'e1': e1, 'e2': e2, 'center_x': 0, 'center_y': 0}]
 
 # evaluate surface brightness at a specific position #
 flux = lightModel_lens.surface_brightness(x=1, y=1, kwargs_list=kwargs_light_lens)
@@ -120,20 +114,21 @@ kwargs_pixel = {'nx': 100, 'ny': 100,  # number of pixels per axis
                 'ra_at_xy_0': ra_at_xy_0,  # RA at pixel (0,0)
                 'dec_at_xy_0': dec_at_xy_0,  # DEC at pixel (0,0)
                 'transform_pix2angle': transform_pix2angle} 
+
 pixel_grid = PixelGrid(**kwargs_pixel)
 # return the list of pixel coordinates #
 x_coords, y_coords = pixel_grid.pixel_coordinates
 # compute pixel value of a coordinate position #
-x_pos, y_pos = pixel_grid.map_coord2pix(ra=0, dec=0)
+x_pos, y_pos = pixel_grid.map_coord2pix(ra = 0, dec = 0)
 # compute the coordinate value of a pixel position #
 ra_pos, dec_pos = pixel_grid.map_pix2coord(x=20, y=10)
 
-# import the PSF() class #
-from lenstronomy.Data.psf import PSF
+# PSF
 kwargs_psf = {'psf_type': 'GAUSSIAN',  # type of PSF model (supports 'GAUSSIAN' and 'PIXEL')
               'fwhm': 0.1,  # full width at half maximum of the Gaussian PSF (in angular units)
               'pixel_size': deltaPix  # angular scale of a pixel (required for a Gaussian PSF to translate the FWHM into a pixel scale)
              }
+
 psf = PSF(**kwargs_psf)
 # return the pixel kernel corresponding to a point source # 
 kernel = psf.kernel_point_source
