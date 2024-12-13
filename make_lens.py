@@ -8,6 +8,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 from mpl_toolkits.axes_grid1 import make_axes_locatable
+from lenstronomy.Util import util
+from lenstronomy.Data.pixel_grid import PixelGrid
 import lenstronomy.Util.simulation_util as sim_util
 import lenstronomy.Util.image_util as image_util
 from lenstronomy.Util import param_util
@@ -22,142 +24,145 @@ from lenstronomy.Data.psf import PSF
 from astropy.cosmology import FlatLambdaCDM
 from astropy.constants import c, G
 
-background_rms = .5  #  background noise per pixel
-exp_time = 100  #  exposure time (arbitrary units, flux per pixel is in units #photons/exp_time unit)
-numPix = 100  #  cutout pixel size per axis 60
-pixel_scale = 0.05  #  pixel size in arcsec (area per pixel = pixel_scale**2) 0.05
-fwhm = 0.1  # full width at half maximum of PSF 0.05
-psf_type = 'GAUSSIAN'  # 'GAUSSIAN', 'PIXEL', 'NONE'
 
-fwhm = 0.1 # PSF FWHM
-kwargs_data = sim_util.data_configure_simple(numPix, pixel_scale, exp_time, background_rms)
-data_class = ImageData(**kwargs_data)
-kwargs_psf = {'psf_type': 'GAUSSIAN','fwhm': fwhm,'pixel_size': pixel_scale,'truncation': 5}
-psf_class = PSF(**kwargs_psf)
-
-f=0.7
-sigmav=200.
-pa=np.pi/4.0 # position angle in radians
-zl=0.3 # lens redshift
-zs=1.5 # source redshift
+# lens parameters
+f = 0.7
+sigmav = 200.
+pa = np.pi/4.0 # position angle in radians
+zl = 0.3 # lens redshift
+zs = 1.5 # source redshift
 
 # lens Einstein radius
-co = FlatLambdaCDM(H0 = 70, Om0 = 0.3)
-dl=co.angular_diameter_distance(zl)
-ds=co.angular_diameter_distance(zs)
-dls=co.angular_diameter_distance_z1z2(zl,zs)
+co = FlatLambdaCDM(H0 = 70, Om0  =0.3)
+dl = co.angular_diameter_distance(zl)
+ds = co.angular_diameter_distance(zs)
+dls = co.angular_diameter_distance_z1z2(zl,zs)
 
 # compute the Einstein radius
 thetaE = 1e6*(4.0*np.pi*sigmav**2/c**2*dls/ds*180.0/np.pi*3600.0).value
 # eccentricity computation
-e1, e2=(1-f)/(1+f)*np.cos(-2*pa), (1-f)/(1+f)*np.sin(-2*pa)
-lens_model_list = ['SIE']
-kwargs_sie = {'theta_E': thetaE,
-              'center_x': 0,
-              'center_y': 0,
-              'e1': e1,
-              'e2': e2}
+e1, e2 = (1-f)/(1+f)*np.cos(-2*pa), (1-f)/(1+f)*np.sin(-2*pa)
 
-kwargs_lens = [kwargs_sie]
-lens_model_class = LensModel(lens_model_list = lens_model_list)
+# specify the choice of lens models #
+lens_model_list = ['SIE', 'SHEAR']
 
-# create the light model for the lens (SERSIC_ELLIPSE)
+# setup lens model class with the list of lens models #
+lensModel = LensModel(lens_model_list = lens_model_list)
+
+# define parameter values of lens models #
+kwargs_spep = {'theta_E': thetaE, 'e1': e1, 'e2': e2, 'center_x': 0.1, 'center_y': 0}
+kwargs_shear = {'gamma1': -0.01, 'gamma2': .03}
+kwargs_lens = [kwargs_spep, kwargs_shear]
+
+# image plane coordinate #
+theta_ra, theta_dec = 1., .5
+# source plane coordinate #
+beta_ra, beta_dec = lensModel.ray_shooting(theta_ra, theta_dec, kwargs_lens)
+# Fermat potential #
+fermat_pot = lensModel.fermat_potential(x_image=theta_ra, y_image=theta_dec, x_source=beta_ra, y_source=beta_dec, kwargs_lens=kwargs_lens)
+
+# Magnification #
+mag = lensModel.magnification(theta_ra, theta_dec, kwargs_lens)
+
+# specifiy the lens model class to deal with #
+solver = LensEquationSolver(lensModel)
+
+# solve for image positions provided a lens model and the source position #
+theta_ra, theta_dec = solver.image_position_from_source(beta_ra, beta_dec, kwargs_lens)
+
+# the magnification of the point source images #
+mag = lensModel.magnification(theta_ra, theta_dec, kwargs_lens)
+
+# set up the list of light models to be used #
+source_light_model_list = ['SERSIC']
+lightModel_source = LightModel(light_model_list=source_light_model_list)
+
 lens_light_model_list = ['SERSIC_ELLIPSE']
-kwargs_sersic = {'amp': 3500, # flux of the lens (arbitrary units)
-                 'R_sersic': 2., # effective radius
-                 'n_sersic': 4, # sersic index
-                 'center_x': 0, # x-coordinate
-                 'center_y': 0, # y-coordinate
-                 'e1': e1,
-                 'e2': e2}
+lightModel_lens = LightModel(light_model_list=lens_light_model_list)
 
-kwargs_lens_light = [kwargs_sersic]
-lens_light_model_class = LightModel(light_model_list = lens_light_model_list)
-# create the light model for the source (SERSIC_ELLIPSE)
-source_model_list = ['SERSIC_ELLIPSE']
-# set the position of the source
-ra_source, dec_source = -0.1 * thetaE, thetaE
-kwargs_sersic_ellipse = {'amp': 4000.,
-                         'R_sersic': .1,
-                         'n_sersic': 3,
-                         'center_x': ra_source,
-                         'center_y': dec_source,
-                         'e1': 0.1,
-                         'e2': 0.01}
+# define the parameters #
+kwargs_light_source = [{'amp': 100, 'R_sersic': 0.1, 'n_sersic': 1.5, 'center_x': beta_ra, 'center_y': beta_dec}]
 
-kwargs_source = [kwargs_sersic_ellipse]
-source_model_class = LightModel(light_model_list = source_model_list)
+#e1, e2 = param_util.phi_q2_ellipticity(phi=0.5, q=0.7)
+kwargs_light_lens = [{'amp': 1000, 'R_sersic': 0.1, 'n_sersic': 2.5, 'e1': e1, 'e2': e2, 'center_x': 0.1, 'center_y': 0}]
 
-# solve the lens equation and find the image positions
-# using the LensEquationSolver class of Lenstronomy.
-lensEquationSolver = LensEquationSolver(lens_model_class)
-x_image, y_image = lensEquationSolver.image_position_from_source(ra_source,
-                                                                 dec_source,
-                                                                 kwargs_lens,
-                                                                 min_distance=pixel_scale,
-                                                                 search_window=numPix * pixel_scale,
-                                                                 precision_limit=1e-10, 
-                                                                 num_iter_max=100,
-                                                                 arrival_time_sort=True,
-                                                                 initial_guess_cut=True,
-                                                                 verbose=False,
-                                                                 x_center=0,
-                                                                 y_center=0,
-                                                                 num_random=0,
-                                                                 non_linear=False,
-                                                                 magnification_limit=None)
+# evaluate surface brightness at a specific position #
+flux = lightModel_lens.surface_brightness(x=1, y=1, kwargs_list=kwargs_light_lens)
 
-# compute lensing magnification at image positions
-mag = lens_model_class.magnification(x_image,
-                                     y_image,
-                                     kwargs=kwargs_lens)
-mag = np.abs(mag) # ignore the sign of the magnification
-# perturb observed magnification due to e.g. micro-lensing
-# the noise is generated from a normal distribution
-# with mean ’mag’ and standard deviation 0.5
+# unlensed source positon #
+point_source_model_list = ['SOURCE_POSITION']
+pointSource = PointSource(point_source_type_list = point_source_model_list,
+                          lens_model = lensModel,
+                          fixed_magnification_list = [True])
 
-mag_pert = np.random.normal(mag, 0.5, len(mag))
+kwargs_ps = [{'ra_source': beta_ra, 'dec_source': beta_dec, 'source_amp': 100}]
+# return image positions and amplitudes #
+x_pos, y_pos = pointSource.image_position(kwargs_ps = kwargs_ps, kwargs_lens = kwargs_lens)
+point_amp = pointSource.image_amplitude(kwargs_ps = kwargs_ps, kwargs_lens = kwargs_lens)
 
-# quasar position in the lens plane
-kwargs_ps = [{'ra_image': x_image,
-              'dec_image': y_image,
-              'point_amp': mag}]
+# lensed image positions (solution of the lens equation) #
+point_source_model_list = ['LENSED_POSITION']
+pointSource = PointSource(point_source_type_list = point_source_model_list,
+                          lens_model=lensModel,
+                          fixed_magnification_list = [False])
 
-point_source_list = ['LENSED_POSITION']
-point_source_class = PointSource(point_source_type_list = point_source_list,
-                                 fixed_magnification_list=[False])
-# create the simulated observation of lens and (lensed)
-# source
-kwargs_numerics = {'supersampling_factor': 1, 'supersampling_convolution': False}
-# imageModel includes the details of the instrument, psf, lens,
-# and source models
-imageModel = ImageModel(data_class, psf_class, lens_model_class,
-source_model_class,lens_light_model_class,point_source_class, kwargs_numerics = kwargs_numerics)
-# now, the simulated image is saved in image_sim
-image_sim = imageModel.image(kwargs_lens, kwargs_source,
-kwargs_lens_light, kwargs_ps)
-# add noise and background
-poisson = image_util.add_poisson(image_sim, exp_time=exp_time)
-bkg = image_util.add_background(image_sim, sigma_bkd=background_rms)
-image_sim = image_sim + poisson + bkg 
+kwargs_ps = [{'ra_image': theta_ra, 'dec_image': theta_dec, 'point_amp': np.abs(mag)*30}]
+# return image positions and amplitudes #
+x_pos, y_pos = pointSource.image_position(kwargs_ps = kwargs_ps, kwargs_lens = kwargs_lens)
+point_amp = pointSource.image_amplitude(kwargs_ps = kwargs_ps, kwargs_lens = kwargs_lens)
 
-data_class.update_data(image_sim)
-kwargs_data['image_data'] = image_sim
+deltaPix = 0.05  # size of pixel in angular coordinates #
 
-# plotting the lens system
-cmap = mpl.cm.get_cmap("gray").copy()
-cmap.set_bad(color='k', alpha=1.)
-cmap.set_under('k')
+# setup the keyword arguments to create the Data() class #
+ra_at_xy_0, dec_at_xy_0 = -2.5, -2.5 # coordinate in angles (RA/DEC) at the position of the pixel edge (0,0)
+transform_pix2angle = np.array([[1, 0], [0, 1]]) * deltaPix  # linear translation matrix of a shift in pixel in a shift in coordinates
+kwargs_pixel = {'nx': 100, 'ny': 100,  # number of pixels per axis
+                'ra_at_xy_0': ra_at_xy_0,  # RA at pixel (0,0)
+                'dec_at_xy_0': dec_at_xy_0,  # DEC at pixel (0,0)
+                'transform_pix2angle': transform_pix2angle} 
+pixel_grid = PixelGrid(**kwargs_pixel)
+# return the list of pixel coordinates #
+x_coords, y_coords = pixel_grid.pixel_coordinates
+# compute pixel value of a coordinate position #
+x_pos, y_pos = pixel_grid.map_coord2pix(ra=0, dec=0)
+# compute the coordinate value of a pixel position #
+ra_pos, dec_pos = pixel_grid.map_pix2coord(x=20, y=10)
 
-v_min = -4
-v_max = 1
+# import the PSF() class #
+from lenstronomy.Data.psf import PSF
+kwargs_psf = {'psf_type': 'GAUSSIAN',  # type of PSF model (supports 'GAUSSIAN' and 'PIXEL')
+              'fwhm': 0.1,  # full width at half maximum of the Gaussian PSF (in angular units)
+              'pixel_size': deltaPix  # angular scale of a pixel (required for a Gaussian PSF to translate the FWHM into a pixel scale)
+             }
+psf = PSF(**kwargs_psf)
+# return the pixel kernel corresponding to a point source # 
+kernel = psf.kernel_point_source
 
-f, axes = plt.subplots(1, 1, figsize=(6, 6), sharex=False, sharey=False)
+# define the numerics #
+kwargs_numerics = {'supersampling_factor': 1, # each pixel gets super-sampled (in each axis direction) 
+                  'supersampling_convolution': False}
+# initialize the Image model class by combining the modules we created above #
+imageModel = ImageModel(data_class=pixel_grid, psf_class=psf, lens_model_class=lensModel,
+                        source_model_class=lightModel_source,
+                        lens_light_model_class=lightModel_lens,
+                        point_source_class=None, # in this example, we do not simulate point source.
+                        kwargs_numerics=kwargs_numerics)
+# simulate image with the parameters we have defined above #
+image = imageModel.image(kwargs_lens=kwargs_lens, kwargs_source=kwargs_light_source,
+                         kwargs_lens_light=kwargs_light_lens, kwargs_ps=kwargs_ps)
 
+# image with noise
+exp_time = 100  # exposure time to quantify the Poisson noise level
+background_rms = 0.1  # background rms value
+poisson = image_util.add_poisson(image, exp_time = exp_time)
+bkg = image_util.add_background(image, sigma_bkd = background_rms)
+image_noisy = image + bkg + poisson
+
+f, axes = plt.subplots(1, 1, figsize=(4, 4), sharex = False, sharey = False)
 ax = axes
-im = ax.matshow(np.log10(image_sim), origin = 'lower', cmap = cmap, extent=[0, 1, 0, 1]) #  vmin=v_min, vmax=v_max, 
+ax.matshow(np.log10(image), origin='lower', cmap = 'gray')
 ax.get_xaxis().set_visible(False)
 ax.get_yaxis().set_visible(False)
-ax.autoscale(False)
-
-plt.show()
+#axes[1].matshow(np.log10(image_noisy), origin='lower', cmap = 'gray')
+f.tight_layout()
+plt.savefig('lens1.png')
