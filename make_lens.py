@@ -20,9 +20,9 @@ from astropy.cosmology import FlatLambdaCDM
 from astropy.constants import c, G
 
 # lens parameters
-f = 0.7
-sigmav = 200.
-pa = np.pi/3.0 # position angle in radians
+f = 0.6
+sigmav = 100.
+pa = np.pi/1.0 # position angle in radians
 zl = 0.3 # lens redshift
 zs = 1.5 # source redshift
 
