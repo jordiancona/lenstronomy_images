@@ -1,162 +1,167 @@
-#!/usr/local/bin/python3
-
-import os
-import sys
-import numpy as np
-import scipy
-import matplotlib.pyplot as plt
-from mpl_toolkits.axes_grid1 import make_axes_locatable
-from astropy.cosmology import default_cosmology
-import imageio
 
 try:
     import lenstronomy
 except:
-    print("lenstronomy not installed")
+    print('Lenstronomy no está instalado')
 
-from lenstronomy.Cosmo.lens_cosmo import LensCosmo
-import lenstronomy.Util.util as util
+import numpy as np
+import matplotlib.pyplot as plt
+from lenstronomy.Util import util
+from lenstronomy.Data.pixel_grid import PixelGrid
 import lenstronomy.Util.image_util as image_util
+#from lenstronomy.Util import param_util
+from lenstronomy.ImSim.image_model import ImageModel
+from lenstronomy.PointSource.point_source import PointSource
 from lenstronomy.LensModel.lens_model import LensModel
-from lenstronomy.LightModel.Profiles.shapelets import ShapeletSet
+from lenstronomy.LensModel.Solver.lens_equation_solver import LensEquationSolver
+from lenstronomy.LightModel.light_model import LightModel
+from lenstronomy.Data.psf import PSF
+from astropy.cosmology import FlatLambdaCDM
+from astropy.constants import c, G
+from dataclasses import dataclass
 
+@dataclass
 class Lenses:
-    def __init__(self, **kwargs):
-        self.__dict__.update(kwargs)
-    
-    def Create_PNG(self, file, **kgwars):
-        file_name, file_extension = os.path.splitext(file)
+    f: float
+    sigmav: float
+    zl: float = 0.2
+    zs: float = 1.5
+    center_x: float = 0.1
+    center_y: float = 0.1
 
-        main_halo_type = self.model
-        kwargs_lens_main = {'theta_E': self.theta_E, 'e1': self.e1, 'e2': self.e2, 'center_x': self.center_x, 'center_y': self.center_y}
-        kwargs_shear = {'gamma1': self.gamma1, 'gamma2': self.gamma2}
-        lens_model_list = [main_halo_type, 'SHEAR']
-        kwargs_lens_list = [kwargs_lens_main, kwargs_shear]
+    def __post_init__(self):
+        # lens Einstein radius
+        co = FlatLambdaCDM(H0 = 70, Om0 = 0.3)
+        self.dl = co.angular_diameter_distance(self.zl)
+        self.ds = co.angular_diameter_distance(self.zs)
+        self.dls = co.angular_diameter_distance_z1z2(self.zl, self.zs)
 
-        subhalo_type = 'TNFW'  # spherical NFW profiles
+# compute the Einstein radius
+thetaE = 1e6*(4.0*np.pi*sigmav**2/c**2*dls/ds*180.0/np.pi*3600.0).value
+# eccentricity computation
+e1, e2 = (1-f)/(1+f)*np.cos(-2*pa), (1-f)/(1+f)*np.sin(-2*pa)
 
-        # as an example, we render some sub-halos with a very simple distribution to be added on the main lens
-        num_subhalo = 10  # number of subhalos to be rendered
-        # the parameterization of the NFW profiles are:
-        # - Rs (radius of the scale parameter Rs in units of angles)
-        # - theta_Rs (radial deflection angle at Rs)
-        # - center_x, center_y, (position of the centre of the profile in angular units)
+# specify the choice of lens models #
+lens_model_list = ['SIE', 'SHEAR']
 
-        Rs_mean = 0.1
-        Rs_sigma = 0.1  # dex scatter
-        theta_Rs_mean = 0.05
-        theta_Rs_sigma = 0.1 # dex scatter
-        r_min, r_max = -2, 2
+# setup lens model class with the list of lens models #
+lensModel = LensModel(lens_model_list = lens_model_list)
 
-        Rs_list = 10**(np.log10(Rs_mean) + np.random.normal(loc=0, scale=Rs_sigma, size=num_subhalo))
-        theta_Rs_list = 10**(np.log10(theta_Rs_mean) + np.random.normal(loc=0, scale=theta_Rs_sigma, size=num_subhalo))
-        center_x_list = np.random.uniform(low=r_min, high=r_max,size=num_subhalo)
-        center_y_list = np.random.uniform(low=r_min, high=r_max,size=num_subhalo)
+# define parameter values of lens models #
+kwargs_spep = {'theta_E': thetaE, 'e1': e1, 'e2': e2, 'center_x': center_x, 'center_y': center_y}
+kwargs_shear = {'gamma1': -0.01, 'gamma2': .03}
+kwargs_lens = [kwargs_spep, kwargs_shear]
 
-        for i in range(num_subhalo):
-            lens_model_list.append(subhalo_type)
-            kwargs_lens_list.append({'alpha_Rs': theta_Rs_list[i],
-                                    'Rs': Rs_list[i],
-                                    'center_x': center_x_list[i],
-                                    'center_y': center_y_list[i],
-                                    'r_trunc': 5 * Rs_list[i]
-                                    })
+# image plane coordinate #
+theta_ra, theta_dec = 1., .5
+# source plane coordinate #
+beta_ra, beta_dec = lensModel.ray_shooting(theta_ra, theta_dec, kwargs_lens)
+# Fermat potential #
+fermat_pot = lensModel.fermat_potential(x_image=theta_ra, y_image=theta_dec, x_source=beta_ra, y_source=beta_dec, kwargs_lens=kwargs_lens)
 
-        lensModel = LensModel(lens_model_list)
+# Magnification #
+mag = lensModel.magnification(theta_ra, theta_dec, kwargs_lens)
 
-        x_grid, y_grid = util.make_grid(numPix = 100, deltapix = 0.05)
-        kappa = lensModel.kappa(x_grid, y_grid, kwargs_lens_list)
+# specifiy the lens model class to deal with #
+solver = LensEquationSolver(lensModel)
 
-        kappa = util.array2image(kappa)
+# solve for image positions provided a lens model and the source position #
+theta_ra, theta_dec = solver.image_position_from_source(beta_ra, beta_dec, kwargs_lens)
 
-        z_lens = 0.5
-        z_source = 2
+# the magnification of the point source images #
+mag = lensModel.magnification(theta_ra, theta_dec, kwargs_lens)
 
-        cosmo = default_cosmology.get()
+# set up the list of light models to be used #
+source_light_model_list = ['SERSIC']
+lightModel_source = LightModel(light_model_list=source_light_model_list)
 
-        # class that converts angular to physical units for a specific cosmology and redshift configuration
-        lensCosmo = LensCosmo(z_lens=z_lens, z_source=z_source, cosmo=cosmo)
+lens_light_model_list = ['SERSIC_ELLIPSE']
+lightModel_lens = LightModel(light_model_list=lens_light_model_list)
 
-        # here we turn an NFW halo defined as M200 crit and concentration into lensing quantities
-        M200 = 10**9
-        concentration = 6
-        Rs_angle_clump, theta_Rs_clump = lensCosmo.nfw_physical2angle(M=M200, c=concentration)
-        print(Rs_angle_clump, theta_Rs_clump)
+# define the parameters #
+kwargs_light_source = [{'amp': 100, 'R_sersic': 0.1, 'n_sersic': 1.5, 'center_x': beta_ra, 'center_y': beta_dec}]
 
-        # and here we do the oposite and turn the lensing quantities into physical units
-        rho0_clump, Rs_clump, c_clump, r200_clump, M200_clump = lensCosmo.nfw_angle2physical(Rs_angle_clump, theta_Rs_clump)
-        print(rho0_clump, Rs_clump, c_clump, r200_clump, M200_clump)
+##e1, e2 = param_util.phi_q2_ellipticity(phi=0.5, q=0.7)
+kwargs_light_lens = [{'amp': 1000, 'R_sersic': 0.1, 'n_sersic': 2.5, 'e1': e1, 'e2': e2, 'center_x': center_x, 'center_y': center_y}]
 
+# evaluate surface brightness at a specific position #
+flux = lightModel_lens.surface_brightness(x = 1, y = 1, kwargs_list = kwargs_light_lens)
 
+# unlensed source positon #
+point_source_model_list = ['SOURCE_POSITION']
+pointSource = PointSource(point_source_type_list = point_source_model_list,
+                          lens_model = lensModel,
+                          fixed_magnification_list = [True])
 
-        # find path to data
-        path = os.getcwd()
-        dirpath, _ = os.path.split(path)
-        module_path, _ = os.path.split(dirpath)
-        ngc_filename = os.path.join(module_path, "lenstronomy/lenstronomy_images/images/images_1/"+file)
+kwargs_ps = [{'ra_source': beta_ra, 'dec_source': beta_dec, 'source_amp': 100}]
+# return image positions and amplitudes #
+x_pos, y_pos = pointSource.image_position(kwargs_ps = kwargs_ps, kwargs_lens = kwargs_lens)
+point_amp = pointSource.image_amplitude(kwargs_ps = kwargs_ps, kwargs_lens = kwargs_lens)
 
-        ngc_data = imageio.imread(ngc_filename, mode = 'F', pilmode=None) # as_gray = True
+# lensed image positions (solution of the lens equation) #
+point_source_model_list = ['LENSED_POSITION']
+pointSource = PointSource(point_source_type_list = point_source_model_list,
+                          lens_model=lensModel,
+                          fixed_magnification_list = [False])
 
-        # subtract the median of an edge of the image
-        median = np.median(ngc_data[:200, :200]) # 200, 200
-        ngc_data -= median
+kwargs_ps = [{'ra_image': theta_ra, 'dec_image': theta_dec, 'point_amp': np.abs(mag)*30}]
+# return image positions and amplitudes #
+x_pos, y_pos = pointSource.image_position(kwargs_ps = kwargs_ps, kwargs_lens = kwargs_lens)
+point_amp = pointSource.image_amplitude(kwargs_ps = kwargs_ps, kwargs_lens = kwargs_lens)
 
-        # resize the image to square size (add zeros at the edges of the non-square bits of the image)
-        nx, ny = np.shape(ngc_data)
-        n_min = min(nx, ny)
-        n_max = max(nx, ny)
-        ngc_square = np.zeros((n_max, n_max))
-        x_start = int((n_max - nx)/2.)
-        y_start = int((n_max - ny)/2.)
-        ngc_square[x_start:x_start+nx, y_start:y_start+ny] = ngc_data
+deltaPix = 0.05  # size of pixel in angular coordinates #
 
-        # we slightly convolve the image with a Gaussian convolution kernel of a few pixels (optional)
-        sigma = 5 # 5
-        ngc_conv = scipy.ndimage.filters.gaussian_filter(ngc_square, sigma, mode='nearest', truncate=6)
+# setup the keyword arguments to create the Data() class #
+ra_at_xy_0, dec_at_xy_0 = -2.5, -2.5 # coordinate in angles (RA/DEC) at the position of the pixel edge (0,0)
+transform_pix2angle = np.array([[1, 0], [0, 1]]) * deltaPix  # linear translation matrix of a shift in pixel in a shift in coordinates
+kwargs_pixel = {'nx': 100, 'ny': 100,  # number of pixels per axis
+                'ra_at_xy_0': ra_at_xy_0,  # RA at pixel (0,0)
+                'dec_at_xy_0': dec_at_xy_0,  # DEC at pixel (0,0)
+                'transform_pix2angle': transform_pix2angle} 
 
-        # we now degrate the pixel resoluton by a factor.
-        # This reduces the data volume and increases the spead of the Shapelet decomposition
-        factor = 3  # lower resolution of image with a given factor (25)
-        numPix_large = int(len(ngc_conv)/factor)
-        n_new = int((numPix_large-1)*factor)
-        ngc_cut = ngc_conv[0:n_new,0:n_new]
-        x, y = util.make_grid(numPix=numPix_large-1, deltapix=1)  # make a coordinate grid
-        ngc_data_resized = image_util.re_size(ngc_cut, factor)  # re-size image to lower resolution
+pixel_grid = PixelGrid(**kwargs_pixel)
+# return the list of pixel coordinates #
+x_coords, y_coords = pixel_grid.pixel_coordinates
+# compute pixel value of a coordinate position #
+x_pos, y_pos = pixel_grid.map_coord2pix(ra = 0, dec = 0)
+# compute the coordinate value of a pixel position #
+ra_pos, dec_pos = pixel_grid.map_pix2coord(x = 20, y = 10)
 
-        image_1d = util.image2array(ngc_data_resized)
+# PSF
+kwargs_psf = {'psf_type': 'GAUSSIAN',  # type of PSF model (supports 'GAUSSIAN' and 'PIXEL')
+              'fwhm': 0.1,  # full width at half maximum of the Gaussian PSF (in angular units)
+              'pixel_size': deltaPix  # angular scale of a pixel (required for a Gaussian PSF to translate the FWHM into a pixel scale)
+             }
 
-        n_max = 150  # choice of number of shapelet basis functions, 150 is a high resolution number, but takes long
-        beta = 10  # shapelet scale parameter (in units of resized pixels)
+psf = PSF(**kwargs_psf)
+# return the pixel kernel corresponding to a point source # 
+kernel = psf.kernel_point_source
 
-        # import the ShapeletSet class
-        shapeletSet = ShapeletSet()
+# define the numerics #
+kwargs_numerics = {'supersampling_factor': 1, # each pixel gets super-sampled (in each axis direction) 
+                  'supersampling_convolution': False}
+# initialize the Image model class by combining the modules we created above #
+imageModel = ImageModel(data_class=pixel_grid, psf_class=psf, lens_model_class=lensModel,
+                        source_model_class=lightModel_source,
+                        lens_light_model_class=lightModel_lens,
+                        point_source_class=None, # in this example, we do not simulate point source.
+                        kwargs_numerics=kwargs_numerics)
+# simulate image with the parameters we have defined above #
+image = imageModel.image(kwargs_lens=kwargs_lens, kwargs_source=kwargs_light_source,
+                         kwargs_lens_light=kwargs_light_lens, kwargs_ps=kwargs_ps)
 
-        # decompose image and return the shapelet coefficients
-        coeff_ngc = shapeletSet.decomposition(image_1d, x, y, n_max, beta, 1., center_x=0, center_y=0) 
-        print(len(coeff_ngc), 'number of coefficients')  # number of coefficients
+# image with noise
+exp_time = 100  # exposure time to quantify the Poisson noise level
+background_rms = 0.1  # background rms value
+poisson = image_util.add_poisson(image, exp_time = exp_time)
+bkg = image_util.add_background(image, sigma_bkd = background_rms)
+image_noisy = image + bkg + poisson
 
-        # reconstruct NGC1300 with the shapelet coefficients
-        image_reconstructed = shapeletSet.function(x, y, coeff_ngc, n_max, beta, center_x=0, center_y=0)
-        # turn 1d array back into 2d image
-        image_reconstructed_2d = util.array2image(image_reconstructed)
-
-        numPix = 100  # number of pixels (low res of data) 100
-        deltaPix = 0.05  # pixel size (low res of data)
-        high_res_factor = 6  # higher resolution factor (per axis) 3
-        
-        # make the high resolution grid 
-        theta_x_high_res, theta_y_high_res = util.make_grid(numPix=numPix*high_res_factor, deltapix=deltaPix/high_res_factor)
-        
-        # ray-shoot the image plane coordinates (angles) to the source plane (angles)
-        beta_x_high_res, beta_y_high_res = lensModel.ray_shooting(theta_x_high_res, theta_y_high_res, kwargs=kwargs_lens_list)
-
-        source_lensed = shapeletSet.function(beta_x_high_res, beta_y_high_res, coeff_ngc, n_max, beta=.05, center_x=0.2, center_y=0)
-        source_lensed = util.array2image(source_lensed)
-
-        f, ax = plt.subplots(1, 1, figsize = (4, 4), sharex = False, sharey = False)
-        im = ax.matshow(source_lensed, origin = 'lower')
-        #ax.set_title("lensed source")
-        ax.get_xaxis().set_visible(False)
-        ax.get_yaxis().set_visible(False)
-        ax.autoscale(False)
-        plt.savefig(f'mock_{file_name}.png')
+f, axes = plt.subplots(1, 1, figsize=(4, 4), sharex = False, sharey = False)
+ax = axes
+ax.matshow(np.log10(image), origin='lower', cmap = 'gray')
+ax.get_xaxis().set_visible(False)
+ax.get_yaxis().set_visible(False)
+#axes[1].matshow(np.log10(image_noisy), origin='lower', cmap = 'gray')
+f.tight_layout()
+plt.savefig('lens1.png')
