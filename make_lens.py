@@ -21,10 +21,12 @@ from astropy.constants import c, G
 
 # lens parameters
 f = 0.6
-sigmav = 100.
-pa = np.pi/1.0 # position angle in radians
-zl = 0.3 # lens redshift
+sigmav = 200.
+pa = np.pi/4.0 # position angle in radians
+zl = 0.2 # lens redshift
 zs = 1.5 # source redshift
+center_x = 0.1
+center_y = 0.1
 
 # lens Einstein radius
 co = FlatLambdaCDM(H0 = 70, Om0 = 0.3)
@@ -44,7 +46,7 @@ lens_model_list = ['SIE', 'SHEAR']
 lensModel = LensModel(lens_model_list = lens_model_list)
 
 # define parameter values of lens models #
-kwargs_spep = {'theta_E': thetaE, 'e1': e1, 'e2': e2, 'center_x': 0, 'center_y': 0}
+kwargs_spep = {'theta_E': thetaE, 'e1': e1, 'e2': e2, 'center_x': center_x, 'center_y': center_y}
 kwargs_shear = {'gamma1': -0.01, 'gamma2': .03}
 kwargs_lens = [kwargs_spep, kwargs_shear]
 
@@ -78,10 +80,10 @@ lightModel_lens = LightModel(light_model_list=lens_light_model_list)
 kwargs_light_source = [{'amp': 100, 'R_sersic': 0.1, 'n_sersic': 1.5, 'center_x': beta_ra, 'center_y': beta_dec}]
 
 ##e1, e2 = param_util.phi_q2_ellipticity(phi=0.5, q=0.7)
-kwargs_light_lens = [{'amp': 1000, 'R_sersic': 0.1, 'n_sersic': 2.5, 'e1': e1, 'e2': e2, 'center_x': 0, 'center_y': 0}]
+kwargs_light_lens = [{'amp': 1000, 'R_sersic': 0.1, 'n_sersic': 2.5, 'e1': e1, 'e2': e2, 'center_x': center_x, 'center_y': center_y}]
 
 # evaluate surface brightness at a specific position #
-flux = lightModel_lens.surface_brightness(x=1, y=1, kwargs_list=kwargs_light_lens)
+flux = lightModel_lens.surface_brightness(x = 1, y = 1, kwargs_list = kwargs_light_lens)
 
 # unlensed source positon #
 point_source_model_list = ['SOURCE_POSITION']
@@ -110,7 +112,7 @@ deltaPix = 0.05  # size of pixel in angular coordinates #
 # setup the keyword arguments to create the Data() class #
 ra_at_xy_0, dec_at_xy_0 = -2.5, -2.5 # coordinate in angles (RA/DEC) at the position of the pixel edge (0,0)
 transform_pix2angle = np.array([[1, 0], [0, 1]]) * deltaPix  # linear translation matrix of a shift in pixel in a shift in coordinates
-kwargs_pixel = {'nx': 100, 'ny': 100,  # number of pixels per axis
+kwargs_pixel = {'nx': 180, 'ny': 180,  # number of pixels per axis
                 'ra_at_xy_0': ra_at_xy_0,  # RA at pixel (0,0)
                 'dec_at_xy_0': dec_at_xy_0,  # DEC at pixel (0,0)
                 'transform_pix2angle': transform_pix2angle} 
@@ -121,7 +123,7 @@ x_coords, y_coords = pixel_grid.pixel_coordinates
 # compute pixel value of a coordinate position #
 x_pos, y_pos = pixel_grid.map_coord2pix(ra = 0, dec = 0)
 # compute the coordinate value of a pixel position #
-ra_pos, dec_pos = pixel_grid.map_pix2coord(x=20, y=10)
+ra_pos, dec_pos = pixel_grid.map_pix2coord(x = 20, y = 10)
 
 # PSF
 kwargs_psf = {'psf_type': 'GAUSSIAN',  # type of PSF model (supports 'GAUSSIAN' and 'PIXEL')

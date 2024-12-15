@@ -4,16 +4,17 @@ import numpy as np
 import matplotlib.pyplot as plt
 from random import uniform
 from create_lens import Lenses as lss
+from dataclasses import dataclass
 
 try:
     import lenstronomy as ln
 except:
     print("Lenstronomy not installed!")
 
+@dataclass
 class lens:
-    def __init__(self, total_images = 1000, model = 'SIE') -> None:
-        self.total_images = total_images
-        self.model = model
+    total_images: int
+    model: str
     
     def Generate_Images(self, theta_E = 1, images_path = './images/', fits_path = './fits/', **kwargs):
         self.__dict__.update(kwargs)
