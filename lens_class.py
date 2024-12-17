@@ -25,7 +25,7 @@ class lens:
             e1, e2 = uniform(-0.5,0.5), uniform(-0.5,0.5)
             center_x, center_y = uniform(-100,100), uniform(-100,100)
 
-            lss.Create_PNG(model = self.model,
+            lss.makelens(model = self.model,
                            theta_E = self.theta_E,
                            e1 = e1,
                            e2 = e2,

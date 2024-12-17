@@ -39,7 +39,7 @@ class Lenses:
 
         ## INTEGRAR CALCULOS PARA KAPPA
         ## self.kappa = np.sqrt(self.f)/2.0/
-        self.gamma1, self.gamma2 = -0.01, .03
+        self.gamma1, self.gamma2 = -0.1, .3
         # compute the Einstein radius
         self.thetaE = 1e6*(4.0*np.pi*self.sigmav**2/c**2*dls/ds*180.0/np.pi*3600.0).value
         # eccentricity computation
@@ -166,6 +166,7 @@ class Lenses:
                                 lens_light_model_class=lightModel_lens,
                                 point_source_class=None, # in this example, we do not simulate point source.
                                 kwargs_numerics=kwargs_numerics)
+        
         # simulate image with the parameters we have defined above #
         image = imageModel.image(kwargs_lens=kwargs_lens, kwargs_source=kwargs_light_source,
                                 kwargs_lens_light=kwargs_light_lens, kwargs_ps=kwargs_ps)
@@ -179,7 +180,7 @@ class Lenses:
 
         f, axes = plt.subplots(1, 1, figsize=(4, 4), sharex = False, sharey = False)
         ax = axes
-        ax.matshow(np.log10(image), origin='lower', cmap = 'gray')
+        ax.matshow(np.log10(image), origin='lower', cmap = 'cividis')
         ax.get_xaxis().set_visible(False)
         ax.get_yaxis().set_visible(False)
         #axes[1].matshow(np.log10(image_noisy), origin='lower', cmap = 'gray')

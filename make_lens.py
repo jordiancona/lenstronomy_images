@@ -47,7 +47,7 @@ lensModel = LensModel(lens_model_list = lens_model_list)
 
 # define parameter values of lens models #
 kwargs_spep = {'theta_E': thetaE, 'e1': e1, 'e2': e2, 'center_x': center_x, 'center_y': center_y}
-kwargs_shear = {'gamma1': -0.01, 'gamma2': .03}
+kwargs_shear = {'gamma1': 0.01, 'gamma2': .01}
 kwargs_lens = [kwargs_spep, kwargs_shear]
 
 # image plane coordinate #
@@ -157,7 +157,7 @@ image_noisy = image + bkg + poisson
 
 f, axes = plt.subplots(1, 1, figsize=(4, 4), sharex = False, sharey = False)
 ax = axes
-ax.matshow(np.log10(image), origin='lower', cmap = 'gray')
+ax.matshow(np.log10(image), origin='lower', cmap = 'cividis')
 ax.get_xaxis().set_visible(False)
 ax.get_yaxis().set_visible(False)
 #axes[1].matshow(np.log10(image_noisy), origin='lower', cmap = 'gray')
