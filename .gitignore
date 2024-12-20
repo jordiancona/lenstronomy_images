@@ -6,6 +6,7 @@ test2.py
 .python-version
 plots.py
 lens1.png
+*.jpg
 
 # directories
 images/
