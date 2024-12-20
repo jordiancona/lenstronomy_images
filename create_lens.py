@@ -26,6 +26,8 @@ class Lenses:
     sigmav: float
     zl: float = 0.2
     zs: float = 1.5
+    gamma1: float
+    gamma2: float
     center_x: float = 0.1
     center_y: float = 0.1
 
@@ -39,7 +41,6 @@ class Lenses:
 
         ## INTEGRAR CALCULOS PARA KAPPA
         ## self.kappa = np.sqrt(self.f)/2.0/
-        self.gamma1, self.gamma2 = -0.1, .3
         # compute the Einstein radius
         self.thetaE = 1e6*(4.0*np.pi*self.sigmav**2/c**2*dls/ds*180.0/np.pi*3600.0).value
         # eccentricity computation

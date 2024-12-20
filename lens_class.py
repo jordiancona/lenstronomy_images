@@ -14,25 +14,20 @@ except:
 @dataclass
 class lens:
     total_images: int
-    model: str
     
-    def Generate_Images(self, theta_E = 1, images_path = './images/', fits_path = './fits/', **kwargs):
+    def Generate_Images(self, images_path = './images/', fits_path = './fits/', **kwargs):
         self.__dict__.update(kwargs)
-        self.theta_E = theta_E
 
         for _ in range(self.total_images):
-            gamma1, gamma2 = uniform(-0.5,0.5), uniform(-0.5,0.5)
-            e1, e2 = uniform(-0.5,0.5), uniform(-0.5,0.5)
-            center_x, center_y = uniform(-100,100), uniform(-100,100)
 
-            lss.makelens(model = self.model,
-                           theta_E = self.theta_E,
-                           e1 = e1,
-                           e2 = e2,
-                           gamma1 = gamma1,
-                           gamma2 = gamma2,
-                           center_x = center_x,
-                           center_y = center_y)
+            lss.makelens(f = 0.6,
+                sigmav = 200,
+                zl = 0.2,
+                zs = 1.5,
+                gamma1 = -0.01,
+                gamma2 = 0.03,
+                center_x = 0.1,
+                center_y = 0.1,)
 
     def Read_FITS(self, path):
         self.files = []
