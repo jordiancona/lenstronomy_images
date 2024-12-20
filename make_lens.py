@@ -21,12 +21,12 @@ from astropy.constants import c
 
 # lens parameters
 f = 0.8
-sigmav = 100.
+sigmav = 200.
 pa = np.pi/1.0 # position angle in radians
 zl = 0.3 # lens redshift
 zs = 1.5 # source redshift
-center_x = 0.1
-center_y = 0.1
+center_x = 0
+center_y = 0
 
 # lens Einstein radius
 co = FlatLambdaCDM(H0 = 70, Om0 = 0.3)
