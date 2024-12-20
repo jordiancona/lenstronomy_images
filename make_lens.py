@@ -17,7 +17,7 @@ from lenstronomy.LensModel.Solver.lens_equation_solver import LensEquationSolver
 from lenstronomy.LightModel.light_model import LightModel
 from lenstronomy.Data.psf import PSF
 from astropy.cosmology import FlatLambdaCDM
-from astropy.constants import c, G
+from astropy.constants import c
 
 # lens parameters
 f = 0.6
