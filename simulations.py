@@ -16,6 +16,8 @@ import lenstronomy.Plots.plot_util as plot_util
 from lenstronomy.SimulationAPI.sim_api import SimAPI
 from lenstronomy.LightModel.Profiles.gaussian import GaussianEllipse
 from lenstronomy.SimulationAPI.ObservationConfig.LSST import LSST
+from astropy.cosmology import FlatLambdaCDM
+from astropy.constants import c
 
 gauss = GaussianEllipse()
 LSST_g = LSST(band='g', psf_type='GAUSSIAN', coadd_years=10)
@@ -77,15 +79,32 @@ imSim_r = sim_r.image_model_class(kwargs_numerics)
 imSim_i = sim_i.image_model_class(kwargs_numerics)
 
 # g-band
+# lens parameters
+f = 1
+sigmav = 200.
+pa = np.pi/2.0 # position angle in radians
+zl = 0.3 # lens redshift
+zs = 1.5 # source redshift
+center_x = 0
+center_y = 0
+
+# lens Einstein radius
+co = FlatLambdaCDM(H0 = 72, Om0 = 0.3)
+dl = co.angular_diameter_distance(zl)
+ds = co.angular_diameter_distance(zs)
+dls = co.angular_diameter_distance_z1z2(zl,zs)
+
+# compute the Einstein radius
+thetaE = 1e6*(4.0*np.pi*sigmav**2/c**2*dls/ds*180.0/np.pi*3600.0).value
+# eccentricity computation
+e1, e2 = (1-f)/(1+f)*np.cos(-2*pa), (1-f)/(1+f)*np.sin(-2*pa)
 
 # lens light
-kwargs_lens_light_mag_g = [{'magnitude': 14, 'R_sersic': .6, 'n_sersic': 4, 'e1': 0.1, 'e2': -0.1, 'center_x': 0, 'center_y': 0}]
+kwargs_lens_light_mag_g = [{'magnitude': 14, 'R_sersic': .6, 'n_sersic': 4, 'e1': e1, 'e2': e2, 'center_x': center_x, 'center_y': center_y}]
 # source light
 kwargs_source_mag_g = [{'magnitude': 19, 'R_sersic': 0.3, 'n_sersic': 1, 'center_x': 0, 'center_y': 0}] # 'e1': -0.3, 'e2': -0.2
 # point source
 kwargs_ps_mag_g = [{'magnitude': 21, 'ra_source': 0.03, 'dec_source': 0}]
-
-
 
 # and now we define the colors of the other two bands
 
@@ -122,8 +141,8 @@ kwargs_lens_light_r, kwargs_source_r, kwargs_ps_r = sim_r.magnitude2amplitude(kw
 kwargs_lens_light_i, kwargs_source_i, kwargs_ps_i = sim_i.magnitude2amplitude(kwargs_lens_light_mag_i, kwargs_source_mag_i, kwargs_ps_mag_i)
 
 kwargs_lens = [
-    {'theta_E': 2., 'e1': 0.4, 'e2': -0.1, 'center_x': 0, 'center_y': 0},  # SIE model
-    {'gamma1': 0.03, 'gamma2': 0.01, 'ra_0': 0, 'dec_0': 0}  # SHEAR model
+    {'theta_E': thetaE, 'e1': e1, 'e2': e2, 'center_x': center_x, 'center_y': center_y},  # SIE model
+    {'gamma1': 0.01, 'gamma2': 0.1, 'ra_0': 0, 'dec_0': 0}  # SHEAR model
 ]
 
 image_g = imSim_g.image(kwargs_lens, kwargs_source_g, kwargs_lens_light_g, kwargs_ps_g)
