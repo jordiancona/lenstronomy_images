@@ -71,10 +71,10 @@ mag = lensModel.magnification(theta_ra, theta_dec, kwargs_lens)
 
 # set up the list of light models to be used #
 source_light_model_list = ['SERSIC']
-lightModel_source = LightModel(light_model_list=source_light_model_list)
+lightModel_source = LightModel(light_model_list = source_light_model_list)
 
 lens_light_model_list = ['SERSIC_ELLIPSE']
-lightModel_lens = LightModel(light_model_list=lens_light_model_list)
+lightModel_lens = LightModel(light_model_list = lens_light_model_list)
 
 # define the parameters #
 kwargs_light_source = [{'amp': 100, 'R_sersic': 0.1, 'n_sersic': 1.5, 'center_x': beta_ra, 'center_y': beta_dec}]
