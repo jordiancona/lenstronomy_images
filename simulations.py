@@ -203,7 +203,7 @@ img_roman, coords_roman = simulate_rgb(roman, size = size, kwargs_numerics = kwa
 f, ax = plt.subplots(1, 1, figsize=(5, 5))
 #ax = axes[0]
 ax.imshow(img_roman, aspect = 'equal', origin = 'lower', extent=[0, size, 0, size])
-ax.set_title('JWST')
+ax.set_title('Roman')
 # coordinate_arrows(ax, d=1, coords=coords_des, color='w', font_size=15, arrow_size=0.05)
 # scale_bar(ax, d=size, dist=1., text='1"', color='w', font_size=15, flipped=False)
 plt.show()

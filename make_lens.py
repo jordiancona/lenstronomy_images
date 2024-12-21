@@ -25,8 +25,8 @@ sigmav = 200.
 pa = np.pi/1.0 # position angle in radians
 zl = 0.3 # lens redshift
 zs = 1.5 # source redshift
-center_x = 0
-center_y = 0
+center_x = 0.1
+center_y = 0.1
 
 # lens Einstein radius
 co = FlatLambdaCDM(H0 = 70, Om0 = 0.3)
@@ -144,6 +144,7 @@ imageModel = ImageModel(data_class=pixel_grid, psf_class=psf, lens_model_class=l
                         lens_light_model_class=lightModel_lens,
                         point_source_class=None, # in this example, we do not simulate point source.
                         kwargs_numerics=kwargs_numerics)
+
 # simulate image with the parameters we have defined above #
 image = imageModel.image(kwargs_lens=kwargs_lens, kwargs_source=kwargs_light_source,
                          kwargs_lens_light=kwargs_light_lens, kwargs_ps=kwargs_ps)
@@ -155,7 +156,7 @@ poisson = image_util.add_poisson(image, exp_time = exp_time)
 bkg = image_util.add_background(image, sigma_bkd = background_rms)
 image_noisy = image + bkg + poisson
 
-f, axes = plt.subplots(1, 1, figsize=(4, 4), sharex = False, sharey = False)
+f, axes = plt.subplots(1, 1, figsize=(5, 5), sharex = False, sharey = False)
 ax = axes
 ax.matshow(np.log10(image), origin='lower', cmap = 'cividis')
 ax.get_xaxis().set_visible(False)
