@@ -22,17 +22,9 @@ from dataclasses import dataclass
 
 @dataclass
 class Lenses:
-    f: float
-    sigmav: float
-    zl: float = 0.2
-    zs: float = 1.5
-    gamma1: float
-    gamma2: float
-    center_x: float = 0.1
-    center_y: float = 0.1
 
-    def __post_init__(self):
-        # lens Einstein radius
+    def makelens(self):
+
         self.pa = np.pi/4.0
         co = FlatLambdaCDM(H0 = 70, Om0 = 0.3)
         dl = co.angular_diameter_distance(self.zl)
@@ -45,8 +37,6 @@ class Lenses:
         self.thetaE = 1e6*(4.0*np.pi*self.sigmav**2/c**2*dls/ds*180.0/np.pi*3600.0).value
         # eccentricity computation
         self.e1, self.e2 = (1 - self.f)/(1 + self.f)*np.cos(-2*self.pa), (1-self.f)/(1+self.f)*np.sin(-2*self.pa)
-
-    def makelens(self):
         # specify the choice of lens models #
         lens_model_list = ['SIE', 'SHEAR']
 
@@ -181,7 +171,7 @@ class Lenses:
 
         f, axes = plt.subplots(1, 1, figsize=(4, 4), sharex = False, sharey = False)
         ax = axes
-        ax.matshow(np.log10(image), origin='lower', cmap = 'cividis')
+        ax.matshow(np.log10(image), origin='lower', cmap = 'gist_heat')
         ax.get_xaxis().set_visible(False)
         ax.get_yaxis().set_visible(False)
         #axes[1].matshow(np.log10(image_noisy), origin='lower', cmap = 'gray')

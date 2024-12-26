@@ -14,20 +14,35 @@ except:
 @dataclass
 class lens:
     total_images: int
-    
+
+    def LoadParameters(self, filename = 'input.dat'):
+        d = {'f':'f','sigmav':'sigmav','zl':'zl', "zs":'zs', 'gamma1': 'gamma2', 'center_x': 'center_x', 'center_y': 'center_y'}
+        FILE = open(filename)
+        for line in FILE:
+            name, value = line.split("=")
+            value = value.strip()
+            if " " in value:
+                value = map(float, value.split())
+            else:
+                value = float(value)
+            setattr(self, d[name], value)
+
     def Generate_Images(self, images_path = './images/', fits_path = './fits/', **kwargs):
         self.__dict__.update(kwargs)
 
         for _ in range(self.total_images):
+            class F(object):pass
 
-            lss.makelens(f = 0.6,
-                sigmav = 200,
-                zl = 0.2,
-                zs = 1.5,
-                gamma1 = -0.01,
-                gamma2 = 0.03,
-                center_x = 0.1,
-                center_y = 0.1,)
+            file = F()
+            self.LoadParameters(file)
+            lss.makelens(f = file['f'],
+                         sigmav = file['sigmav'],
+                         zl = file['zl'],
+                         zs = file['zs'],
+                         gamma1 =file['gamma1'],
+                         gamma2 = file['gamma2'],
+                         center_x = file['center_x'],
+                         center_y = file['center_y'])
 
     def Read_FITS(self, path):
         self.files = []

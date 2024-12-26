@@ -20,9 +20,9 @@ from astropy.cosmology import FlatLambdaCDM
 from astropy.constants import c
 
 # lens parameters
-f = 0.8
+f = 0.6
 sigmav = 200.
-pa = np.pi/1.0 # position angle in radians
+pa = np.pi/3.0 # position angle in radians
 zl = 0.3 # lens redshift
 zs = 1.5 # source redshift
 center_x = 0.1
@@ -158,7 +158,7 @@ image_noisy = image + bkg + poisson
 
 f, axes = plt.subplots(1, 1, figsize=(5, 5), sharex = False, sharey = False)
 ax = axes
-ax.matshow(np.log10(image), origin='lower', cmap = 'cividis')
+ax.matshow(np.log10(image), origin='lower', cmap = 'gist_heat') # cividis
 ax.get_xaxis().set_visible(False)
 ax.get_yaxis().set_visible(False)
 #axes[1].matshow(np.log10(image_noisy), origin='lower', cmap = 'gray')

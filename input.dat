@@ -1,0 +1,9 @@
+
+f=0.6
+sigmav=200
+zl=0.2
+zs=1.5
+gamma1=-0.01,
+gamma2=0.03
+center_x = 0.1
+center_y = 0.1
