@@ -42,13 +42,14 @@ class lens:
         if len(s) == 2:
             self.center_y = float(s[1])
 
-    def Generate_Images(self, images_path = './images/', fits_path = './fits/', **kwargs):
+    def Generate_Images(self, images_path = './lenses/', fits_path = './fits/', **kwargs):
         self.__dict__.update(kwargs)
         for i in range(self.total_images):
             class F(object): pass
 
             self.LoadParameters()
-            lss.makelens(n = i,
+            lss.makelens(n = i+1,
+                         path = images_path,
                          f = self.f,
                          sigmav = self.sigmav,
                          zl = self.zl,
@@ -67,5 +68,5 @@ class lens:
                 if file.endswith('.fits'):
                     self.files.append(file)
 
-Lens = lens(total_images = 2)
+Lens = lens(total_images = 1)
 Lens.Generate_Images()
