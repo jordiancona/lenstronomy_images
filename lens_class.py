@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 from random import uniform
 from create_lens import Lenses as lss
 from dataclasses import dataclass
+import random as rd
 
 try:
     import lenstronomy as ln
@@ -15,49 +16,19 @@ except:
 class lens:
     total_images: int
 
-    def LoadParameters(self, filename = 'input.dat'):
-        FILE = open(filename)
-        s = FILE.readline().split('=')
-        if len(s) == 2:
-            self.f = float(s[1])
-        s = FILE.readline().split('=')
-        if len(s) == 2:
-            self.sigmav = float(s[1])
-        s = FILE.readline().split('=')
-        if len(s) == 2:
-            self.zl = float(s[1])
-        s = FILE.readline().split('=')
-        if len(s) == 2:
-            self.zs = float(s[1])
-        s = FILE.readline().split('=')
-        if len(s) == 2:
-            self.gamma1 = float(s[1])
-        s = FILE.readline().split('=')
-        if len(s) == 2:
-            self.gamma2 = float(s[1])
-        s = FILE.readline().split('=')
-        if len(s) == 2:
-            self.center_x = float(s[1])
-        s = FILE.readline().split('=')
-        if len(s) == 2:
-            self.center_y = float(s[1])
-
-    def Generate_Images(self, images_path = './lenses/', fits_path = './fits/', **kwargs):
+    def Generate_Train_Images(self, images_path = './lenses/train', fits_path = './fits/', **kwargs):
         self.__dict__.update(kwargs)
         for i in range(self.total_images):
-            class F(object): pass
-
-            self.LoadParameters()
             lss.makelens(n = i+1,
                          path = images_path,
-                         f = self.f,
-                         sigmav = self.sigmav,
-                         zl = self.zl,
-                         zs = self.zs,
-                         gamma1 = self.gamma1,
-                         gamma2 = self.gamma2,
-                         center_x = self.center_x,
-                         center_y = self.center_y)
+                         f = rd.random(),
+                         sigmav = 200,
+                         zl = rd.uniform(0.,1.),
+                         zs = rd.uniform(1.,2.),
+                         gamma1 = rd.uniform(-0.5,0.5),
+                         gamma2 = rd.uniform(-0.5,0.5),
+                         center_x = rd.uniform(0.,0.5),
+                         center_y = rd.uniform(0.,0.5))
 
     def Read_FITS(self, path):
         self.files = []
@@ -68,5 +39,5 @@ class lens:
                 if file.endswith('.fits'):
                     self.files.append(file)
 
-Lens = lens(total_images = 1)
-Lens.Generate_Images()
+Lens = lens(total_images = 10)
+Lens.Generate_Train_Images()
