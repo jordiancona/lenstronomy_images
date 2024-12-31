@@ -189,6 +189,7 @@ class Lenses:
         #axes[1].matshow(np.log10(image_noisy), origin='lower', cmap = 'gray')
         f.tight_layout()
         plt.savefig(self.file_name)
+        plt.clf()
 
     @classmethod
     def Create_FITS(self, path):

@@ -72,6 +72,6 @@ class lens:
         hdu = fits.HDUList([primary_hdu] + images_hdus)
         hdu.writeto('lens_fits.fits', overwrite = True)
 
-Lens = lens(total_images = 10)
+Lens = lens(total_images = 100)
 Lens.Generate_Train_Images()
 Lens.Save_FITS()
