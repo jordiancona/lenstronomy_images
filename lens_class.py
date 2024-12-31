@@ -39,10 +39,10 @@ class lens:
                          sigmav = 200,
                          zl = rd.uniform(0.,1.),
                          zs = rd.uniform(1.,2.),
-                         gamma1 = rd.uniform(-0.2,0.2),
-                         gamma2 = rd.uniform(-0.2,0.2),
-                         center_x = rd.uniform(0.,0.5),
-                         center_y = rd.uniform(0.,0.5))
+                         gamma1 = rd.uniform(-0.2,0.1),
+                         gamma2 = rd.uniform(-0.2,0.1),
+                         center_x = rd.uniform(0.,0.4),
+                         center_y = rd.uniform(0.,0.4))
             
             lss.Create_FITS(path = self.fits_path)
     
