@@ -1,11 +1,13 @@
 
+
+import numpy as np
+import matplotlib.pyplot as plt
+
 try:
     import lenstronomy
 except:
     print('Lenstronomy no está instalado')
 
-import numpy as np
-import matplotlib.pyplot as plt
 from lenstronomy.Util import util
 from lenstronomy.Data.pixel_grid import PixelGrid
 import lenstronomy.Util.image_util as image_util
@@ -20,23 +22,22 @@ from astropy.cosmology import FlatLambdaCDM
 from astropy.constants import c, G
 from dataclasses import dataclass
 
-@dataclass
+#@dataclass
 class Lenses:
-
-    def makelens(self):
-
-        self.pa = np.pi/4.0
+    @classmethod
+    def makelens(self, f, sigmav, zl , zs, gamma1, gamma2, center_x, center_y):
+        pa = np.pi/3.0
         co = FlatLambdaCDM(H0 = 70, Om0 = 0.3)
-        dl = co.angular_diameter_distance(self.zl)
-        ds = co.angular_diameter_distance(self.zs)
-        dls = co.angular_diameter_distance_z1z2(self.zl, self.zs)
+        dl = co.angular_diameter_distance(zl)
+        ds = co.angular_diameter_distance(zs)
+        dls = co.angular_diameter_distance_z1z2(zl, zs)
 
         ## INTEGRAR CALCULOS PARA KAPPA
         ## self.kappa = np.sqrt(self.f)/2.0/
         # compute the Einstein radius
-        self.thetaE = 1e6*(4.0*np.pi*self.sigmav**2/c**2*dls/ds*180.0/np.pi*3600.0).value
+        thetaE = 1e6*(4.0*np.pi*sigmav**2/c**2*dls/ds*180.0/np.pi*3600.0).value
         # eccentricity computation
-        self.e1, self.e2 = (1 - self.f)/(1 + self.f)*np.cos(-2*self.pa), (1-self.f)/(1+self.f)*np.sin(-2*self.pa)
+        e1, e2 = (1 - f)/(1 + f)*np.cos(-2*pa), (1 - f)/(1 + f)*np.sin(-2*pa)
         # specify the choice of lens models #
         lens_model_list = ['SIE', 'SHEAR']
 
@@ -44,13 +45,13 @@ class Lenses:
         lensModel = LensModel(lens_model_list = lens_model_list)
 
         # define parameter values of lens models #
-        kwargs_spep = {'theta_E': self.thetaE, 
-                       'e1': self.e1, 
-                       'e2': self.e2, 
-                       'center_x': self.center_x, 
-                       'center_y': self.center_y}
+        kwargs_spep = {'theta_E': thetaE, 
+                       'e1': e1, 
+                       'e2': e2, 
+                       'center_x': center_x, 
+                       'center_y': center_y}
         
-        kwargs_shear = {'gamma1': self.gamma1, 'gamma2': self.gamma2}
+        kwargs_shear = {'gamma1': gamma1, 'gamma2': gamma2}
         kwargs_lens = [kwargs_spep, kwargs_shear]
 
         # image plane coordinate #
@@ -90,10 +91,10 @@ class Lenses:
         kwargs_light_lens = [{'amp': 1000,
                               'R_sersic': 0.1,
                               'n_sersic': 2.5,
-                              'e1': self.e1,
-                              'e2': self.e2,
-                              'center_x': self.center_x,
-                              'center_y': self.center_y}]
+                              'e1': e1,
+                              'e2': e2,
+                              'center_x': center_x,
+                              'center_y': center_y}]
 
         # evaluate surface brightness at a specific position #
         flux = lightModel_lens.surface_brightness(x = 1, y = 1, kwargs_list = kwargs_light_lens)
