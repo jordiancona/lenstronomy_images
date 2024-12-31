@@ -44,11 +44,12 @@ class lens:
 
     def Generate_Images(self, images_path = './images/', fits_path = './fits/', **kwargs):
         self.__dict__.update(kwargs)
-        for _ in range(self.total_images):
+        for i in range(self.total_images):
             class F(object): pass
 
             self.LoadParameters()
-            lss.makelens(f = self.f,
+            lss.makelens(n = i,
+                         f = self.f,
                          sigmav = self.sigmav,
                          zl = self.zl,
                          zs = self.zs,
@@ -66,5 +67,5 @@ class lens:
                 if file.endswith('.fits'):
                     self.files.append(file)
 
-Lens = lens(total_images = 1)
+Lens = lens(total_images = 2)
 Lens.Generate_Images()

@@ -25,7 +25,7 @@ from dataclasses import dataclass
 #@dataclass
 class Lenses:
     @classmethod
-    def makelens(self, f, sigmav, zl , zs, gamma1, gamma2, center_x, center_y):
+    def makelens(self, n, f, sigmav, zl , zs, gamma1, gamma2, center_x, center_y):
         pa = np.pi/3.0
         co = FlatLambdaCDM(H0 = 70, Om0 = 0.3)
         dl = co.angular_diameter_distance(zl)
@@ -177,4 +177,4 @@ class Lenses:
         ax.get_yaxis().set_visible(False)
         #axes[1].matshow(np.log10(image_noisy), origin='lower', cmap = 'gray')
         f.tight_layout()
-        plt.savefig('lens1.png')
+        plt.savefig(f'lens{n}.png')

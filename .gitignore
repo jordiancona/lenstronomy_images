@@ -5,7 +5,7 @@ ds9.zip
 test2.py
 .python-version
 plots.py
-lens1.png
+*.png
 *.jpg
 
 # directories
