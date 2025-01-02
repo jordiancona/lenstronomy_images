@@ -19,16 +19,13 @@ class lens:
     total_images: int
     train_path: str = './lenses/train/'
     fits_path: str = './fits/'
+    fits_name: str = 'lens_fits.fits'
 
-    def Read_FITS(self, path):
-        self.files = []
-        
-        self.path = path
-        for _ in range(self.total_images):
-            for file in os.listdir(self.path):
-                if file.endswith('.fits'):
-                    self.files.append(file)
-    
+    def Read_FITS(self, n):
+        hdul = fits.open(self.fits_name)
+        file = hdul[n]
+        hdr = file.header
+        print(hdr)
 
     def Generate_Train_Images(self, **kwargs):
         self.__dict__.update(kwargs)
@@ -70,8 +67,9 @@ class lens:
         primary_hdu = fits.PrimaryHDU(header = hdr)
 
         hdu = fits.HDUList([primary_hdu] + images_hdus)
-        hdu.writeto('lens_fits.fits', overwrite = True)
+        hdu.writeto(self.fits_name, overwrite = True)
 
 Lens = lens(total_images = 100)
-Lens.Generate_Train_Images()
-Lens.Save_FITS()
+#Lens.Generate_Train_Images()
+#Lens.Save_FITS()
+#Lens.Read_FITS(2)
