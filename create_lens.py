@@ -212,7 +212,7 @@ class Lenses:
         # Lens parameters
         c1 = fits.Card('theta_E', self.thetaE, 'Einstein Radius')
         c2 = fits.Card('e1', self.e1, 'elipticity1')
-        c3 = fits.Card('e1', self.e2, 'elipticity2')
+        c3 = fits.Card('e2', self.e2, 'elipticity2')
 
         # Shear components
         c4 = fits.Card('gamma1', self.gamma1, 'first shear component')

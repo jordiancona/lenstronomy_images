@@ -23,11 +23,42 @@ class lens:
 
     def Read_FITS(self, n):
         hdul = fits.open(self.fits_name)
-        file = hdul[n]
-        hdr = file.header
-        print(hdr)
+        plt.figure(figsize = (5,5))
+        for i in range(15):
+            data = hdul[i+1].data
+            plt.subplot(5,3,i+1)
+            plt.xticks([])
+            plt.yticks([])
+            plt.grid(False)
+            plt.imshow(data, cmap = 'gray')
+            plt.axis('off')
+        plt.title('Example of lenses')
+        plt.savefig('lenses_images.png')
+        plt.clf()
+    
+    def Train_and_Val(self, ntrain):
+        hdul = fits.open(self.fits_name)
+        self.labels = ['theta_E','e1','e2','gamma1','gamma2','center_x','center_y']
+        self.train_images = []
+        self.train_labels = []
+        for i in range(ntrain):
+            file = hdul[i+1]
+            hdr = file.header
+            self.train_images.append(file.data)
+            self.train_labels.append([hdr['theta_E'],
+                                      hdr['e1'],
+                                      hdr['e2'],
+                                      hdr['gamma1'],
+                                      hdr['gamma2'],
+                                      hdr['center_x'],
+                                      hdr['center_y']])
+        print(self.train_labels)
 
-    def Generate_Train_Images(self, **kwargs):
+    def Predict_parameters(self):
+        pass
+        #train_data = 
+
+    def Generate_Images(self, **kwargs):
         self.__dict__.update(kwargs)
         for i in range(self.total_images):
             lss.makelens(n = i+1,
@@ -70,6 +101,7 @@ class lens:
         hdu.writeto(self.fits_name, overwrite = True)
 
 Lens = lens(total_images = 100)
-#Lens.Generate_Train_Images()
+#Lens.Generate_Images()
 #Lens.Save_FITS()
 #Lens.Read_FITS(2)
+Lens.Train_and_Val(60)
