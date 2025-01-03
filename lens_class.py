@@ -8,6 +8,7 @@ from dataclasses import dataclass
 import random as rd
 import astropy.io.fits as fits
 from time import gmtime, strftime
+from models import alexnet
 
 try:
     import lenstronomy as ln
@@ -20,6 +21,8 @@ class lens:
     train_path: str = './lenses/train/'
     fits_path: str = './fits/'
     fits_name: str = 'lens_fits.fits'
+    batch_size: int = 64
+    input_shape = (400, 400)
 
     # Genera una matriz de las imégenes de lentes gravitacionales para entrenamiento
     def Examples(self, n):
@@ -78,6 +81,7 @@ class lens:
     # Se entrena el modelo
     def Train_and_Val(self):
         pass
+        #alexnet.AlexNet(input_shape = self.input_shape)
         #train_data = 
     
     # Se evalua el modelo
@@ -106,12 +110,8 @@ class lens:
 
     # Se guardan los archivos FITS en un general
     def Save_FITS(self):
-        files = []
         path = self.fits_path
-        for file in os.listdir(path):
-            if file.endswith('.fits'):
-                files.append(file)
-        
+        files = [file for file in os.listdir(path) if file.endswith('.fits')]
         images_hdus = []
 
         for file in files:
@@ -133,7 +133,7 @@ class lens:
 
 Lens = lens(total_images = 100)
 #Lens.Generate_Images()
-#Lens.Save_FIT# Genera una matriz de las imégenes de lentes gravitacionales para entrenamientoS()
+#Lens.Save_FITS()
 #Lens.Examples(2)
 #Lens.Trian_and_Val_Images(60)
 Lens.Generate_Summary()
