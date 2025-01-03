@@ -1,20 +1,31 @@
 
 import os
 import numpy as np
-import matplotlib.pyplot as plt
-from random import uniform
-from create_lens import Lenses as lss
-from dataclasses import dataclass
 import random as rd
-import astropy.io.fits as fits
+import matplotlib.pyplot as plt
+import argparse
 from time import gmtime, strftime
+from create_lens import Lenses as lss
 from models import alexnet
+import tensorflow as tf
+import keras
+from keras.optimizers import Adam # type: ignore
+import astropy.io.fits as fits
+from dataclasses import dataclass
 
 try:
     import lenstronomy as ln
 except:
     print("Lenstronomy not installed!")
 
+parser = argparse.ArgumentParser()
+
+parser.add_argument('-tr', '--train', help = 'Train the DL model.')
+parser.add_argument('-db', '--database', help = 'Generate the images for the training.')
+parser.add_argument('-sh', '--show', help = 'Return an example of the images for the training.')
+parser.add_argument('-sm', '--summary', help = 'Gives a summary of the database.')
+
+args = parser.parse_args()
 @dataclass
 class lens:
     total_images: int
@@ -81,7 +92,12 @@ class lens:
     # Se entrena el modelo
     def Train_and_Val(self):
         pass
-        #alexnet.AlexNet(input_shape = self.input_shape)
+        lr_schedule = keras.optimizers.schedules.ExponentialDecay(initial_learning_rate = 1e-4,
+                                                                  decay_steps = 10000,
+                                                                  decay_rate = 0.9)
+        optimzer = Adam(learning_rate = lr_schedule)
+        model = alexnet.AlexNet(input_shape = self.input_shape)
+        model.compile()
         #train_data = 
     
     # Se evalua el modelo
@@ -132,8 +148,17 @@ class lens:
         hdu.writeto(self.fits_name, overwrite = True)
 
 Lens = lens(total_images = 100)
-#Lens.Generate_Images()
-#Lens.Save_FITS()
-#Lens.Examples(2)
-#Lens.Trian_and_Val_Images(60)
-Lens.Generate_Summary()
+
+if args.train:
+    Lens.Trian_and_Val_Images(60)
+    Lens.Train_and_Val()
+
+if args.database:
+    Lens.Generate_Images()
+    Lens.Save_FITS()
+
+if args.show:
+    Lens.Examples(2)
+
+if args.summary:
+    Lens.Generate_Summary()
