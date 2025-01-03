@@ -21,59 +21,90 @@ class lens:
     fits_path: str = './fits/'
     fits_name: str = 'lens_fits.fits'
 
-    def Read_FITS(self, n):
-        hdul = fits.open(self.fits_name)
-        plt.figure(figsize = (5,5))
-        for i in range(15):
-            data = hdul[i+1].data
-            plt.subplot(5,3,i+1)
-            plt.xticks([])
-            plt.yticks([])
-            plt.grid(False)
-            plt.imshow(data, cmap = 'gray')
-            plt.axis('off')
-        plt.title('Example of lenses')
-        plt.savefig('lenses_images.png')
-        plt.clf()
-    
-    def Train_and_Val(self, ntrain):
-        hdul = fits.open(self.fits_name)
-        self.labels = ['theta_E','e1','e2','gamma1','gamma2','center_x','center_y']
-        self.train_images = []
-        self.train_labels = []
-        for i in range(ntrain):
-            file = hdul[i+1]
-            hdr = file.header
-            self.train_images.append(file.data)
-            self.train_labels.append([hdr['theta_E'],
-                                      hdr['e1'],
-                                      hdr['e2'],
-                                      hdr['gamma1'],
-                                      hdr['gamma2'],
-                                      hdr['center_x'],
-                                      hdr['center_y']])
-        print(self.train_labels)
+    # Genera una matriz de las imégenes de lentes gravitacionales para entrenamiento
+    def Examples(self, n):
+        try:
+            with fits.open(self.fits_name) as hdul:
+                plt.figure(figsize = (5,5))
+                for i in range(15):
+                    data = hdul[i+1].data
+                    plt.subplot(5, 3, i+1)
+                    plt.grid(False)
+                    plt.imshow(data, cmap = 'gray', aspect = 'auto')
+                    plt.axis('off')
+                plt.suptitle('Example of lenses')
+                plt.tight_layout()
+                plt.savefig('lenses_images.png')
+                plt.close()
 
-    def Predict_parameters(self):
+        except FileNotFoundError:
+            print(f"File {self.fits_name} not found.")
+
+    # Guarda las imágenes y etiquetas para entrenamiento y validación
+    def Trian_and_Val_Images(self, ntrain):
+        try:
+            with fits.open(self.fits_name) as hdul:
+                self.labels = ['theta_E','e1','e2','gamma1','gamma2','center_x','center_y']
+                self.train_images = []
+                self.train_labels = []
+                for i in range(ntrain):
+                    file = hdul[i+1]
+                    hdr = file.header
+                    self.train_images.append(file.data)
+                    self.train_labels.append([hdr['theta_E'],
+                                            hdr['e1'],
+                                            hdr['e2'],
+                                            hdr['gamma1'],
+                                            hdr['gamma2'],
+                                            hdr['center_x'],
+                                            hdr['center_y']])
+                print(self.train_labels)
+
+        except FileNotFoundError:
+            print(f"File {self.fits_name} not found.")
+
+    # Da un resumen del archivo general FITS
+    def Generate_Summary(self):
+        try:
+            with fits.open(self.fits_name) as hdul:
+                summary = {"total_images": len(hdul) - 1,
+                           "file_info": hdul.info()}
+                
+                print("Dataset Summary:", summary)
+        
+        except FileNotFoundError:
+            print(f"File {self.fits_name} not found.")
+
+    # Se entrena el modelo
+    def Train_and_Val(self):
         pass
         #train_data = 
+    
+    # Se evalua el modelo
+    def Evaluate(self):
+        pass
 
+    # Se generan las imágenes y archivos FITS
     def Generate_Images(self, **kwargs):
         self.__dict__.update(kwargs)
-        for i in range(self.total_images):
-            lss.makelens(n = i+1,
-                         path = self.train_path,
-                         f = rd.uniform(0.5,1.),
-                         sigmav = 200,
-                         zl = rd.uniform(0.,1.),
-                         zs = rd.uniform(1.,2.),
-                         gamma1 = rd.uniform(-0.2,0.1),
-                         gamma2 = rd.uniform(-0.2,0.1),
-                         center_x = rd.uniform(0.,0.4),
-                         center_y = rd.uniform(0.,0.4))
-            
-            lss.Create_FITS(path = self.fits_path)
-    
+        try:
+            for i in range(self.total_images):
+                lss.makelens(n = i+1,
+                            path = self.train_path,
+                            f = rd.uniform(0.5,1.),
+                            sigmav = 200,
+                            zl = rd.uniform(0.,1.),
+                            zs = rd.uniform(1.,2.),
+                            gamma1 = rd.uniform(-0.2,0.1),
+                            gamma2 = rd.uniform(-0.2,0.1),
+                            center_x = rd.uniform(0.,0.4),
+                            center_y = rd.uniform(0.,0.4))
+                
+                lss.Create_FITS(path = self.fits_path)
+        except:
+            print('Class Lenses not downloaded!')
+
+    # Se guardan los archivos FITS en un general
     def Save_FITS(self):
         files = []
         path = self.fits_path
@@ -102,6 +133,7 @@ class lens:
 
 Lens = lens(total_images = 100)
 #Lens.Generate_Images()
-#Lens.Save_FITS()
-#Lens.Read_FITS(2)
-Lens.Train_and_Val(60)
+#Lens.Save_FIT# Genera una matriz de las imégenes de lentes gravitacionales para entrenamientoS()
+#Lens.Examples(2)
+#Lens.Trian_and_Val_Images(60)
+Lens.Generate_Summary()
