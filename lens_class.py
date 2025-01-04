@@ -19,11 +19,10 @@ except:
     print("Lenstronomy not installed!")
 
 parser = argparse.ArgumentParser()
-
 parser.add_argument('-tr', '--train', action = 'store_true', help = 'Train the DL model.')
 parser.add_argument('-db', '--database', action = 'store_true', help = 'Generate the images for the training.')
 parser.add_argument('-sh', '--show', action = 'store_true', help = 'Return an example of the images for the training.')
-parser.add_argument('-sm', '--summary', action = 'store_true', help = 'Gives a summary of the database.')
+parser.add_argument('-sm', '--summary', action = 'store_true', help = 'Gives a summary of the dataset.')
 
 args = parser.parse_args()
 
@@ -40,12 +39,12 @@ class lens:
     def Examples(self, n):
         try:
             with fits.open(self.fits_name) as hdul:
-                plt.figure(figsize = (5,5))
-                for i in range(15):
+                plt.figure(figsize = (6,6))
+                for i in range(9):
                     data = hdul[i+1].data
-                    plt.subplot(5, 3, i+1)
+                    plt.subplot(3, 3, i+1)
                     plt.grid(False)
-                    plt.imshow(data, cmap = 'gray', aspect = 'auto')
+                    plt.imshow(data, cmap = 'gist_heat', aspect = 'auto')
                     plt.axis('off')
                 plt.suptitle('Example of lenses')
                 plt.tight_layout()
@@ -110,9 +109,9 @@ class lens:
         lr_schedule = keras.optimizers.schedules.ExponentialDecay(initial_learning_rate = 1e-4,
                                                                   decay_steps = 10000,
                                                                   decay_rate = 0.9)
-        optimizer = Adam(learning_rate = lr_schedule)
+        optimizer = Adam(learning_rate = lr_schedule) # 'adam', 'sgd'
         self.model = alexnet.AlexNet(input_shape = self.input_shape)
-        self.model.compile(optimizer = optimizer, # 'adam', 'sgd'
+        self.model.compile(optimizer = optimizer,
                            loss = 'mean_squared_error',
                            metrics = ['mae'])
         history = self.model.fit(self.train_images, epochs = 100, validation_data = self.val_images)
