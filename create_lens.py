@@ -166,15 +166,17 @@ class Lenses:
         kwargs_numerics = {'supersampling_factor': 1, # each pixel gets super-sampled (in each axis direction) 
                         'supersampling_convolution': False}
         # initialize the Image model class by combining the modules we created above #
-        imageModel = ImageModel(data_class=pixel_grid, psf_class=psf, lens_model_class=lensModel,
-                                source_model_class=lightModel_source,
-                                lens_light_model_class=lightModel_lens,
-                                point_source_class=None, # in this example, we do not simulate point source.
-                                kwargs_numerics=kwargs_numerics)
+        imageModel = ImageModel(data_class = pixel_grid,
+                                psf_class = psf,
+                                lens_model_class = lensModel,
+                                source_model_class = lightModel_source,
+                                lens_light_model_class = lightModel_lens,
+                                point_source_class = None, # in this example, we do not simulate point source.
+                                kwargs_numerics = kwargs_numerics)
         
         # simulate image with the parameters we have defined above #
-        image = imageModel.image(kwargs_lens=kwargs_lens, kwargs_source=kwargs_light_source,
-                                kwargs_lens_light=kwargs_light_lens, kwargs_ps=kwargs_ps)
+        image = imageModel.image(kwargs_lens = kwargs_lens, kwargs_source = kwargs_light_source,
+                                kwargs_lens_light = kwargs_light_lens, kwargs_ps = kwargs_ps)
 
         # image with noise
         exp_time = 100  # exposure time to quantify the Poisson noise level

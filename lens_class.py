@@ -20,12 +20,13 @@ except:
 
 parser = argparse.ArgumentParser()
 
-parser.add_argument('-tr', '--train', help = 'Train the DL model.')
-parser.add_argument('-db', '--database', help = 'Generate the images for the training.')
-parser.add_argument('-sh', '--show', help = 'Return an example of the images for the training.')
-parser.add_argument('-sm', '--summary', help = 'Gives a summary of the database.')
+parser.add_argument('-tr', '--train', action = 'store_true', help = 'Train the DL model.')
+parser.add_argument('-db', '--database', action = 'store_true', help = 'Generate the images for the training.')
+parser.add_argument('-sh', '--show', action = 'store_true', help = 'Return an example of the images for the training.')
+parser.add_argument('-sm', '--summary', action = 'store_true', help = 'Gives a summary of the database.')
 
 args = parser.parse_args()
+
 @dataclass
 class lens:
     total_images: int
@@ -61,6 +62,9 @@ class lens:
                 self.labels = ['theta_E','e1','e2','gamma1','gamma2','center_x','center_y']
                 self.train_images = []
                 self.train_labels = []
+                self.val_images = []
+                self.val_labels = []
+
                 for i in range(ntrain):
                     file = hdul[i+1]
                     hdr = file.header
@@ -72,7 +76,18 @@ class lens:
                                             hdr['gamma2'],
                                             hdr['center_x'],
                                             hdr['center_y']])
-                print(self.train_labels)
+                #print(self.train_labels)
+                for i in range(ntrain, self.total_images):
+                    file = hdul[i]
+                    hdr = file.header
+                    self.val_images.append(file.data)
+                    self.val_labels.append([hdr['theta_E'],
+                                            hdr['e1'],
+                                            hdr['e2'],
+                                            hdr['gamma1'],
+                                            hdr['gamma2'],
+                                            hdr['center_x'],
+                                            hdr['center_y']])
 
         except FileNotFoundError:
             print(f"File {self.fits_name} not found.")
@@ -95,14 +110,19 @@ class lens:
         lr_schedule = keras.optimizers.schedules.ExponentialDecay(initial_learning_rate = 1e-4,
                                                                   decay_steps = 10000,
                                                                   decay_rate = 0.9)
-        optimzer = Adam(learning_rate = lr_schedule)
-        model = alexnet.AlexNet(input_shape = self.input_shape)
-        model.compile()
-        #train_data = 
+        optimizer = Adam(learning_rate = lr_schedule)
+        self.model = alexnet.AlexNet(input_shape = self.input_shape)
+        self.model.compile(optimizer = optimizer, # 'adam', 'sgd'
+                           loss = 'mean_squared_error',
+                           metrics = ['mae'])
+        history = self.model.fit(self.train_images, epochs = 100, validation_data = self.val_images)
     
     # Se evalua el modelo
     def Evaluate(self):
-        pass
+        test_loss, test_mae = self.model.evaluate(self.test_images)
+        print(f"Test Loss: {test_loss}, Test MAE: {test_mae}")
+
+        predictions = self.model.predict(self.test_images)
 
     # Se generan las imágenes y archivos FITS
     def Generate_Images(self, **kwargs):
