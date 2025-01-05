@@ -31,7 +31,7 @@ args = parser.parse_args()
 class lens:
     total_images: int
     train_path: str = './lenses/train/'
-    val_path: str = './lenses/val/'
+    test_path: str = './lenses/test/'
     fits_path: str = './fits/'
     fits_name: str = './lens_fits.fits'
     batch_size: int = 64
@@ -61,19 +61,12 @@ class lens:
         try:
             with fits.open(self.fits_name) as hdul:
                 self.labels = ['theta_E','e1','e2','gamma1','gamma2','center_x','center_y']
-                total_images = len(hdul) - 1
-                indices = np.arange(1,total_images)
-                np.random.shuffle(indices)
-
-                train_indices = indices[:ntrain]
-                val_indices = indices[ntrain:]
                 self.train_labels = []
-                self.val_labels = []                
+                self.val_labels = []
 
-                for idx in train_indices:
+                for idx in range(self.total_images):
                     file = hdul[idx+1]
                     hdr = file.header
-                    np.save(os.path.join(self.train_path, f'train_{idx+1}.npy'), file.data)
                     self.train_labels.append([hdr['theta_E'],
                                             hdr['e1'],
                                             hdr['e2'],
@@ -81,18 +74,31 @@ class lens:
                                             hdr['gamma2'],
                                             hdr['center_x'],
                                             hdr['center_y']])
-                #print(self.train_labels)
-                for idx in val_indices:
-                    file = hdul[idx]
-                    hdr = file.header
-                    np.save(os.path.join(self.val_path, f'train_{idx+1}.npy'), file.data)
-                    self.val_labels.append([hdr['theta_E'],
-                                            hdr['e1'],
-                                            hdr['e2'],
-                                            hdr['gamma1'],
-                                            hdr['gamma2'],
-                                            hdr['center_x'],
-                                            hdr['center_y']])
+                
+            self.train_df = tf.keras.utils.image_dataset_from_directory(
+                self.train_path,
+                validation_split = 0.2,
+                subset = 'training',
+                seed = 123,
+                image_size = self.input_shape,
+                batch_size = self.batch_size
+            )
+            '''
+            self.val_df = tf.keras.utils.image_dataset_from_directory(
+                self.train_path,
+                validation_split = 0.2,
+                subset = 'validation',
+                seed = 123,
+                image_size = self.input_shape,
+                batch_size = self.batch_size
+            )
+
+            self.test_df = tf.keras.preprocessing.image_dataset_from_directory(
+                self.test_path,
+                seed = 123,
+                image_size = self.input_shape,
+                batch_size = self.batch_size,
+            )'''
 
         except FileNotFoundError:
             print(f"File {self.fits_name} not found (train_and_val_images).")
@@ -120,11 +126,11 @@ class lens:
         self.model.compile(optimizer = optimizer,
                            loss = 'mean_squared_error',
                            metrics = ['mae'])
-        history = self.model.fit(self.train_images, epochs = 100, validation_data = self.val_images)
+        history = self.model.fit(self.train_df, epochs = 100, validation_data = self.val_df)
     
     # Se evalua el modelo
     def Evaluate(self):
-        test_loss, test_mae = self.model.evaluate(self.test_images)
+        test_loss, test_mae = self.model.evaluate()
         print(f"Test Loss: {test_loss}, Test MAE: {test_mae}")
 
         predictions = self.model.predict(self.test_images)
@@ -134,7 +140,7 @@ class lens:
         self.__dict__.update(kwargs)
         for i in range(self.total_images):
             lss.makelens(n = i+1,
-                        path = './lenses/',
+                        path = './lenses/train/lenses/',
                         f = rd.uniform(0.5,1.),
                         sigmav = 200,
                         zl = rd.uniform(0.,1.),
