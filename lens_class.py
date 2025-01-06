@@ -35,7 +35,7 @@ class lens:
     fits_path: str = './fits/'
     fits_name: str = './lens_fits.fits'
     batch_size: int = 64
-    input_shape = (400, 400)
+    input_shape = (400, 400, 1)
 
     # Genera una matriz de las imégenes de lentes gravitacionales para entrenamiento
     def Examples(self):
@@ -128,6 +128,7 @@ class lens:
         self.model.compile(optimizer = optimizer,
                            loss = 'mean_squared_error',
                            metrics = ['mae'])
+        
         history = self.model.fit(self.train_df, epochs = 100, validation_data = self.val_df)
     
     # Se evalua el modelo
