@@ -30,7 +30,8 @@ args = parser.parse_args()
 @dataclass
 class lens:
     total_images: int
-    train_path: str = './lenses/train/'
+    train_path: str = './lenses/train/lenses'
+    val_path: str = './lenses/val/lenses'
     test_path: str = './lenses/test/'
     fits_path: str = './fits/'
     fits_name: str = './lens_fits.fits'
@@ -65,6 +66,7 @@ class lens:
                 np.random.shuffle(indices)
 
                 ntrain = self.total_images - self.total_images*val_porentage
+                ntrain = int(ntrain)
                 train_indices = indices[:ntrain]
                 val_indices = indices[ntrain:]
 
@@ -76,8 +78,7 @@ class lens:
                 for idx in train_indices:
                     file = hdul[idx+1]
                     hdr = file.header
-                    data = file.data / 255.
-                    train_images.append(data)
+                    plt.savefig(f'{self.train_path}train_{idx+1}.png')
                     train_labels.append([hdr['theta_E'],
                                             hdr['e1'],
                                             hdr['e2'],
@@ -89,8 +90,8 @@ class lens:
                 for idx in val_indices:
                     file = hdul[idx+1]
                     hdr = file.header
-                    data = file.data / 255.
-                    val_images.append(data)
+                    plt.imshow(file.data)
+                    plt.savefig(f'{self.val_path}val_{idx+1}.png')
                     val_labels.append([hdr['theta_E'],
                                             hdr['e1'],
                                             hdr['e2'],
@@ -98,10 +99,11 @@ class lens:
                                             hdr['gamma2'],
                                             hdr['center_x'],
                                             hdr['center_y']])
-                
-                self.train_df = [{'images':img,'labels':label} for img, label, in zip(train_images, train_labels)]
-                self.val_df = [{'images':img,'labels':label} for img, label, in zip(val_images, val_labels)]
-
+            
+                #traind_data_generator = tf.keras.preprocessing.ImageDataGenerator()
+                #train_df = [{'images':img,'labels':label} for img, label, in zip(train_images, train_labels)]
+                #val_df = [{'images':img,'labels':label} for img, label, in zip(val_images, val_labels)]
+        
         except FileNotFoundError:
             print(f"File {self.fits_name} not found (train_and_val_images).")
 
@@ -109,8 +111,7 @@ class lens:
     def Generate_Summary(self):
         try:
             with fits.open(self.fits_name) as hdul:
-                summary = {"total_images": len(hdul) - 1,
-                           "file_info": hdul.info()}
+                summary = {'total_images': len(hdul) - 1, 'file_info': hdul.info()}
                 
                 print("Dataset Summary:", summary)
         
@@ -119,17 +120,13 @@ class lens:
 
     # Se entrena el modelo
     def Train_and_Val(self):
-        pass
-        lr_schedule = keras.optimizers.schedules.ExponentialDecay(initial_learning_rate = 1e-4,
-                                                                  decay_steps = 10000,
-                                                                  decay_rate = 0.9)
-        optimizer = Adam(learning_rate = lr_schedule) # 'adam', 'sgd'
+        optimizer = Adam(learning_rate = 1e-4) # 'adam', 'sgd'
         self.model = alexnet.AlexNet(input_shape = self.input_shape)
         self.model.compile(optimizer = optimizer,
                            loss = 'mean_squared_error',
                            metrics = ['mae'])
-        
-        history = self.model.fit(self.train_df, epochs = 100, validation_data = self.val_df)
+
+        history = self.model.fit_generator(train_df, epochs = 100, validation_data = val_df)
     
     # Se evalua el modelo
     def Evaluate(self):
@@ -143,7 +140,7 @@ class lens:
         self.__dict__.update(kwargs)
         for i in range(self.total_images):
             lss.makelens(n = i+1,
-                        path = './lenses/train/lenses/',
+                        path = './lenses/',
                         f = rd.uniform(0.5,1.),
                         sigmav = 200,
                         zl = rd.uniform(0.,1.),
@@ -185,7 +182,7 @@ if args.train:
 if args.database:
     Lens_instance.Generate_Images()
     Lens_instance.Save_FITS()
-    Lens_instance.Train_and_Val_Images(60)
+    Lens_instance.Train_and_Val_Images(0.2)
 
 if args.show:
     Lens_instance.Examples()
