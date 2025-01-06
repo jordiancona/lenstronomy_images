@@ -30,8 +30,8 @@ args = parser.parse_args()
 @dataclass
 class lens:
     total_images: int
-    train_path: str = './lenses/train/lenses'
-    val_path: str = './lenses/val/lenses'
+    train_path: str = './lenses/train/lenses/'
+    val_path: str = './lenses/val/lenses/'
     test_path: str = './lenses/test/'
     fits_path: str = './fits/'
     fits_name: str = './lens_fits.fits'
@@ -63,7 +63,6 @@ class lens:
             with fits.open(self.fits_name) as hdul:
                 self.labels = ['theta_E','e1','e2','gamma1','gamma2','center_x','center_y']
                 indices = np.arange(self.total_images)
-                np.random.shuffle(indices)
 
                 ntrain = self.total_images - self.total_images*val_porentage
                 ntrain = int(ntrain)
@@ -78,7 +77,10 @@ class lens:
                 for idx in train_indices:
                     file = hdul[idx+1]
                     hdr = file.header
+                    plt.imshow(file.data, cmap = 'gist_heat')
+                    plt.axis('off')
                     plt.savefig(f'{self.train_path}train_{idx+1}.png')
+                    plt.close()
                     train_labels.append([hdr['theta_E'],
                                             hdr['e1'],
                                             hdr['e2'],
@@ -90,8 +92,10 @@ class lens:
                 for idx in val_indices:
                     file = hdul[idx+1]
                     hdr = file.header
-                    plt.imshow(file.data)
+                    plt.imshow(file.data, cmap = 'gist_heat')
+                    plt.axis('off')
                     plt.savefig(f'{self.val_path}val_{idx+1}.png')
+                    plt.close()
                     val_labels.append([hdr['theta_E'],
                                             hdr['e1'],
                                             hdr['e2'],
