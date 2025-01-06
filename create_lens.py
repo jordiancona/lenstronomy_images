@@ -186,7 +186,7 @@ class Lenses:
         image_noisy = image + bkg + poisson
 
         f, ax = plt.subplots(1, 1, figsize=(4, 4), sharex = False, sharey = False)
-        ax.matshow(np.log10(image), origin='lower', cmap = 'gist_heat')
+        ax.matshow(np.log10(image), origin = 'lower', cmap = 'gist_heat')
         ax.get_xaxis().set_visible(False)
         ax.get_yaxis().set_visible(False)
         #axes[1].matshow(np.log10(image_noisy), origin='lower', cmap = 'gray')

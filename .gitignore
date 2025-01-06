@@ -17,3 +17,4 @@ pyautolens_test.py
 root.log
 models
 lenses
+__pycache__/

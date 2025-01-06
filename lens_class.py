@@ -57,51 +57,50 @@ class lens:
             print(f"File {self.fits_name} not found.")
 
     # Guarda las imágenes y etiquetas para entrenamiento y validación
-    def Train_and_Val_Images(self, ntrain):
+    def Train_and_Val_Images(self, val_porentage):
         try:
             with fits.open(self.fits_name) as hdul:
                 self.labels = ['theta_E','e1','e2','gamma1','gamma2','center_x','center_y']
-                total_images = len(hdul) - 1
-                indices = np.arange(total_images)
+                indices = np.arange(self.total_images)
                 np.random.shuffle(indices)
 
+                ntrain = self.total_images - self.total_images*val_porentage
                 train_indices = indices[:ntrain]
                 val_indices = indices[ntrain:]
 
-                self.train_df = []
-                self.train_labels = []
-                self.val_df = []
-                self.val_labels = []
+                train_images = []
+                val_images = []
+                train_labels = []
+                val_labels = []
 
                 for idx in train_indices:
                     file = hdul[idx+1]
                     hdr = file.header
-                    self.train_df.append(file.data)
-                    self.train_labels.append([hdr['theta_E'],
+                    data = file.data / 255.
+                    train_images.append(data)
+                    train_labels.append([hdr['theta_E'],
                                             hdr['e1'],
                                             hdr['e2'],
                                             hdr['gamma1'],
                                             hdr['gamma2'],
                                             hdr['center_x'],
                                             hdr['center_y']])
-
-                print(len(self.train_df))
-            '''
-            self.val_df = tf.keras.utils.image_dataset_from_directory(
-                self.train_path,
-                validation_split = 0.2,
-                subset = 'validation',
-                seed = 123,
-                image_size = self.input_shape,
-                batch_size = self.batch_size
-            )
-
-            self.test_df = tf.keras.preprocessing.image_dataset_from_directory(
-                self.test_path,
-                seed = 123,
-                image_size = self.input_shape,
-                batch_size = self.batch_size,
-            )'''
+                
+                for idx in val_indices:
+                    file = hdul[idx+1]
+                    hdr = file.header
+                    data = file.data / 255.
+                    val_images.append(data)
+                    val_labels.append([hdr['theta_E'],
+                                            hdr['e1'],
+                                            hdr['e2'],
+                                            hdr['gamma1'],
+                                            hdr['gamma2'],
+                                            hdr['center_x'],
+                                            hdr['center_y']])
+                
+                self.train_df = [{'images':img,'labels':label} for img, label, in zip(train_images, train_labels)]
+                self.val_df = [{'images':img,'labels':label} for img, label, in zip(val_images, val_labels)]
 
         except FileNotFoundError:
             print(f"File {self.fits_name} not found (train_and_val_images).")
