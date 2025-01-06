@@ -61,12 +61,22 @@ class lens:
         try:
             with fits.open(self.fits_name) as hdul:
                 self.labels = ['theta_E','e1','e2','gamma1','gamma2','center_x','center_y']
+                total_images = len(hdul) - 1
+                indices = np.arange(total_images)
+                np.random.shuffle(indices)
+
+                train_indices = indices[:ntrain]
+                val_indices = indices[ntrain:]
+
+                self.train_df = []
                 self.train_labels = []
+                self.val_df = []
                 self.val_labels = []
 
-                for idx in range(self.total_images):
+                for idx in train_indices:
                     file = hdul[idx+1]
                     hdr = file.header
+                    self.train_df.append(file.data)
                     self.train_labels.append([hdr['theta_E'],
                                             hdr['e1'],
                                             hdr['e2'],
@@ -74,15 +84,8 @@ class lens:
                                             hdr['gamma2'],
                                             hdr['center_x'],
                                             hdr['center_y']])
-                
-            self.train_df = tf.keras.utils.image_dataset_from_directory(
-                self.train_path,
-                validation_split = 0.2,
-                subset = 'training',
-                seed = 123,
-                image_size = self.input_shape,
-                batch_size = self.batch_size
-            )
+
+                print(len(self.train_df))
             '''
             self.val_df = tf.keras.utils.image_dataset_from_directory(
                 self.train_path,
