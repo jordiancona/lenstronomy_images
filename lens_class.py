@@ -30,8 +30,8 @@ args = parser.parse_args()
 @dataclass
 class lens:
     total_images: int
-    train_path: str = './lenses/train/lenses/'
-    val_path: str = './lenses/val/lenses/'
+    train_path: str = './lenses/train/'
+    val_path: str = './lenses/val/'
     test_path: str = './lenses/test/'
     fits_path: str = './fits/'
     fits_name: str = './lens_fits.fits'
@@ -103,8 +103,22 @@ class lens:
                                             hdr['gamma2'],
                                             hdr['center_x'],
                                             hdr['center_y']])
-            
-                #traind_data_generator = tf.keras.preprocessing.ImageDataGenerator()
+
+                train_data_generator = tf.keras.preprocessing.image.ImageDataGenerator(rescale = 1./255)
+
+                train_df = train_data_generator.flow_from_directory(
+                    self.train_path,
+                    target_size = (400,400),
+                    batch_size = self.batch_size,
+                    class_mode = None
+                )
+
+                val_df = train_data_generator.flow_from_directory(
+                    self.train_path,
+                    target_size = (400,400),
+                    batch_size = self.batch_size,
+                    class_mode = None
+                )
                 #train_df = [{'images':img,'labels':label} for img, label, in zip(train_images, train_labels)]
                 #val_df = [{'images':img,'labels':label} for img, label, in zip(val_images, val_labels)]
         
@@ -144,7 +158,7 @@ class lens:
         self.__dict__.update(kwargs)
         for i in range(self.total_images):
             lss.makelens(n = i+1,
-                        path = './lenses/',
+                        path = './lenses/images/',
                         f = rd.uniform(0.5,1.),
                         sigmav = 200,
                         zl = rd.uniform(0.,1.),
