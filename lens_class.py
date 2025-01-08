@@ -104,26 +104,11 @@ class lens:
                                             hdr['center_x'],
                                             hdr['center_y']])
 
-                train_data_generator = tf.keras.preprocessing.image.ImageDataGenerator(rescale = 1./255)
-
-                train_df = train_data_generator.flow_from_directory(
-                    self.train_path,
-                    target_size = (400,400),
-                    batch_size = self.batch_size,
-                    class_mode = None
-                )
-
-                val_df = train_data_generator.flow_from_directory(
-                    self.train_path,
-                    target_size = (400,400),
-                    batch_size = self.batch_size,
-                    class_mode = None
-                )
                 #train_df = [{'images':img,'labels':label} for img, label, in zip(train_images, train_labels)]
                 #val_df = [{'images':img,'labels':label} for img, label, in zip(val_images, val_labels)]
         
         except FileNotFoundError:
-            print(f"File {self.fits_name} not found (train_and_val_images).")
+            print(f"File {self.fits_name} not found.")
 
     # Da un resumen del archivo general FITS
     def Generate_Summary(self):
@@ -138,13 +123,31 @@ class lens:
 
     # Se entrena el modelo
     def Train_and_Val(self):
+        train_data_generator = tf.keras.preprocessing.image.ImageDataGenerator(rescale = 1./255)
+
+        train_df = train_data_generator.flow_from_directory(
+            self.train_path,
+            target_size = (400,400),
+            batch_size = self.batch_size,
+            class_mode = None,
+            shuffle = True
+        )
+
+        val_df = train_data_generator.flow_from_directory(
+            self.train_path,
+            target_size = (400,400),
+            batch_size = self.batch_size,
+            class_mode = None,
+            shuffle = True
+        )
+        
         optimizer = Adam(learning_rate = 1e-4) # 'adam', 'sgd'
         self.model = alexnet.AlexNet(input_shape = self.input_shape)
         self.model.compile(optimizer = optimizer,
                            loss = 'mean_squared_error',
                            metrics = ['mae'])
 
-        history = self.model.fit_generator(train_df, epochs = 100, validation_data = val_df)
+        history = self.model.fit(train_df, epochs = 100, validation_data = val_df)
     
     # Se evalua el modelo
     def Evaluate(self):
