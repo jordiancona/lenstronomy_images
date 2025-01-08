@@ -13,6 +13,8 @@ import keras
 from keras.optimizers import Adam # type: ignore
 import astropy.io.fits as fits
 from dataclasses import dataclass
+from PIL import Image
+from sklearn.model_selection import train_test_split
 
 try:
     import lenstronomy as ln
@@ -30,13 +32,13 @@ args = parser.parse_args()
 @dataclass
 class lens:
     total_images: int
-    train_path: str = './lenses/train/'
-    val_path: str = './lenses/val/'
-    test_path: str = './lenses/test/'
+    train_path: str = './dataset/train/lenses/'
+    val_path: str = './dataset/val/lenses/'
+    test_path: str = './dataset/test/'
     fits_path: str = './fits/'
     fits_name: str = './lens_fits.fits'
     batch_size: int = 64
-    input_shape = (400, 400, 1)
+    input_shape = (400, 400, 3)
 
     # Genera una matriz de las imégenes de lentes gravitacionales para entrenamiento
     def Examples(self):
@@ -59,57 +61,7 @@ class lens:
 
     # Guarda las imágenes y etiquetas para entrenamiento y validación
     def Train_and_Val_Images(self, val_porentage):
-        try:
-            with fits.open(self.fits_name) as hdul:
-                self.labels = ['theta_E','e1','e2','gamma1','gamma2','center_x','center_y']
-                indices = np.arange(self.total_images)
-
-                ntrain = self.total_images - self.total_images*val_porentage
-                ntrain = int(ntrain)
-                train_indices = indices[:ntrain]
-                val_indices = indices[ntrain:]
-
-                train_images = []
-                val_images = []
-                train_labels = []
-                val_labels = []
-
-                for idx in train_indices:
-                    file = hdul[idx+1]
-                    hdr = file.header
-                    plt.imshow(file.data, cmap = 'gist_heat')
-                    plt.axis('off')
-                    plt.savefig(f'{self.train_path}train_{idx+1}.png')
-                    plt.close()
-                    train_labels.append([hdr['theta_E'],
-                                            hdr['e1'],
-                                            hdr['e2'],
-                                            hdr['gamma1'],
-                                            hdr['gamma2'],
-                                            hdr['center_x'],
-                                            hdr['center_y']])
-                
-                for idx in val_indices:
-                    file = hdul[idx+1]
-                    hdr = file.header
-                    plt.imshow(file.data, cmap = 'gist_heat')
-                    plt.axis('off')
-                    plt.savefig(f'{self.val_path}val_{idx+1}.png')
-                    plt.close()
-                    val_labels.append([hdr['theta_E'],
-                                            hdr['e1'],
-                                            hdr['e2'],
-                                            hdr['gamma1'],
-                                            hdr['gamma2'],
-                                            hdr['center_x'],
-                                            hdr['center_y']])
-
-                #train_df = [{'images':img,'labels':label} for img, label, in zip(train_images, train_labels)]
-                #val_df = [{'images':img,'labels':label} for img, label, in zip(val_images, val_labels)]
-        
-        except FileNotFoundError:
-            print(f"File {self.fits_name} not found.")
-
+        pass
     # Da un resumen del archivo general FITS
     def Generate_Summary(self):
         try:
@@ -123,31 +75,46 @@ class lens:
 
     # Se entrena el modelo
     def Train_and_Val(self):
-        train_data_generator = tf.keras.preprocessing.image.ImageDataGenerator(rescale = 1./255)
+        try:
+            with fits.open(self.fits_name) as hdul:
+                self.labels = ['theta_E','e1','e2','gamma1','gamma2','center_x','center_y']
 
-        train_df = train_data_generator.flow_from_directory(
-            self.train_path,
-            target_size = (400,400),
-            batch_size = self.batch_size,
-            class_mode = None,
-            shuffle = True
-        )
+                train_lbs = []
+                train_images = []
 
-        val_df = train_data_generator.flow_from_directory(
-            self.train_path,
-            target_size = (400,400),
-            batch_size = self.batch_size,
-            class_mode = None,
-            shuffle = True
-        )
+                for idx in range(self.total_images):
+                    file = hdul[idx+1]
+                    hdr = file.header
+                    plt.imshow(file.data, cmap = 'gist_heat')
+                    plt.axis('off')
+                    plt.savefig(f'{self.train_path}lens_{idx+1}.png')
+                    plt.close()
+                    train_lbs.append([hdr['theta_E'],
+                                            hdr['e1'],
+                                            hdr['e2'],
+                                            hdr['gamma1'],
+                                            hdr['gamma2'],
+                                            hdr['center_x'],
+                                            hdr['center_y']])
+
+                for file in os.listdir(self.train_path):
+                    if file.endswith('.png'):
+                        img = Image.open(file)
+                        train_images.append(np.asarray(img))
+
+                train_df, val_df, train_labels, val_labels = train_test_split(train_images, train_lbs, test_size = 0.2, random_state = 42)
+                #train_df = [{'images':img,'labels':label} for img, label, in zip(train_images, train_labels)]
+                #val_df = [{'images':img,'labels':label} for img, label, in zip(val_images, val_labels)]
+                optimizer = Adam(learning_rate = 1e-4) # 'adam', 'sgd'
+                self.model = alexnet.AlexNet(input_shape = self.input_shape)
+                self.model.compile(optimizer = optimizer,
+                            loss = 'mean_squared_error',
+                            metrics = ['mae'])
         
-        optimizer = Adam(learning_rate = 1e-4) # 'adam', 'sgd'
-        self.model = alexnet.AlexNet(input_shape = self.input_shape)
-        self.model.compile(optimizer = optimizer,
-                           loss = 'mean_squared_error',
-                           metrics = ['mae'])
+                history = self.model.fit(train_df, train_labels, epochs = 100, validation_data = (val_df, val_labels))
 
-        history = self.model.fit(train_df, epochs = 100, validation_data = val_df)
+        except FileNotFoundError:
+            print(f"File {self.fits_name} not found.")
     
     # Se evalua el modelo
     def Evaluate(self):
@@ -161,7 +128,7 @@ class lens:
         self.__dict__.update(kwargs)
         for i in range(self.total_images):
             lss.makelens(n = i+1,
-                        path = './lenses/images/',
+                        path = './dataset/images/',
                         f = rd.uniform(0.5,1.),
                         sigmav = 200,
                         zl = rd.uniform(0.,1.),
@@ -203,7 +170,6 @@ if args.train:
 if args.database:
     Lens_instance.Generate_Images()
     Lens_instance.Save_FITS()
-    Lens_instance.Train_and_Val_Images(0.2)
 
 if args.show:
     Lens_instance.Examples()
