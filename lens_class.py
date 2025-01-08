@@ -26,6 +26,7 @@ parser.add_argument('-tr', '--train', action = 'store_true', help = 'Train the D
 parser.add_argument('-db', '--database', action = 'store_true', help = 'Generate the images for training.')
 parser.add_argument('-sh', '--show', action = 'store_true', help = 'Return an example of the images for the training.')
 parser.add_argument('-sm', '--summary', action = 'store_true', help = 'Gives a summary of the dataset.')
+parser.add_argument('-ev', '--evaluate', action = 'store_true', help = 'Evaluate the model.')
 
 args = parser.parse_args()
 
@@ -38,7 +39,7 @@ class lens:
     fits_path: str = './fits/'
     fits_name: str = './lens_fits.fits'
     batch_size: int = 64
-    input_shape = (400, 400, 3)
+    input_shape = (480, 640, 4)
 
     # Genera una matriz de las imégenes de lentes gravitacionales para entrenamiento
     def Examples(self):
@@ -59,9 +60,6 @@ class lens:
         except FileNotFoundError:
             print(f"File {self.fits_name} not found.")
 
-    # Guarda las imágenes y etiquetas para entrenamiento y validación
-    def Train_and_Val_Images(self, val_porentage):
-        pass
     # Da un resumen del archivo general FITS
     def Generate_Summary(self):
         try:
@@ -75,50 +73,59 @@ class lens:
 
     # Se entrena el modelo
     def Train_and_Val(self):
-        try:
-            with fits.open(self.fits_name) as hdul:
-                self.labels = ['theta_E','e1','e2','gamma1','gamma2','center_x','center_y']
+        with fits.open(self.fits_name) as hdul:
+            self.labels = ['theta_E','e1','e2','gamma1','gamma2','center_x','center_y']
 
-                train_lbs = []
-                train_images = []
+            train_lbs = []
+            train_images = []
+            for idx in range(self.total_images):
+                file = hdul[idx+1]
+                hdr = file.header
+                plt.imshow(file.data, cmap = 'gist_heat')
+                plt.axis('off')
+                plt.savefig(f'{self.train_path}lens_{idx+1}.png')
+                plt.close()
+                train_lbs.append([hdr['theta_E'],
+                                        hdr['e1'],
+                                        hdr['e2'],
+                                        hdr['gamma1'],
+                                        hdr['gamma2'],
+                                        hdr['center_x'],
+                                        hdr['center_y']])
 
-                for idx in range(self.total_images):
-                    file = hdul[idx+1]
-                    hdr = file.header
-                    plt.imshow(file.data, cmap = 'gist_heat')
-                    plt.axis('off')
-                    plt.savefig(f'{self.train_path}lens_{idx+1}.png')
-                    plt.close()
-                    train_lbs.append([hdr['theta_E'],
-                                            hdr['e1'],
-                                            hdr['e2'],
-                                            hdr['gamma1'],
-                                            hdr['gamma2'],
-                                            hdr['center_x'],
-                                            hdr['center_y']])
+            for file in os.listdir(self.train_path):
+                if file.endswith('.png'):
+                    img = Image.open(os.path.join(self.train_path, file))
+                    train_images.append(np.asarray(img))
 
-                for file in os.listdir(self.train_path):
-                    if file.endswith('.png'):
-                        img = Image.open(file)
-                        train_images.append(np.asarray(img))
+            train_images, train_lbs = np.array(train_images), np.array(train_lbs)
+            train_df, val_df, train_labels, val_labels = train_test_split(train_images, train_lbs, test_size = 0.33, random_state = 42)
+            train_df, val_df = train_df / 255., val_df / 255.
+            train_labels, val_labels = np.array(train_labels), np.array(val_labels)
 
-                train_df, val_df, train_labels, val_labels = train_test_split(train_images, train_lbs, test_size = 0.2, random_state = 42)
-                #train_df = [{'images':img,'labels':label} for img, label, in zip(train_images, train_labels)]
-                #val_df = [{'images':img,'labels':label} for img, label, in zip(val_images, val_labels)]
-                optimizer = Adam(learning_rate = 1e-4) # 'adam', 'sgd'
-                self.model = alexnet.AlexNet(input_shape = self.input_shape)
-                self.model.compile(optimizer = optimizer,
-                            loss = 'mean_squared_error',
-                            metrics = ['mae'])
-        
-                history = self.model.fit(train_df, train_labels, epochs = 100, validation_data = (val_df, val_labels))
+            optimizer = Adam(learning_rate = 1e-4) # 'adam', 'sgd'
+            model = alexnet.AlexNet(input_shape = self.input_shape)
+            model.compile(optimizer = optimizer,
+                          loss = 'mean_squared_error',
+                          metrics = ['mae'])
+    
+            history = model.fit(train_df, train_labels, epochs = 10, validation_data = (val_df, val_labels))
 
-        except FileNotFoundError:
-            print(f"File {self.fits_name} not found.")
+            plt.figure()
+            plt.plot(history.history['mae'], label = f'Trainning mae', c = 'k', lw = 0.8)
+            plt.plot(history.history['val_mae'], label = f'Validation mae', c = 'r', lw = 0.8)
+            plt.title('MAE')
+            plt.xlabel('epoch')
+            plt.ylabel('mae')
+            plt.legend()
+            plt.show()
+
+            return model
     
     # Se evalua el modelo
     def Evaluate(self):
-        test_loss, test_mae = self.model.evaluate()
+        model = self.Train_and_Val()
+        test_loss, test_mae = model.evaluate()
         print(f"Test Loss: {test_loss}, Test MAE: {test_mae}")
 
         predictions = self.model.predict(self.test_images)
@@ -164,8 +171,6 @@ class lens:
         hdu.writeto(self.fits_name, overwrite = True)
 
 Lens_instance = lens(total_images = 100)
-if args.train:
-    Lens_instance.Train_and_Val()
 
 if args.database:
     Lens_instance.Generate_Images()
@@ -176,3 +181,9 @@ if args.show:
 
 if args.summary:
     Lens_instance.Generate_Summary()
+
+if args.train:
+    Lens_instance.Train_and_Val()
+
+if args.evaluate:
+    Lens_instance.Evaluate()
