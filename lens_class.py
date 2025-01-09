@@ -107,14 +107,14 @@ class lens:
         except FileNotFoundError:
             print(f"File {self.fits_name} not found.")
     # Se entrena el modelo
-    def Train_and_Val(self):
+    def Train_and_Val(self, epochs):
         optimizer = Adam(learning_rate = 1e-4) # 'adam', 'sgd'
         self.model = alexnet.AlexNet(input_shape = self.input_shape)
         self.model.compile(optimizer = optimizer,
                         loss = 'mean_squared_error',
                         metrics = ['mae'])
 
-        self.history = self.model.fit(self.train_df, self.train_labels, epochs = 10, validation_data = (self.val_df, self.val_labels))
+        self.history = self.model.fit(self.train_df, self.train_labels, epochs = epochs, validation_data = (self.val_df, self.val_labels))
         self.Plot_Results()
     
     # Se evalua el modelo
@@ -158,7 +158,7 @@ class lens:
         images_hdus = []
 
         for file in files:
-            with fits.open(path + file) as hdul:
+            with fits.open(path + file, mode = 'denywrite') as hdul:
                 if not isinstance(hdul[0], fits.ImageHDU):
                     image_hdu = fits.ImageHDU(header = hdul[0].header , data = hdul[0].data)
                     images_hdus.append(image_hdu)
@@ -188,7 +188,7 @@ if args.summary:
 
 if args.train:
     Lens_instance.Train_and_Val_Images()
-    Lens_instance.Train_and_Val()
+    Lens_instance.Train_and_Val(100)
 
 if args.evaluate:
     Lens_instance.Evaluate()
