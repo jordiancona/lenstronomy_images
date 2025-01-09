@@ -191,7 +191,7 @@ class Lenses:
         ax.get_yaxis().set_visible(False)
         #axes[1].matshow(np.log10(image_noisy), origin='lower', cmap = 'gray')
         f.tight_layout()
-        plt.savefig(self.file_name)
+        plt.savefig(self.file_name, bbox_inches = "tight")
         plt.close()
 
     # Se crean los archivos FITS a partir de los PNG
