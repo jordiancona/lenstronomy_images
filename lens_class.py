@@ -8,8 +8,6 @@ import argparse
 from time import gmtime, strftime
 from create_lens import Lenses as lss
 from models import alexnet
-import tensorflow as tf
-import keras
 from keras.optimizers import Adam # type: ignore
 import astropy.io.fits as fits
 from dataclasses import dataclass
@@ -30,7 +28,6 @@ parser.add_argument('-ev', '--evaluate', action = 'store_true', help = 'Evaluate
 
 args = parser.parse_args()
 
-#@dataclass
 class lens:
     def __init__(self, total_images):
         self.total_images = total_images
@@ -101,6 +98,7 @@ class lens:
         
         except FileNotFoundError:
             print(f"File {self.fits_name} not found.")
+    
     # Se entrena el modelo
     def Train_and_Val(self, epochs):
         optimizer = Adam(learning_rate = 1e-4) # 'adam', 'sgd'

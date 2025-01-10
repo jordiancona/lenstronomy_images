@@ -13,7 +13,6 @@ except:
 from lenstronomy.Util import util
 from lenstronomy.Data.pixel_grid import PixelGrid
 import lenstronomy.Util.image_util as image_util
-#from lenstronomy.Util import param_util
 from lenstronomy.ImSim.image_model import ImageModel
 from lenstronomy.PointSource.point_source import PointSource
 from lenstronomy.LensModel.lens_model import LensModel
@@ -22,7 +21,7 @@ from lenstronomy.LightModel.light_model import LightModel
 from lenstronomy.Data.psf import PSF
 import astropy.io.fits as fits
 from astropy.cosmology import FlatLambdaCDM
-from astropy.constants import c, G
+from astropy.constants import c
 from dataclasses import dataclass
 
 @dataclass
