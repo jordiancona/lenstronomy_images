@@ -25,7 +25,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('-db', '--database', action = 'store_true', help = 'Generate the images for training.')
 parser.add_argument('-sh', '--show', action = 'store_true', help = 'Return an example of the images for the training.')
 parser.add_argument('-sm', '--summary', action = 'store_true', help = 'Gives a summary of the dataset.')
-parser.add_argument('-tr', '--train', action = 'store_true', help = 'Train the DL model.')
+parser.add_argument('-tr', '--train', help = 'Train the DL model.')
 parser.add_argument('-ev', '--evaluate', action = 'store_true', help = 'Evaluate the model.')
 
 args = parser.parse_args()
@@ -87,13 +87,7 @@ class lens:
                     plt.margins(0,0)
                     plt.savefig(f'{self.train_path}lens_{idx+1}.png', bbox_inches = "tight")
                     plt.close()
-                    train_lbs.append([hdr['theta_E'],
-                                            hdr['e1'],
-                                            hdr['e2'],
-                                            hdr['gamma1'],
-                                            hdr['gamma2'],
-                                            hdr['center_x'],
-                                            hdr['center_y']])
+                    train_lbs.append([hdr[label] for label in self.labels])
 
                 for file in os.listdir(self.train_path):
                     if file.endswith('.png'):
@@ -104,6 +98,7 @@ class lens:
                 self.train_df, self.val_df, self.train_labels, self.val_labels = train_test_split(train_images, train_lbs, test_size = 0.33, random_state = 42)
                 self.train_df, self.val_df = self.train_df / 255., self.val_df / 255.
                 self.train_labels, self.val_labels = np.array(self.train_labels), np.array(self.val_labels)
+        
         except FileNotFoundError:
             print(f"File {self.fits_name} not found.")
     # Se entrena el modelo
@@ -158,12 +153,10 @@ class lens:
         images_hdus = []
 
         for file in files:
-            with fits.open(path + file, mode = 'denywrite') as hdul:
-                if not isinstance(hdul[0], fits.ImageHDU):
-                    image_hdu = fits.ImageHDU(header = hdul[0].header , data = hdul[0].data)
-                    images_hdus.append(image_hdu)
-                else:
-                    images_hdus.append(hdul[0].copy())
+            with fits.open(path + file, lazy_load = True) as hdul:
+                for hdu in hdul:
+                    if isinstance(hdu, fits.ImageHDU):
+                        images_hdus.append(hdu.copy())
 
         first_file_time = strftime('%Y-%m-%d %H:%M:%S', gmtime())
         hdr = fits.Header()
@@ -174,7 +167,7 @@ class lens:
         hdu = fits.HDUList([primary_hdu] + images_hdus)
         hdu.writeto(self.fits_name, overwrite = True)
 
-Lens_instance = lens(total_images = 100)
+Lens_instance = lens(total_images = 300)
 
 if args.database:
     Lens_instance.Generate_Images()
@@ -188,7 +181,7 @@ if args.summary:
 
 if args.train:
     Lens_instance.Train_and_Val_Images()
-    Lens_instance.Train_and_Val(100)
+    Lens_instance.Train_and_Val(int(args.train))
 
 if args.evaluate:
     Lens_instance.Evaluate()
