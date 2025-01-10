@@ -37,9 +37,6 @@ class Lenses:
         dls = co.angular_diameter_distance_z1z2(zl, zs)
 
         self.file_name = f'{path}lens{n+1}.png'
-
-        ## INTEGRAR CALCULOS PARA KAPPA
-        ## self.kappa = np.sqrt(self.f)/2.0/
         
         # Einstein radius
         self.thetaE = 1e6*(4.0*np.pi*sigmav**2/c**2*dls/ds*180.0/np.pi*3600.0).value
