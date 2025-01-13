@@ -49,11 +49,8 @@ class lens:
                 for i in range(9):
                     file = hdul[i+1]
                     data = file.data
-                    hdr = file.header
                     plt.subplot(3, 3, i+1)
                     plt.grid(False)
-                    #for idx in range(len(self.labels)):
-                    #    plt.text(1, idx/10, f'{self.labels[idx]} = {hdr[self.labels[idx]]} \\')
                     plt.imshow(data, cmap = 'gist_heat', aspect = 'auto')
                     plt.axis('off')
                 plt.suptitle('Example of lenses')
@@ -173,7 +170,7 @@ class lens:
         hdu = fits.HDUList([primary_hdu] + images_hdus)
         hdu.writeto(self.fits_name, overwrite = True)
 
-Lens_instance = lens(total_images = 100)
+Lens_instance = lens(total_images = 500)
 
 if args.database:
     Lens_instance.Generate_Images()
