@@ -8,6 +8,7 @@ plots.py
 *.png
 *.jpg
 *.fits
+clean_data.sh
 
 # directories
 images/

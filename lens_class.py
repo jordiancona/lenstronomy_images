@@ -25,6 +25,7 @@ parser.add_argument('-sh', '--show', action = 'store_true', help = 'Return an ex
 parser.add_argument('-sm', '--summary', action = 'store_true', help = 'Gives a summary of the dataset.')
 parser.add_argument('-tr', '--train', help = 'Train the DL model.')
 parser.add_argument('-ev', '--evaluate', action = 'store_true', help = 'Evaluate the model.')
+parser.add_argument('-sv', '--save', action = 'store_true', help = 'Save the model.')
 
 args = parser.parse_args()
 
@@ -36,6 +37,7 @@ class lens:
         self.test_path = './dataset/test/'
         self.fits_path = './fits/'
         self.fits_name = './lens_fits.fits'
+        self.labels = ['theta_E','e1','e2','gamma1','gamma2','center_x','center_y']
         self.batch_size = 64
         self.input_shape = (389, 389, 4)
 
@@ -45,9 +47,13 @@ class lens:
             with fits.open(self.fits_name) as hdul:
                 plt.figure(figsize = (6,6))
                 for i in range(9):
-                    data = hdul[i+1].data
+                    file = hdul[i+1]
+                    data = file.data
+                    hdr = file.header
                     plt.subplot(3, 3, i+1)
                     plt.grid(False)
+                    #for idx in range(len(self.labels)):
+                    #    plt.text(1, idx/10, f'{self.labels[idx]} = {hdr[self.labels[idx]]} \\')
                     plt.imshow(data, cmap = 'gist_heat', aspect = 'auto')
                     plt.axis('off')
                 plt.suptitle('Example of lenses')
@@ -69,11 +75,10 @@ class lens:
         except FileNotFoundError:
             print(f"File {self.fits_name} not found.")
 
+    # Genera la base de datos para entrenamiento y validación
     def Train_and_Val_Images(self):
         try:
             with fits.open(self.fits_name) as hdul:
-                self.labels = ['theta_E','e1','e2','gamma1','gamma2','center_x','center_y']
-
                 train_lbs = []
                 train_images = []
                 for idx in range(self.total_images):
@@ -109,6 +114,9 @@ class lens:
 
         self.history = self.model.fit(self.train_df, self.train_labels, epochs = epochs, validation_data = (self.val_df, self.val_labels))
         self.Plot_Results()
+
+    def Save_model(self):
+        self.model.save('./cnn_model/my_model.h5')
     
     # Se evalua el modelo
     def Evaluate(self):
@@ -165,7 +173,7 @@ class lens:
         hdu = fits.HDUList([primary_hdu] + images_hdus)
         hdu.writeto(self.fits_name, overwrite = True)
 
-Lens_instance = lens(total_images = 300)
+Lens_instance = lens(total_images = 100)
 
 if args.database:
     Lens_instance.Generate_Images()
