@@ -26,7 +26,6 @@ parser.add_argument('-sm', '--summary', action = 'store_true', help = 'Gives a s
 parser.add_argument('-tr', '--train', help = 'Train the DL model.')
 parser.add_argument('-ev', '--evaluate', action = 'store_true', help = 'Evaluate the model.')
 parser.add_argument('-sv', '--save', action = 'store_true', help = 'Save the model.')
-
 args = parser.parse_args()
 
 class lens:
@@ -112,6 +111,7 @@ class lens:
         self.history = self.model.fit(self.train_df, self.train_labels, epochs = epochs, validation_data = (self.val_df, self.val_labels))
         self.Plot_Results()
 
+    # Se guarda el modelo
     def Save_model(self):
         self.model.save('./cnn_model/my_model.h5')
     
@@ -130,7 +130,7 @@ class lens:
         plt.xlabel('epoch')
         plt.ylabel('mae')
         plt.legend()
-        plt.show()
+        plt.savefig('mae.png')
     
     # Se generan las imágenes y archivos FITS
     def Generate_Images(self, **kwargs):
