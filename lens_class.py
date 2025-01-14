@@ -4,6 +4,7 @@ import os
 import numpy as np
 import random as rd
 import matplotlib.pyplot as plt
+import cv2
 import argparse
 from time import gmtime, strftime
 from create_lens import Lenses as lss
@@ -11,7 +12,6 @@ from models import alexnet
 from keras.optimizers import Adam # type: ignore
 import astropy.io.fits as fits
 from dataclasses import dataclass
-from PIL import Image
 from sklearn.model_selection import train_test_split
 
 try:
@@ -38,7 +38,7 @@ class lens:
         self.fits_name = './lens_fits.fits'
         self.labels = ['theta_E','e1','e2','gamma1','gamma2','center_x','center_y']
         self.batch_size = 64
-        self.input_shape = (389, 389, 4)
+        self.input_shape = (389, 389, 1)
 
     # Genera una matriz de las imégenes de lentes gravitacionales para entrenamiento
     def Examples(self):
@@ -80,7 +80,7 @@ class lens:
                 for idx in range(self.total_images):
                     file = hdul[idx+1]
                     hdr = file.header
-                    plt.imshow(file.data, cmap = 'gist_heat')
+                    plt.imshow(file.data, cmap = 'gray')
                     plt.axis('off')
                     plt.margins(0,0)
                     plt.savefig(f'{self.train_path}lens_{idx+1}.png', bbox_inches = "tight")
@@ -89,9 +89,14 @@ class lens:
 
                 for file in os.listdir(self.train_path):
                     if file.endswith('.png'):
-                        img = Image.open(os.path.join(self.train_path, file))
-                        train_images.append(np.asarray(img))
+                        img = cv2.imread(os.path.join(self.train_path, file), 0)
+                        #img_yuv = cv2.cvtColor(img, cv2.COLOR_BGR2YUV)
+                        #img_yuv[:,:,0] = cv2.equalizeHist(img_yuv[:,:,0])
+                        #img_equ = cv2.cvtColor(img_yuv, cv2.COLOR_YUV2BGR)
+                        img_equ = cv2.equalizeHist(img)
+                        train_images.append(np.asarray(img_equ))
 
+                cv2.imwrite('equalized_image.png', train_images[0])
                 train_images, train_lbs = np.array(train_images), np.array(train_lbs)
                 self.train_df, self.val_df, self.train_labels, self.val_labels = train_test_split(train_images, train_lbs, test_size = 0.33, random_state = 42)
                 self.train_df, self.val_df = self.train_df / 255., self.val_df / 255.
