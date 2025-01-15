@@ -35,8 +35,8 @@ class Lenses:
         ds = co.angular_diameter_distance(zs)
         dls = co.angular_diameter_distance_z1z2(zl, zs)
 
-        self.file_name = f'{path}lens{n+1}.png'
-        
+        self.file_name = f'lens{n+1}.png'
+        self.path = path
         # Einstein radius
         self.thetaE = 1e6*(4.0*np.pi*sigmav**2/c**2*dls/ds*180.0/np.pi*3600.0).value
         
@@ -187,7 +187,7 @@ class Lenses:
         ax.get_yaxis().set_visible(False)
         #axes[1].matshow(np.log10(image_noisy), origin='lower', cmap = 'gray')
         f.tight_layout()
-        plt.savefig(self.file_name, bbox_inches = "tight")
+        plt.savefig(path+self.file_name, bbox_inches = "tight")
         plt.close()
 
     # Se crean los archivos FITS a partir de los PNG
@@ -197,7 +197,7 @@ class Lenses:
         inbase_name, inbase_ext = os.path.splitext(os.path.basename(file))
         outfile = path + inbase_name + '.fits'
 
-        inimage = imageio.imread(file, mode = 'F')
+        inimage = imageio.imread(self.path + file, mode = 'F')
         outimage = np.flipud(inimage)
 
         file_time = strftime('%Y-%m-%d %H:%M:%S', gmtime())

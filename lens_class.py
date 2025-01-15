@@ -29,18 +29,17 @@ parser.add_argument('-ev', '--evaluate', action = 'store_true', help = 'Evaluate
 parser.add_argument('-sv', '--save', action = 'store_true', help = 'Save the model.')
 args = parser.parse_args()
 
-class lens:
+class Lens:
     def __init__(self, total_images):
         self.total_images = total_images
         self.train_path = './dataset/train/lenses/'
         self.val_path = './dataset/val/lenses/'
         self.test_path = './dataset/test/'
-        self.images_path = './dataset/images/'
         self.fits_path = './fits/'
         self.fits_name = './lens_fits.fits'
         self.labels = ['theta_E','e1','e2','gamma1','gamma2','center_x','center_y']
         self.batch_size = 64
-        self.input_shape = (389, 389, 4)
+        self.input_shape = (390, 390, 4)
 
     # Genera una matriz de las imégenes de lentes gravitacionales para entrenamiento
     def Examples(self):
@@ -67,9 +66,8 @@ class lens:
         try:
             with fits.open(self.fits_name) as hdul:
                 summary = {'total_images': len(hdul) - 1, 'file_info': hdul.info()}
-                
                 print("Dataset Summary:", summary)
-        
+                
         except FileNotFoundError:
             print(f"File {self.fits_name} not found.")
 
@@ -79,28 +77,14 @@ class lens:
             with fits.open(self.fits_name) as hdul:
                 train_lbs = []
                 train_images = []
-                images_names = []
+
                 for idx in range(self.total_images):
                     file = hdul[idx+1]
                     hdr = file.header
-                    file_name = hdr['NAME'].replace(self.images_path, '')
-                    plt.imshow(file.data, cmap = 'gist_heat')
-                    plt.axis('off')
-                    plt.margins(0,0)
-                    plt.savefig(f'{self.train_path}{file_name}', bbox_inches = 'tight')
-                    plt.close()
+                    file_name = hdr['NAME']
                     train_lbs.append([hdr[label] for label in self.labels])
-                    images_names.append(file_name)
-
-                for file in images_names:
-                    if file.endswith('.png'):
-                        img = Image.open(os.path.join(self.train_path, file))
-                        #img = cv2.imread(os.path.join(self.train_path, file), 0)
-                        #img_yuv = cv2.cvtColor(img, cv2.COLOR_BGR2YUV)
-                        #img_yuv[:,:,0] = cv2.equalizeHist(img_yuv[:,:,0])
-                        #img_equ = cv2.cvtColor(img_yuv, cv2.COLOR_YUV2BGR)
-                        #img_equ = cv2.equalizeHist(img)
-                        train_images.append(np.asarray(img))
+                    img = Image.open(os.path.join(self.train_path, file_name))
+                    train_images.append(np.asarray(img))
 
                 train_images, train_lbs = np.array(train_images), np.array(train_lbs)
                 self.train_df, self.val_df, self.train_labels, self.val_labels = train_test_split(train_images, train_lbs, test_size = 0.33, random_state = 42)
@@ -119,7 +103,8 @@ class lens:
                            metrics = ['mae'])
 
         self.history = self.model.fit(self.train_df, self.train_labels, epochs = epochs, validation_data = (self.val_df, self.val_labels))
-        self.Plot_Results()
+        self.Plot_Results('mae')
+        self.Plot_Results('loss')
 
     # Se guarda el modelo
     def Save_model(self):
@@ -132,22 +117,23 @@ class lens:
 
         #predictions = self.model.predict(self.test_images)
 
-    def Plot_Results(self):
+    def Plot_Results(self, metric):
         plt.figure()
-        plt.plot(self.history.history['mae'], label = f'Trainning mae', c = 'k', lw = 0.8)
-        plt.plot(self.history.history['val_mae'], label = f'Validation mae', c = 'r', lw = 0.8)
-        plt.title('MAE')
+        plt.plot(self.history.history[f'{metric}'], label = f'Trainning {metric}', c = 'k', lw = 0.8)
+        plt.plot(self.history.history[f'val_{metric}'], label = f'Validation {metric}', c = 'r', lw = 0.8)
+        plt.title(metric.upper())
         plt.xlabel('epoch')
-        plt.ylabel('mae')
+        plt.ylabel(metric)
         plt.legend()
-        plt.savefig('mae.png')
+        plt.savefig(f'{metric.upper()}.png')
+        plt.close()
     
     # Se generan las imágenes y archivos FITS
     def Generate_Images(self, **kwargs):
         self.__dict__.update(kwargs)
         for i in range(self.total_images):
             lss.makelens(n = i,
-                        path = self.images_path,
+                        path = self.train_path,
                         f = rd.uniform(0.5,1.),
                         sigmav = 200,
                         zl = rd.uniform(0.,1.),
@@ -180,7 +166,7 @@ class lens:
         hdu = fits.HDUList([primary_hdu] + images_hdus)
         hdu.writeto(self.fits_name, overwrite = True)
 
-Lens_instance = lens(total_images = 500)
+Lens_instance = Lens(total_images = 100)
 
 if args.database:
     Lens_instance.Generate_Images()
