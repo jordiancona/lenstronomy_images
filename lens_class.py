@@ -33,7 +33,6 @@ class Lens:
     def __init__(self, total_images):
         self.total_images = total_images
         self.train_path = './dataset/train/lenses/'
-        self.val_path = './dataset/val/lenses/'
         self.test_path = './dataset/test/'
         self.fits_path = './fits/'
         self.fits_name = './lens_fits.fits'
