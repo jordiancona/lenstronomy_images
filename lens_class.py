@@ -5,6 +5,7 @@ import numpy as np
 import random as rd
 import matplotlib.pyplot as plt
 import cv2
+from PIL import Image
 import argparse
 from time import gmtime, strftime
 from create_lens import Lenses as lss
@@ -34,11 +35,12 @@ class lens:
         self.train_path = './dataset/train/lenses/'
         self.val_path = './dataset/val/lenses/'
         self.test_path = './dataset/test/'
+        self.images_path = './dataset/images/'
         self.fits_path = './fits/'
         self.fits_name = './lens_fits.fits'
         self.labels = ['theta_E','e1','e2','gamma1','gamma2','center_x','center_y']
         self.batch_size = 64
-        self.input_shape = (389, 389, 1)
+        self.input_shape = (389, 389, 4)
 
     # Genera una matriz de las imégenes de lentes gravitacionales para entrenamiento
     def Examples(self):
@@ -77,26 +79,29 @@ class lens:
             with fits.open(self.fits_name) as hdul:
                 train_lbs = []
                 train_images = []
+                images_names = []
                 for idx in range(self.total_images):
                     file = hdul[idx+1]
                     hdr = file.header
-                    plt.imshow(file.data, cmap = 'gray')
+                    file_name = hdr['NAME'].replace(self.images_path, '')
+                    plt.imshow(file.data, cmap = 'gist_heat')
                     plt.axis('off')
                     plt.margins(0,0)
-                    plt.savefig(f'{self.train_path}lens_{idx+1}.png', bbox_inches = "tight")
+                    plt.savefig(f'{self.train_path}{file_name}', bbox_inches = 'tight')
                     plt.close()
                     train_lbs.append([hdr[label] for label in self.labels])
+                    images_names.append(file_name)
 
-                for file in os.listdir(self.train_path):
+                for file in images_names:
                     if file.endswith('.png'):
-                        img = cv2.imread(os.path.join(self.train_path, file), 0)
+                        img = Image.open(os.path.join(self.train_path, file))
+                        #img = cv2.imread(os.path.join(self.train_path, file), 0)
                         #img_yuv = cv2.cvtColor(img, cv2.COLOR_BGR2YUV)
                         #img_yuv[:,:,0] = cv2.equalizeHist(img_yuv[:,:,0])
                         #img_equ = cv2.cvtColor(img_yuv, cv2.COLOR_YUV2BGR)
-                        img_equ = cv2.equalizeHist(img)
-                        train_images.append(np.asarray(img_equ))
+                        #img_equ = cv2.equalizeHist(img)
+                        train_images.append(np.asarray(img))
 
-                cv2.imwrite('equalized_image.png', train_images[0])
                 train_images, train_lbs = np.array(train_images), np.array(train_lbs)
                 self.train_df, self.val_df, self.train_labels, self.val_labels = train_test_split(train_images, train_lbs, test_size = 0.33, random_state = 42)
                 self.train_df, self.val_df = self.train_df / 255., self.val_df / 255.
@@ -110,8 +115,8 @@ class lens:
         optimizer = Adam(learning_rate = 1e-4) # 'adam', 'sgd'
         self.model = alexnet.AlexNet(input_shape = self.input_shape)
         self.model.compile(optimizer = optimizer,
-                        loss = 'mean_squared_error',
-                        metrics = ['mae'])
+                           loss = 'mean_squared_error',
+                           metrics = ['mae'])
 
         self.history = self.model.fit(self.train_df, self.train_labels, epochs = epochs, validation_data = (self.val_df, self.val_labels))
         self.Plot_Results()
@@ -142,7 +147,7 @@ class lens:
         self.__dict__.update(kwargs)
         for i in range(self.total_images):
             lss.makelens(n = i,
-                        path = './dataset/images/',
+                        path = self.images_path,
                         f = rd.uniform(0.5,1.),
                         sigmav = 200,
                         zl = rd.uniform(0.,1.),
