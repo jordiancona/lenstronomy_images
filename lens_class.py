@@ -39,7 +39,7 @@ class Lens:
     def Examples(self):
         try:
             with fits.open(self.fits_name) as hdul:
-                plt.figure(figsize = (10,10))
+                plt.figure(figsize = (10,8))
                 for i in range(9):
                     file = hdul[i+1]
                     hdr = file.header
@@ -48,14 +48,14 @@ class Lens:
                     plt.grid(False)
                     plt.imshow(data, cmap = 'gist_heat', aspect = 'auto')
                     text_values = [f'{label}: {hdr[label]:.2}' for label in self.labels]
-                    y_start = 15
-                    y_step = 5
+                    y_start = 195
+                    y_step = 25
                     for j, text in enumerate(text_values):
-                        plt.text(5, y_start - j * y_step, text, fontsize = 8, ha = 'left')
+                        plt.text(400, y_start - j * y_step, text, fontsize = 8, ha = 'left')
                     plt.axis('off')
                 plt.suptitle('Example of lenses')
                 plt.tight_layout()
-                plt.savefig('lenses_images.png')#, bbox_inches = "tight")
+                plt.savefig('lenses_images.png', bbox_inches = "tight")
                 plt.close()
 
         except FileNotFoundError:
