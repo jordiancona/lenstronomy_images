@@ -15,11 +15,6 @@ import astropy.io.fits as fits
 from dataclasses import dataclass
 from sklearn.model_selection import train_test_split
 
-try:
-    import lenstronomy as ln
-except:
-    print("Lenstronomy not installed!")
-
 parser = argparse.ArgumentParser()
 parser.add_argument('-db', '--database', action = 'store_true', help = 'Generate the images for training.')
 parser.add_argument('-sh', '--show', action = 'store_true', help = 'Return an example of the images for the training.')
@@ -44,17 +39,23 @@ class Lens:
     def Examples(self):
         try:
             with fits.open(self.fits_name) as hdul:
-                plt.figure(figsize = (6,6))
+                plt.figure(figsize = (10,10))
                 for i in range(9):
                     file = hdul[i+1]
+                    hdr = file.header
                     data = file.data
                     plt.subplot(3, 3, i+1)
                     plt.grid(False)
                     plt.imshow(data, cmap = 'gist_heat', aspect = 'auto')
+                    text_values = [f'{label}: {hdr[label]:.2}' for label in self.labels]
+                    y_start = 15
+                    y_step = 5
+                    for j, text in enumerate(text_values):
+                        plt.text(5, y_start - j * y_step, text, fontsize = 8, ha = 'left')
                     plt.axis('off')
                 plt.suptitle('Example of lenses')
                 plt.tight_layout()
-                plt.savefig('lenses_images.png', bbox_inches = "tight")
+                plt.savefig('lenses_images.png')#, bbox_inches = "tight")
                 plt.close()
 
         except FileNotFoundError:

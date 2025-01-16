@@ -4,12 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import imageio
 from time import gmtime, strftime
-
-try:
-    import lenstronomy
-except:
-    print('Lenstronomy no está instalado')
-
+import lenstronomy
 from lenstronomy.Util import util
 from lenstronomy.Data.pixel_grid import PixelGrid
 import lenstronomy.Util.image_util as image_util
