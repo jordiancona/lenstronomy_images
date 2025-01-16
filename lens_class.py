@@ -97,7 +97,7 @@ class Lens:
     # Se entrena el modelo
     def Train_and_Val(self, epochs):
         optimizer = Adam(learning_rate = 1e-4) # 'adam', 'sgd'
-        self.model = alexnet.AlexNet(input_shape = self.input_shape)
+        self.model = alexnet.AlexNet(input_shape = self.input_shape, classes = 7)
         self.model.compile(optimizer = optimizer,
                            loss = 'mean_squared_error',
                            metrics = ['mae'])
@@ -116,7 +116,7 @@ class Lens:
         print(f"Test Loss: {test_loss}, Test MAE: {test_mae}")
 
         predictions = self.model.predict(self.test_df[:10])
-        print(f'Len predictions {len(predictions)} \n predictions: {predictions}')
+        print(f'Len predictions {len(predictions)} \n predictions: \n{predictions}')
 
     def Plot_Results(self, metric):
         plt.figure()
