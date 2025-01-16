@@ -9,6 +9,8 @@ plots.py
 *.jpg
 *.fits
 clean_data.sh
+results.txt
+*.out
 
 # directories
 images/

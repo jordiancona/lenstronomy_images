@@ -87,9 +87,9 @@ class Lens:
                     train_images.append(np.asarray(img))
 
                 train_images, train_lbs = np.array(train_images), np.array(train_lbs)
-                self.train_df, self.val_df, self.train_labels, self.val_labels = train_test_split(train_images, train_lbs, test_size = 0.33, random_state = 42)
-                self.train_df, self.val_df = self.train_df / 255., self.val_df / 255.
-                self.train_labels, self.val_labels = np.array(self.train_labels), np.array(self.val_labels)
+                self.train_df, self.test_df, self.train_labels, self.test_labels = train_test_split(train_images, train_lbs, test_size = 0.33, random_state = 42)
+                self.train_df, self.test_df = self.train_df / 255., self.test_df / 255.
+                self.val_df, self.val_labels = self.train_df[-100:], self.train_labels[-100:]
         
         except FileNotFoundError:
             print(f"File {self.fits_name} not found.")
@@ -112,10 +112,11 @@ class Lens:
     
     # Se evalua el modelo
     def Evaluate(self):
-        test_loss, test_mae = self.model.evaluate(self.val_df, self.val_labels, batch_size = 128)
+        test_loss, test_mae = self.model.evaluate(self.test_df, self.test_labels, batch_size = 128)
         print(f"Test Loss: {test_loss}, Test MAE: {test_mae}")
 
-        #predictions = self.model.predict(self.test_images)
+        predictions = self.model.predict(self.test_df[:10])
+        print(f'Len predictions {len(predictions)} \n predictions: {predictions}')
 
     def Plot_Results(self, metric):
         plt.figure()
@@ -129,8 +130,8 @@ class Lens:
         plt.close()
     
     # Se generan las imágenes y archivos FITS
-    def Generate_Images(self, **kwargs):
-        self.__dict__.update(kwargs)
+    def Generate_Images(self):
+        #self.__dict__.update(kwargs)
         for i in range(self.total_images):
             lss.makelens(n = i,
                         path = self.train_path,
@@ -166,7 +167,7 @@ class Lens:
         hdu = fits.HDUList([primary_hdu] + images_hdus)
         hdu.writeto(self.fits_name, overwrite = True)
 
-Lens_instance = Lens(total_images = 100)
+Lens_instance = Lens(total_images = 500)
 
 if args.database:
     Lens_instance.Generate_Images()
