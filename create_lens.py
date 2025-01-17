@@ -36,7 +36,7 @@ class Lenses:
         self.thetaE = 1e6*(4.0*np.pi*sigmav**2/c**2*dls/ds*180.0/np.pi*3600.0).value
         
         # eccentricity computation
-        self.e1, self.e2 = (1 - f)/(1 + f)*np.cos(-2*pa), (1 - f)/(1 + f)*np.sin(-2*pa)
+        self.e1, self.e2 = (1 - f)/(1 + f)*np.cos(2*pa), (1 - f)/(1 + f)*np.sin(2*pa)
         self.gamma1 = gamma1
         self.gamma2 = gamma2
         self.center_x = center_x
