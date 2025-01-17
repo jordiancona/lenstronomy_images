@@ -4,7 +4,6 @@ import os
 import numpy as np
 import random as rd
 import matplotlib.pyplot as plt
-import cv2
 import argparse
 from PIL import Image
 from time import gmtime, strftime
@@ -12,7 +11,6 @@ from create_lens import Lenses as lss
 from models import alexnet
 from keras.optimizers import Adam # type: ignore
 import astropy.io.fits as fits
-from dataclasses import dataclass
 from sklearn.model_selection import train_test_split
 
 parser = argparse.ArgumentParser()
