@@ -178,8 +178,7 @@ class Lenses:
 
         f, ax = plt.subplots(1, 1, figsize=(4, 4), sharex = False, sharey = False)
         ax.matshow(np.log10(image), origin = 'lower', cmap = 'gist_heat')
-        ax.get_xaxis().set_visible(False)
-        ax.get_yaxis().set_visible(False)
+        plt.axis('off')
         #axes[1].matshow(np.log10(image_noisy), origin='lower', cmap = 'gray')
         f.tight_layout()
         plt.savefig(path+self.file_name, bbox_inches = "tight")

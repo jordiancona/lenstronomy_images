@@ -45,7 +45,7 @@ class Lens:
                     plt.subplot(3, 3, i+1)
                     plt.grid(False)
                     plt.imshow(data, cmap = 'gist_heat', aspect = 'auto')
-                    text_values = [f'{label}: {hdr[label]:.2}' for label in self.labels]
+                    text_values = [f'{label}: {hdr[label]:.2f}' for label in self.labels]
                     y_start = 195
                     y_step = 25
                     for j, text in enumerate(text_values):
