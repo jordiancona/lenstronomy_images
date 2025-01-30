@@ -133,10 +133,10 @@ class Lens:
         for i in range(self.total_images):
             lss.makelens(n = i,
                         path = self.train_path,
-                        f = 1.,
+                        f = rd.uniform(0.,1.),
                         sigmav = 200,
-                        zl = rd.uniform(0.,1.),
-                        zs = rd.uniform(1.,2.),
+                        zl = rd.uniform(0.5,1.0),
+                        zs = rd.uniform(1.,3.),
                         gamma1 = rd.uniform(-0.2,0.1),
                         gamma2 = rd.uniform(-0.2,0.1),
                         center_x = 0.,
