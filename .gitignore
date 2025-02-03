@@ -12,6 +12,7 @@ clean_data.sh
 results.txt
 *.out
 analize_lens.py
+illustrating_lenses.py
 
 # directories
 images/

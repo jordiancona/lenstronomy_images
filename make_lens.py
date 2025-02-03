@@ -19,22 +19,7 @@ from lenstronomy.Data.psf import PSF
 from astropy.cosmology import FlatLambdaCDM
 from astropy.constants import c
 
-def MakeLens(e1, e2, gamma1, gamma2):
-    sigmav = 200.
-    pa = np.pi/2.0 # position angle in radians
-    zl = 0.3 # lens redshift
-    zs = 1.5 # source redshift
-    center_x = 0.
-    center_y = 0.
-
-    # lens Einstein radius
-    co = FlatLambdaCDM(H0 = 70, Om0 = 0.3)
-    dl = co.angular_diameter_distance(zl)
-    ds = co.angular_diameter_distance(zs)
-    dls = co.angular_diameter_distance_z1z2(zl,zs)
-
-    # compute the Einstein radius
-    thetaE = 1e6*(4.0*np.pi*sigmav**2/c**2*dls/ds*180.0/np.pi*3600.0).value
+def MakeLens(thetaE, e1, e2, gamma1, gamma2, center_x, center_y, name):
 
     # specify the choice of lens models #
     lens_model_list = ['SIE', 'SHEAR']
@@ -43,16 +28,21 @@ def MakeLens(e1, e2, gamma1, gamma2):
     lensModel = LensModel(lens_model_list = lens_model_list)
 
     # define parameter values of lens models #
-    kwargs_spep = {'theta_E': thetaE, 'e1': e1, 'e2': e2, 'center_x': center_x, 'center_y': center_y}
+    kwargs_spep = {'theta_E': thetaE, 
+                    'e1': e1, 
+                    'e2': e2, 
+                    'center_x': center_x, 
+                    'center_y': center_y}
+    
     kwargs_shear = {'gamma1': gamma1, 'gamma2': gamma2}
     kwargs_lens = [kwargs_spep, kwargs_shear]
 
     # image plane coordinate #
-    theta_ra, theta_dec = 1., .5
+    theta_ra, theta_dec =0., 0.
     # source plane coordinate #
     beta_ra, beta_dec = lensModel.ray_shooting(theta_ra, theta_dec, kwargs_lens)
     # Fermat potential #
-    fermat_pot = lensModel.fermat_potential(x_image=theta_ra, y_image=theta_dec, x_source=beta_ra, y_source=beta_dec, kwargs_lens=kwargs_lens)
+    fermat_pot = lensModel.fermat_potential(x_image = theta_ra, y_image = theta_dec, x_source = beta_ra, y_source=beta_dec, kwargs_lens = kwargs_lens)
 
     # Magnification #
     mag = lensModel.magnification(theta_ra, theta_dec, kwargs_lens)
@@ -68,16 +58,26 @@ def MakeLens(e1, e2, gamma1, gamma2):
 
     # set up the list of light models to be used #
     source_light_model_list = ['SERSIC']
-    lightModel_source = LightModel(light_model_list = source_light_model_list)
+    lightModel_source = LightModel(light_model_list=source_light_model_list)
 
     lens_light_model_list = ['SERSIC_ELLIPSE']
-    lightModel_lens = LightModel(light_model_list = lens_light_model_list)
+    lightModel_lens = LightModel(light_model_list=lens_light_model_list)
 
     # define the parameters #
-    kwargs_light_source = [{'amp': 100, 'R_sersic': 0.1, 'n_sersic': 1.5, 'center_x': beta_ra, 'center_y': beta_dec}]
+    kwargs_light_source = [{'amp': 100,
+                            'R_sersic': 0.1,
+                            'n_sersic': 1.5, 
+                            'center_x': beta_ra, 
+                            'center_y': beta_dec}]
 
     ##e1, e2 = param_util.phi_q2_ellipticity(phi=0.5, q=0.7)
-    kwargs_light_lens = [{'amp': 1000, 'R_sersic': 0.1, 'n_sersic': 2.5, 'e1': e1, 'e2': e2, 'center_x': center_x, 'center_y': center_y}]
+    kwargs_light_lens = [{'amp': 1000,
+                            'R_sersic': 0.1,
+                            'n_sersic': 2.5,
+                            'e1': e1,
+                            'e2': e2,
+                            'center_x': center_x,
+                            'center_y': center_y}]
 
     # evaluate surface brightness at a specific position #
     flux = lightModel_lens.surface_brightness(x = 1, y = 1, kwargs_list = kwargs_light_lens)
@@ -85,8 +85,8 @@ def MakeLens(e1, e2, gamma1, gamma2):
     # unlensed source positon #
     point_source_model_list = ['SOURCE_POSITION']
     pointSource = PointSource(point_source_type_list = point_source_model_list,
-                            lens_model = lensModel,
-                            fixed_magnification_list = [True])
+                                lens_model = lensModel,
+                                fixed_magnification_list = [True])
 
     kwargs_ps = [{'ra_source': beta_ra, 'dec_source': beta_dec, 'source_amp': 100}]
     # return image positions and amplitudes #
@@ -136,15 +136,17 @@ def MakeLens(e1, e2, gamma1, gamma2):
     kwargs_numerics = {'supersampling_factor': 1, # each pixel gets super-sampled (in each axis direction) 
                     'supersampling_convolution': False}
     # initialize the Image model class by combining the modules we created above #
-    imageModel = ImageModel(data_class=pixel_grid, psf_class=psf, lens_model_class=lensModel,
-                            source_model_class=lightModel_source,
-                            lens_light_model_class=lightModel_lens,
-                            point_source_class=None, # in this example, we do not simulate point source.
-                            kwargs_numerics=kwargs_numerics)
-
+    imageModel = ImageModel(data_class = pixel_grid,
+                            psf_class = psf,
+                            lens_model_class = lensModel,
+                            source_model_class = lightModel_source,
+                            lens_light_model_class = lightModel_lens,
+                            point_source_class = None, # in this example, we do not simulate point source.
+                            kwargs_numerics = kwargs_numerics)
+    
     # simulate image with the parameters we have defined above #
-    image = imageModel.image(kwargs_lens=kwargs_lens, kwargs_source=kwargs_light_source,
-                            kwargs_lens_light=kwargs_light_lens, kwargs_ps=kwargs_ps)
+    image = imageModel.image(kwargs_lens = kwargs_lens, kwargs_source = kwargs_light_source,
+                            kwargs_lens_light = kwargs_light_lens, kwargs_ps = kwargs_ps)
 
     # image with noise
     exp_time = 100  # exposure time to quantify the Poisson noise level
@@ -153,13 +155,10 @@ def MakeLens(e1, e2, gamma1, gamma2):
     bkg = image_util.add_background(image, sigma_bkd = background_rms)
     image_noisy = image + bkg + poisson
 
-    f, axes = plt.subplots(1, 1, figsize=(5, 5), sharex = False, sharey = False)
-    ax = axes
-    ax.matshow(np.log10(image), origin='lower', cmap = 'gist_heat') # cividis
-    ax.get_xaxis().set_visible(False)
-    ax.get_yaxis().set_visible(False)
+    f, ax = plt.subplots(1, 1, figsize = (4, 4), sharex = False, sharey = False)
+    ax.matshow(np.log10(image), origin = 'lower', cmap = 'gist_heat')
+    plt.axis('off')
     #axes[1].matshow(np.log10(image_noisy), origin='lower', cmap = 'gray')
     f.tight_layout()
-    plt.savefig('lens_test.png')
-
-MakeLens(0, 0.4, 0., 0.)
+    plt.savefig(f'{name}.png', bbox_inches = "tight")
+    plt.close()
