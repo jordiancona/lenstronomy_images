@@ -80,7 +80,7 @@ def MakeLens(thetaE, e1, e2, gamma1, gamma2, center_x, center_y, name):
                             'center_y': center_y}]
 
     # evaluate surface brightness at a specific position #
-    flux = lightModel_lens.surface_brightness(x = 1, y = 1, kwargs_list = kwargs_light_lens)
+    flux = lightModel_lens.surface_brightness(x = 0, y = 0, kwargs_list = kwargs_light_lens)
 
     # unlensed source positon #
     point_source_model_list = ['SOURCE_POSITION']
@@ -120,12 +120,12 @@ def MakeLens(thetaE, e1, e2, gamma1, gamma2, center_x, center_y, name):
     # compute pixel value of a coordinate position #
     x_pos, y_pos = pixel_grid.map_coord2pix(ra = 0, dec = 0)
     # compute the coordinate value of a pixel position #
-    ra_pos, dec_pos = pixel_grid.map_pix2coord(x = 20, y = 10)
+    ra_pos, dec_pos = pixel_grid.map_pix2coord(x = 20, y = 10) #20 10
 
     # PSF
     kwargs_psf = {'psf_type': 'GAUSSIAN',  # type of PSF model (supports 'GAUSSIAN' and 'PIXEL')
-                'fwhm': 0.1,  # full width at half maximum of the Gaussian PSF (in angular units)
-                'pixel_size': deltaPix  # angular scale of a pixel (required for a Gaussian PSF to translate the FWHM into a pixel scale)
+                  'fwhm': 0.1,  # full width at half maximum of the Gaussian PSF (in angular units)
+                  'pixel_size': deltaPix  # angular scale of a pixel (required for a Gaussian PSF to translate the FWHM into a pixel scale)
                 }
 
     psf = PSF(**kwargs_psf)
