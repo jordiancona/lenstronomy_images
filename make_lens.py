@@ -155,10 +155,11 @@ def MakeLens(thetaE, e1, e2, gamma1, gamma2, center_x, center_y, name):
     bkg = image_util.add_background(image, sigma_bkd = background_rms)
     image_noisy = image + bkg + poisson
 
-    f, ax = plt.subplots(1, 1, figsize = (4, 4), sharex = False, sharey = False)
-    ax.matshow(np.log10(image), origin = 'lower', cmap = 'gist_heat')
-    plt.axis('off')
+    #f, ax = plt.subplots(1, 1, figsize = (4, 4), sharex = False, sharey = False)
+    #ax.matshow(np.log10(image), origin = 'lower', cmap = 'gist_heat')
+    #plt.axis('off')
     #axes[1].matshow(np.log10(image_noisy), origin='lower', cmap = 'gray')
-    f.tight_layout()
-    plt.savefig(f'{name}.png', bbox_inches = "tight")
-    plt.close()
+    #f.tight_layout()
+    #plt.savefig(f'{name}.png', bbox_inches = "tight")
+    #plt.close()
+    return image
