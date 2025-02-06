@@ -12,6 +12,7 @@ from models import alexnet
 from keras.optimizers import Adam # type: ignore
 import astropy.io.fits as fits
 from sklearn.model_selection import train_test_split
+#import tensorflow_addons as tfa
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-db', '--database', action = 'store_true', help = 'Generate the images for training.')
@@ -70,7 +71,7 @@ class Lens:
             print(f"File {self.fits_name} not found.")
 
     # Genera la base de datos para entrenamiento y validación
-    def Train_and_Val_Images(self):
+    def Train_and_Val_Images(self, augment = False):
         try:
             with fits.open(self.fits_name) as hdul:
                 train_lbs = []
@@ -137,8 +138,8 @@ class Lens:
                         sigmav = 200,
                         zl = rd.uniform(0.5,1.0),
                         zs = rd.uniform(1.,3.),
-                        gamma1 = rd.uniform(-0.2,0.1),
-                        gamma2 = rd.uniform(-0.2,0.1),
+                        gamma1 = 0.1, # rd.uniform(-0.2,0.1),
+                        gamma2 = 0.1, # rd.uniform(-0.2,0.1),
                         center_x = 0.,
                         center_y = 0.)
             
@@ -164,6 +165,22 @@ class Lens:
 
         hdu = fits.HDUList([primary_hdu] + images_hdus)
         hdu.writeto(self.fits_name, overwrite = True)
+    
+    def rotate_lens(image, e1, e2, angle=None):
+        if angle is None:
+            angle = np.random.uniform(0, 360)  # Rotación aleatoria entre 0 y 360 grados
+        
+        # Convertir ángulo a radianes
+        phi = np.radians(angle)
+
+        # Transformar e1 y e2 con las fórmulas de rotación
+        e1_new = e1 * np.cos(2 * phi) - e2 * np.sin(2 * phi)
+        e2_new = e1 * np.sin(2 * phi) + e2 * np.cos(2 * phi)
+
+        # Aplicar rotación a la imagen
+        rotated_image = tfa.image.rotate(image, angles=phi)
+
+        return rotated_image, e1_new, e2_new
 
 Lens_instance = Lens(total_images = 500)
 
