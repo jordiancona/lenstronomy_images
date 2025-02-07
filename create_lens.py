@@ -24,7 +24,8 @@ class Lenses:
     # Se simulan las lentes
     @classmethod
     def makelens(self, n, path, f, sigmav, zl , zs, gamma1, gamma2, center_x, center_y):
-        pa = np.pi/3.0
+        deg = 60
+        pa = deg/180*np.pi#np.pi/3.0
         co = FlatLambdaCDM(H0 = 70, Om0 = 0.3)
         dl = co.angular_diameter_distance(zl)
         ds = co.angular_diameter_distance(zs)

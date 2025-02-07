@@ -134,12 +134,12 @@ class Lens:
         for i in range(self.total_images):
             lss.makelens(n = i,
                         path = self.train_path,
-                        f = rd.uniform(0.,1.),
+                        f = 0.6,#rd.uniform(0.,1.),
                         sigmav = 200,
-                        zl = rd.uniform(0.5,1.0),
-                        zs = rd.uniform(1.,3.),
-                        gamma1 = 0.1, # rd.uniform(-0.2,0.1),
-                        gamma2 = 0.1, # rd.uniform(-0.2,0.1),
+                        zl = 0.3,#rd.uniform(0.5,1.0),
+                        zs = 1.5,#rd.uniform(1.,3.),
+                        gamma1 = 0., # rd.uniform(-0.2,0.1),
+                        gamma2 = 0., # rd.uniform(-0.2,0.1),
                         center_x = 0.,
                         center_y = 0.)
             
@@ -178,11 +178,11 @@ class Lens:
         e2_new = e1 * np.sin(2 * phi) + e2 * np.cos(2 * phi)
 
         # Aplicar rotación a la imagen
-        rotated_image = tfa.image.rotate(image, angles=phi)
+        rotated_image = tfa.image.rotate(image, angles=phi) # corregir tfa
 
         return rotated_image, e1_new, e2_new
 
-Lens_instance = Lens(total_images = 500)
+Lens_instance = Lens(total_images = 1)
 
 if args.database:
     Lens_instance.Generate_Images()
