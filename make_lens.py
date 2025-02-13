@@ -19,7 +19,7 @@ from lenstronomy.Data.psf import PSF
 from astropy.cosmology import FlatLambdaCDM
 from astropy.constants import c
 
-def MakeLens(thetaE, e1, e2, gamma1, gamma2, center_x, center_y, name):
+def MakeLens(thetaE, e1, e2, gamma1, gamma2, center_x, center_y):
 
     # specify the choice of lens models #
     lens_model_list = ['SIE', 'SHEAR']
@@ -38,7 +38,7 @@ def MakeLens(thetaE, e1, e2, gamma1, gamma2, center_x, center_y, name):
     kwargs_lens = [kwargs_spep, kwargs_shear]
 
     # image plane coordinate #
-    theta_ra, theta_dec =0., 0.
+    theta_ra, theta_dec = 0., 0.
     # source plane coordinate #
     beta_ra, beta_dec = lensModel.ray_shooting(theta_ra, theta_dec, kwargs_lens)
     # Fermat potential #
@@ -70,7 +70,7 @@ def MakeLens(thetaE, e1, e2, gamma1, gamma2, center_x, center_y, name):
                             'center_x': beta_ra, 
                             'center_y': beta_dec}]
 
-    ##e1, e2 = param_util.phi_q2_ellipticity(phi=0.5, q=0.7)
+    #e1, e2 = param_util.phi_q2_ellipticity(phi=0.5, q=0.7)
     kwargs_light_lens = [{'amp': 1000,
                             'R_sersic': 0.1,
                             'n_sersic': 2.5,

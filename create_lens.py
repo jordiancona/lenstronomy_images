@@ -23,9 +23,7 @@ from dataclasses import dataclass
 class Lenses:
     # Se simulan las lentes
     @classmethod
-    def makelens(self, n, path, f, sigmav, zl , zs, gamma1, gamma2, center_x, center_y):
-        deg = 60
-        pa = deg/180*np.pi#np.pi/3.0
+    def makelens(self, n, path, e1, e2, sigmav, zl , zs, gamma1, gamma2, center_x, center_y):
         co = FlatLambdaCDM(H0 = 70, Om0 = 0.3)
         dl = co.angular_diameter_distance(zl)
         ds = co.angular_diameter_distance(zs)
@@ -37,7 +35,7 @@ class Lenses:
         self.thetaE = 1e6*(4.0*np.pi*sigmav**2/c**2*dls/ds*180.0/np.pi*3600.0).value
         
         # eccentricity computation
-        self.e1, self.e2 = (1 - f)/(1 + f)*np.cos(2*pa), (1 - f)/(1 + f)*np.sin(2*pa)
+        self.e1, self.e2 = e1, e2
         self.gamma1 = gamma1
         self.gamma2 = gamma2
         self.center_x = center_x

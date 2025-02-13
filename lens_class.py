@@ -19,7 +19,6 @@ parser.add_argument('-db', '--database', action = 'store_true', help = 'Generate
 parser.add_argument('-sh', '--show', action = 'store_true', help = 'Return an example of the images for the training.')
 parser.add_argument('-sm', '--summary', action = 'store_true', help = 'Gives a summary of the dataset.')
 parser.add_argument('-tr', '--train', help = 'Train the DL model.')
-parser.add_argument('-ev', '--evaluate', action = 'store_true', help = 'Evaluate the model.')
 parser.add_argument('-sv', '--save', action = 'store_true', help = 'Save the model.')
 args = parser.parse_args()
 
@@ -33,6 +32,7 @@ class Lens:
         self.labels = ['theta_E','e1','e2','gamma1','gamma2','center_x','center_y']
         self.batch_size = 64
         self.input_shape = (390, 390, 4)
+        self.f = 0.6
 
     # Genera una matriz de las imégenes de lentes gravitacionales para entrenamiento
     def Examples(self):
@@ -74,48 +74,47 @@ class Lens:
     def Train_and_Val_Images(self, augment = False):
         try:
             with fits.open(self.fits_name) as hdul:
-                train_lbs = []
-                train_images = []
+                self.train_lbs = []
+                self.train_images = []
 
                 for idx in range(self.total_images):
                     file = hdul[idx+1]
                     hdr = file.header
                     file_name = hdr['NAME']
-                    train_lbs.append([hdr[label] for label in self.labels])
+                    self.train_lbs.append([hdr[label] for label in self.labels])
                     img = Image.open(os.path.join(self.train_path, file_name))
-                    train_images.append(np.asarray(img))
+                    self.train_images.append(np.asarray(img))
 
-                train_images, train_lbs = np.array(train_images), np.array(train_lbs)
-                self.train_df, self.test_df, self.train_labels, self.test_labels = train_test_split(train_images, train_lbs, test_size = 0.33, random_state = 42)
-                self.train_df, self.test_df = self.train_df / 255., self.test_df / 255.
-                self.val_df, self.val_labels = self.train_df[-100:], self.train_labels[-100:]
+                self.train_images, self.train_lbs = np.array(self.train_imagess), np.array(self.train_lbs)
         
         except FileNotFoundError:
             print(f"File {self.fits_name} not found.")
     
     # Se entrena el modelo
     def Train_and_Val(self, epochs):
+        train_df, test_df, self.train_labels, self.test_labels = train_test_split(self.train_images, self.train_lbs, test_size = 0.33, random_state = 42)
+        train_df, test_df = train_df / 255., test_df / 255.
+        val_df, val_labels = train_df[-100:], self.train_labels[-100:]
+
         optimizer = Adam(learning_rate = 1e-4) # 'adam', 'sgd'
         self.model = alexnet.AlexNet(input_shape = self.input_shape, classes = 7)
         self.model.compile(optimizer = optimizer,
                            loss = 'mean_squared_error',
                            metrics = ['mae'])
 
-        self.history = self.model.fit(self.train_df, self.train_labels, epochs = epochs, validation_data = (self.val_df, self.val_labels))
+        self.history = self.model.fit(train_df, self.train_labels, epochs = epochs, validation_data = (val_df, val_labels))
         self.Plot_Results('mae')
         self.Plot_Results('loss')
+
+        test_loss, test_mae = self.model.evaluate(test_df, self.test_labels, batch_size = 128)
+        print(f"Test Loss: {test_loss}, Test MAE: {test_mae}")
+
+        predictions = self.model.predict(test_df[:10])
+        print(f'Len predictions {len(predictions)} \n predictions: \n{predictions}')
 
     # Se guarda el modelo
     def Save_model(self):
         self.model.save('./cnn_model/my_model.h5')
-    
-    # Se evalua el modelo
-    def Evaluate(self):
-        test_loss, test_mae = self.model.evaluate(self.test_df, self.test_labels, batch_size = 128)
-        print(f"Test Loss: {test_loss}, Test MAE: {test_mae}")
-
-        predictions = self.model.predict(self.test_df[:10])
-        print(f'Len predictions {len(predictions)} \n predictions: \n{predictions}')
 
     def Plot_Results(self, metric):
         plt.figure()
@@ -132,16 +131,21 @@ class Lens:
     def Generate_Images(self):
         #self.__dict__.update(kwargs)
         for i in range(self.total_images):
+            f = self.f
+            deg = 60
+            pa = deg/180*np.pi#np.pi/3.0
+            self.e1, self.e2 = (1 - f)/(1 + f)*np.cos(2*pa), (1 - f)/(1 + f)*np.sin(2*pa)
             lss.makelens(n = i,
-                        path = self.train_path,
-                        f = 0.6,#rd.uniform(0.,1.),
-                        sigmav = 200,
-                        zl = 0.3,#rd.uniform(0.5,1.0),
-                        zs = 1.5,#rd.uniform(1.,3.),
-                        gamma1 = 0., # rd.uniform(-0.2,0.1),
-                        gamma2 = 0., # rd.uniform(-0.2,0.1),
-                        center_x = 0.,
-                        center_y = 0.)
+                         path = self.train_path,
+                         e1 = self.e1,
+                         e2 = self.e2,
+                         sigmav = 200,
+                         zl = 0.3,#rd.uniform(0.5,1.0),
+                         zs = 1.5,#rd.uniform(1.,3.),
+                         gamma1 = 0., # rd.uniform(-0.2,0.1),
+                         gamma2 = 0., # rd.uniform(-0.2,0.1),
+                         center_x = 0.,
+                         center_y = 0.)
             
             lss.Create_FITS(path = self.fits_path)
 
@@ -166,21 +170,27 @@ class Lens:
         hdu = fits.HDUList([primary_hdu] + images_hdus)
         hdu.writeto(self.fits_name, overwrite = True)
     
-    def rotate_lens(image, e1, e2, angle=None):
+    def Augment_Data(self, image, e1, e2, angle = None):
         if angle is None:
             angle = np.random.uniform(0, 360)  # Rotación aleatoria entre 0 y 360 grados
         
-        # Convertir ángulo a radianes
-        phi = np.radians(angle)
+        with fits.open(self.fits_name) as hdul:
+            for i in range(len(self.trainf_df)):
+                # Convertir ángulo a radianes
+                phi = angle*np.pi/180
+            
+                train_lbs = []
+                train_images = []
 
-        # Transformar e1 y e2 con las fórmulas de rotación
-        e1_new = e1 * np.cos(2 * phi) - e2 * np.sin(2 * phi)
-        e2_new = e1 * np.sin(2 * phi) + e2 * np.cos(2 * phi)
-
-        # Aplicar rotación a la imagen
-        rotated_image = tfa.image.rotate(image, angles=phi) # corregir tfa
-
-        return rotated_image, e1_new, e2_new
+                for idx in range(self.total_images):
+                    file = hdul[idx+1]
+                    hdr = file.header
+                    file_name = hdr['NAME']
+                    img = Image.open(os.path.join(self.train_path, file_name))
+                    train_images.append(np.asarray(img))
+                    e1, e2 = hdr['e1'], hdr['e2']
+                    e1_new = e1 * np.cos(2 * phi) - e2 * np.sin(2 * phi)
+                    e2_new = e1 * np.sin(2 * phi) + e2 * np.cos(2 * phi)
 
 Lens_instance = Lens(total_images = 1)
 
@@ -197,6 +207,3 @@ if args.summary:
 if args.train:
     Lens_instance.Train_and_Val_Images()
     Lens_instance.Train_and_Val(int(args.train))
-
-if args.evaluate:
-    Lens_instance.Evaluate()
