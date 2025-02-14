@@ -178,19 +178,28 @@ class Lens:
             for i in range(len(self.trainf_df)):
                 # Convertir ángulo a radianes
                 phi = angle*np.pi/180
-            
-                train_lbs = []
-                train_images = []
 
                 for idx in range(self.total_images):
                     file = hdul[idx+1]
                     hdr = file.header
                     file_name = hdr['NAME']
-                    img = Image.open(os.path.join(self.train_path, file_name))
-                    train_images.append(np.asarray(img))
                     e1, e2 = hdr['e1'], hdr['e2']
                     e1_new = e1 * np.cos(2 * phi) - e2 * np.sin(2 * phi)
                     e2_new = e1 * np.sin(2 * phi) + e2 * np.cos(2 * phi)
+                    lss.makelens(n = i,
+                                 path = self.train_path,
+                                 e1 = e1_new,
+                                 e2 = e2_new,
+                                 sigmav = 200,
+                                 zl = 0.3,#rd.uniform(0.5,1.0),
+                                 zs = 1.5,#rd.uniform(1.,3.),
+                                 gamma1 = 0., # rd.uniform(-0.2,0.1),
+                                 gamma2 = 0., # rd.uniform(-0.2,0.1),
+                                 center_x = 0.,
+                                 center_y = 0.)
+            
+                    lss.Create_FITS(path = self.fits_path)
+
 
 Lens_instance = Lens(total_images = 1)
 
