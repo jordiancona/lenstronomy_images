@@ -130,10 +130,10 @@ class Lens:
     # Se generan las imágenes y archivos FITS
     def Generate_Images(self):
         #self.__dict__.update(kwargs)
-        for i in range(self.total_images):
-            f = self.f
+        for i in tqdm(range(self.total_images)):
+            f = rd.uniform(0,1.)
             deg = 60
-            pa = deg/180*np.pi#np.pi/3.0
+            pa = deg/180*np.pi
             self.e1, self.e2 = (1 - f)/(1 + f)*np.cos(2*pa), (1 - f)/(1 + f)*np.sin(2*pa)
             lss.makelens(n = i,
                          e1 = self.e1,
@@ -141,8 +141,8 @@ class Lens:
                          sigmav = 200,
                          zl = rd.uniform(0.5,1.0),
                          zs = rd.uniform(1.,3.),
-                         gamma1 = rd.uniform(-0.2,0.1),
-                         gamma2 = rd.uniform(-0.2,0.1),
+                         gamma1 = rd.uniform(0,.1),
+                         gamma2 = rd.uniform(0,.1),
                          center_x = 0.,
                          center_y = 0.)
             
