@@ -13,6 +13,7 @@ from keras.optimizers import Adam # type: ignore
 import astropy.io.fits as fits
 from sklearn.model_selection import train_test_split
 from tqdm import tqdm
+from scipy.ndimage import rotate
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-db', '--database', action = 'store_true', help = 'Generate the images for training.')
@@ -20,6 +21,7 @@ parser.add_argument('-sh', '--show', action = 'store_true', help = 'Return an ex
 parser.add_argument('-sm', '--summary', action = 'store_true', help = 'Gives a summary of the dataset.')
 parser.add_argument('-tr', '--train', help = 'Train the DL model.')
 parser.add_argument('-sv', '--save', action = 'store_true', help = 'Save the model.')
+parser.add_argument('-ag', '--augment', help = 'Generate a Data Augmentation.')
 args = parser.parse_args()
 
 class Lens:
@@ -32,7 +34,6 @@ class Lens:
         self.labels = ['theta_E','e1','e2','gamma1','gamma2','center_x','center_y']
         self.batch_size = 64
         self.input_shape = (100, 100, 1)
-        self.f = 0.6
 
     # Genera una matriz de las imégenes de lentes gravitacionales para entrenamiento
     def Examples(self):
@@ -96,7 +97,7 @@ class Lens:
         train_df, test_df = train_df / 255., test_df / 255.
         val_df, val_labels = train_df[-100:], self.train_labels[-100:]
 
-        optimizer = Adam(learning_rate = 1e-4) # 'adam', 'sgd'
+        optimizer = Adam(learning_rate = 1e-3) # 'adam', 'sgd'
         self.model = alexnet.AlexNet(input_shape = self.input_shape, classes = 7)
         self.model.compile(optimizer = optimizer,
                            loss = 'mean_squared_error',
@@ -128,7 +129,7 @@ class Lens:
         plt.close()
     
     # Se generan las imágenes y archivos FITS
-    def Generate_Images(self):
+    def Generate_Images(self, augment = False):
         #self.__dict__.update(kwargs)
         for i in tqdm(range(self.total_images)):
             f = rd.uniform(0,1.)
@@ -149,7 +150,7 @@ class Lens:
             lss.Create_FITS(path = self.fits_path)
 
     # Se guardan los archivos FITS en un general
-    def Save_FITS(self):
+    def Save_FITS(self, augment = False):
         path = self.fits_path
         files = [file for file in os.listdir(path) if file.endswith('.fits')]
         images_hdus = []
@@ -168,42 +169,43 @@ class Lens:
 
         hdu = fits.HDUList([primary_hdu] + images_hdus)
         hdu.writeto(self.fits_name, overwrite = True)
+
+        if augment == True:
+                self.Augment_Data()
     
-    def Augment_Data(self, image, e1, e2, angle = None):
-        if angle is None:
-            angle = np.random.uniform(0, 360)  # Rotación aleatoria entre 0 y 360 grados
-        
-        with fits.open(self.fits_name) as hdul:
-            for i in range(len(self.trainf_df)):
-                # Convertir ángulo a radianes
-                phi = angle*np.pi/180
-
-                for idx in range(self.total_images):
-                    file = hdul[idx+1]
+    def Rotate_Parameters(self, e1, e2, gamma1, gamma2, angle=45):
+        theta = np.radians(angle)
+        cos_theta = np.cos(2 * theta)
+        sin_theta = np.sin(2 * theta)
+        e1_new = e1 * cos_theta - e2 * sin_theta
+        e2_new = e1 * sin_theta + e2 * cos_theta
+        gamma1_new = gamma1 * cos_theta - gamma2 * sin_theta
+        gamma2_new = gamma1 * sin_theta + gamma2 * cos_theta
+        return e1_new, e2_new, gamma1_new, gamma2_new
+    
+    def Augment_Data(self):
+        try:
+            with fits.open(self.fits_name, mode = 'update') as hdul:
+                for i in range(1, len(hdul)):
+                    file = hdul[i]
                     hdr = file.header
-                    file_name = hdr['NAME']
-                    e1, e2 = hdr['e1'], hdr['e2']
-                    e1_new = e1 * np.cos(2 * phi) - e2 * np.sin(2 * phi)
-                    e2_new = e1 * np.sin(2 * phi) + e2 * np.cos(2 * phi)
-                    lss.makelens(n = i,
-                                 e1 = e1_new,
-                                 e2 = e2_new,
-                                 sigmav = 200,
-                                 zl = 0.3,#rd.uniform(0.5,1.0),
-                                 zs = 1.5,#rd.uniform(1.,3.),
-                                 gamma1 = 0., # rd.uniform(-0.2,0.1),
-                                 gamma2 = 0., # rd.uniform(-0.2,0.1),
-                                 center_x = 0.,
-                                 center_y = 0.)
-            
-                    lss.Create_FITS(path = self.fits_path)
+                    data = file.data
+                    
+                    rotated_data = rotate(data, 45, reshape = False)
+                    hdr['e1'], hdr['e2'], hdr['gamma1'], hdr['gamma2'] = self.Rotate_Parameters(
+                        hdr['e1'], hdr['e2'], hdr['gamma1'], hdr['gamma2']
+                    )
+                    new_hdu = fits.ImageHDU(rotated_data, header = hdr)
+                    hdul.append(new_hdu)
+                hdul.flush()
+        except FileNotFoundError:
+            print(f'File {self.fits_name} not found.')
 
-
-Lens_instance = Lens(total_images = 100)
+Lens_instance = Lens(total_images = 300)
 
 if args.database:
     Lens_instance.Generate_Images()
-    Lens_instance.Save_FITS()
+    Lens_instance.Save_FITS(bool(args.augment))
 
 if args.show:
     Lens_instance.Examples()
