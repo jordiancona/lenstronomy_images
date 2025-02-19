@@ -12,6 +12,7 @@ from models import alexnet
 from keras.optimizers import Adam # type: ignore
 import astropy.io.fits as fits
 from sklearn.model_selection import train_test_split
+from tqdm import tqdm
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-db', '--database', action = 'store_true', help = 'Generate the images for training.')
@@ -30,7 +31,7 @@ class Lens:
         self.fits_name = './lens_fits.fits'
         self.labels = ['theta_E','e1','e2','gamma1','gamma2','center_x','center_y']
         self.batch_size = 64
-        self.input_shape = (390, 390, 4)
+        self.input_shape = (100, 100, 1)
         self.f = 0.6
 
     # Genera una matriz de las imégenes de lentes gravitacionales para entrenamiento
@@ -44,12 +45,12 @@ class Lens:
                     data = file.data
                     plt.subplot(3, 3, i+1)
                     plt.grid(False)
-                    plt.imshow(data, cmap = 'gist_heat', aspect = 'auto')
+                    plt.imshow(np.log10(data), cmap = 'gist_heat', aspect = 'auto')
                     text_values = [f'{label}: {hdr[label]:.2f}' for label in self.labels]
-                    y_start = 195
-                    y_step = 25
+                    y_start = 50
+                    y_step = 8
                     for j, text in enumerate(text_values):
-                        plt.text(400, y_start - j * y_step, text, fontsize = 8, ha = 'left')
+                        plt.text(100, y_start - j * y_step, text, fontsize = 8, ha = 'left')
                     plt.axis('off')
                 plt.suptitle('Example of lenses')
                 plt.tight_layout()
@@ -82,10 +83,9 @@ class Lens:
                     file_name = hdr['NAME']
                     img = file.data
                     self.train_lbs.append([hdr[label] for label in self.labels])
-                    #img = Image.open(os.path.join(self.train_path, file_name))
-                    self.train_images.append(np.asarray(img))
+                    self.train_images.append(np.asarray(np.log10(img)))
 
-                self.train_images, self.train_lbs = np.array(self.train_imagess), np.array(self.train_lbs)
+                self.train_images, self.train_lbs = np.array(self.train_images), np.array(self.train_lbs)
         
         except FileNotFoundError:
             print(f"File {self.fits_name} not found.")
@@ -139,10 +139,10 @@ class Lens:
                          e1 = self.e1,
                          e2 = self.e2,
                          sigmav = 200,
-                         zl = 0.3,#rd.uniform(0.5,1.0),
-                         zs = 1.5,#rd.uniform(1.,3.),
-                         gamma1 = 0., # rd.uniform(-0.2,0.1),
-                         gamma2 = 0., # rd.uniform(-0.2,0.1),
+                         zl = rd.uniform(0.5,1.0),
+                         zs = rd.uniform(1.,3.),
+                         gamma1 = rd.uniform(-0.2,0.1),
+                         gamma2 = rd.uniform(-0.2,0.1),
                          center_x = 0.,
                          center_y = 0.)
             
@@ -199,7 +199,7 @@ class Lens:
                     lss.Create_FITS(path = self.fits_path)
 
 
-Lens_instance = Lens(total_images = 1)
+Lens_instance = Lens(total_images = 100)
 
 if args.database:
     Lens_instance.Generate_Images()

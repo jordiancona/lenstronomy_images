@@ -189,8 +189,8 @@ class Lenses:
         #inbase_name, inbase_ext = os.path.splitext(os.path.basename(file))
         outfile = path + file + '.fits'
 
-        inimage = imageio.imread(self.path + file, mode = 'F')
-        outimage = np.flipud(inimage)
+        #inimage = imageio.imread(self.path + file, mode = 'F')
+        outimage = np.flipud(self.image) #inimage
 
         file_time = strftime('%Y-%m-%d %H:%M:%S', gmtime())
 
