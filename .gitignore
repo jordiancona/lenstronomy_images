@@ -13,6 +13,7 @@ results.txt
 *.out
 analize_lens.py
 illustrating_lenses.py
+Lens_doc.ipynb
 
 # directories
 images/

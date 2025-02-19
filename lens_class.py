@@ -12,7 +12,6 @@ from models import alexnet
 from keras.optimizers import Adam # type: ignore
 import astropy.io.fits as fits
 from sklearn.model_selection import train_test_split
-#import tensorflow_addons as tfa
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-db', '--database', action = 'store_true', help = 'Generate the images for training.')
@@ -81,8 +80,9 @@ class Lens:
                     file = hdul[idx+1]
                     hdr = file.header
                     file_name = hdr['NAME']
+                    img = file.data
                     self.train_lbs.append([hdr[label] for label in self.labels])
-                    img = Image.open(os.path.join(self.train_path, file_name))
+                    #img = Image.open(os.path.join(self.train_path, file_name))
                     self.train_images.append(np.asarray(img))
 
                 self.train_images, self.train_lbs = np.array(self.train_imagess), np.array(self.train_lbs)
@@ -136,7 +136,6 @@ class Lens:
             pa = deg/180*np.pi#np.pi/3.0
             self.e1, self.e2 = (1 - f)/(1 + f)*np.cos(2*pa), (1 - f)/(1 + f)*np.sin(2*pa)
             lss.makelens(n = i,
-                         path = self.train_path,
                          e1 = self.e1,
                          e2 = self.e2,
                          sigmav = 200,
@@ -187,7 +186,6 @@ class Lens:
                     e1_new = e1 * np.cos(2 * phi) - e2 * np.sin(2 * phi)
                     e2_new = e1 * np.sin(2 * phi) + e2 * np.cos(2 * phi)
                     lss.makelens(n = i,
-                                 path = self.train_path,
                                  e1 = e1_new,
                                  e2 = e2_new,
                                  sigmav = 200,

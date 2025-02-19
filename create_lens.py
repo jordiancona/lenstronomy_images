@@ -23,14 +23,13 @@ from dataclasses import dataclass
 class Lenses:
     # Se simulan las lentes
     @classmethod
-    def makelens(self, n, path, e1, e2, sigmav, zl , zs, gamma1, gamma2, center_x, center_y):
+    def makelens(self, n, e1, e2, sigmav, zl , zs, gamma1, gamma2, center_x, center_y):
         co = FlatLambdaCDM(H0 = 70, Om0 = 0.3)
         dl = co.angular_diameter_distance(zl)
         ds = co.angular_diameter_distance(zs)
         dls = co.angular_diameter_distance_z1z2(zl, zs)
 
         self.file_name = f'lens{n+1}.png'
-        self.path = path
         # Einstein radius
         self.thetaE = 1e6*(4.0*np.pi*sigmav**2/c**2*dls/ds*180.0/np.pi*3600.0).value
         
@@ -165,15 +164,15 @@ class Lenses:
                                 kwargs_numerics = kwargs_numerics)
         
         # simulate image with the parameters we have defined above #
-        image = imageModel.image(kwargs_lens = kwargs_lens, kwargs_source = kwargs_light_source,
+        self.image = imageModel.image(kwargs_lens = kwargs_lens, kwargs_source = kwargs_light_source,
                                 kwargs_lens_light = kwargs_light_lens, kwargs_ps = kwargs_ps)
 
         # image with noise
         exp_time = 100  # exposure time to quantify the Poisson noise level
         background_rms = 0.1  # background rms value
-        poisson = image_util.add_poisson(image, exp_time = exp_time)
-        bkg = image_util.add_background(image, sigma_bkd = background_rms)
-        image_noisy = image + bkg + poisson
+        poisson = image_util.add_poisson(self.image, exp_time = exp_time)
+        bkg = image_util.add_background(self.image, sigma_bkd = background_rms)
+        image_noisy = self.image + bkg + poisson
 
         #f, ax = plt.subplots(1, 1, figsize=(4, 4), sharex = False, sharey = False)
         #ax.matshow(np.log10(image), origin = 'lower', cmap = 'gist_heat')
@@ -187,8 +186,8 @@ class Lenses:
     @classmethod
     def Create_FITS(self, path):
         file = self.file_name
-        inbase_name, inbase_ext = os.path.splitext(os.path.basename(file))
-        outfile = path + inbase_name + '.fits'
+        #inbase_name, inbase_ext = os.path.splitext(os.path.basename(file))
+        outfile = path + file + '.fits'
 
         inimage = imageio.imread(self.path + file, mode = 'F')
         outimage = np.flipud(inimage)
