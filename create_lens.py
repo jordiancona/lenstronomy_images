@@ -29,7 +29,7 @@ class Lenses:
         ds = co.angular_diameter_distance(zs)
         dls = co.angular_diameter_distance_z1z2(zl, zs)
 
-        self.file_name = f'lens{n+1}.png'
+        self.file_name = f'lens{n+1}s'
         # Einstein radius
         self.thetaE = 1e6*(4.0*np.pi*sigmav**2/c**2*dls/ds*180.0/np.pi*3600.0).value
         
