@@ -94,7 +94,7 @@ class Lens:
     # Se entrena el modelo
     def Train_and_Val(self, epochs):
         train_df, test_df, self.train_labels, self.test_labels = train_test_split(self.train_images, self.train_lbs, test_size = 0.33, random_state = 42)
-        train_df, test_df = train_df / 255., test_df / 255.
+        #train_df, test_df = train_df / 255., test_df / 255.
         val_df, val_labels = train_df[-100:], self.train_labels[-100:]
 
         optimizer = Adam(learning_rate = 1e-3) # 'adam', 'sgd'
