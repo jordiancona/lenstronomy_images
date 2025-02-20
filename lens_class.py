@@ -83,6 +83,7 @@ class Lens:
                     hdr = file.header
                     file_name = hdr['NAME']
                     img = file.data
+                    #img_resized = img.resize((224, 224), Image.BILINEAR)
                     self.train_lbs.append([hdr[label] for label in self.labels])
                     self.train_images.append(np.asarray(np.log10(img)))
 
@@ -189,9 +190,9 @@ class Lens:
                 for i in range(1, len(hdul)):
                     file = hdul[i]
                     hdr = file.header
-                    data = file.data
-                    
-                    rotated_data = rotate(data, 45, reshape = False)
+                    img = file.data
+                
+                    rotated_data = rotate(img, 45, reshape = False)
                     hdr['e1'], hdr['e2'], hdr['gamma1'], hdr['gamma2'] = self.Rotate_Parameters(
                         hdr['e1'], hdr['e2'], hdr['gamma1'], hdr['gamma2']
                     )
