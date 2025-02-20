@@ -112,8 +112,11 @@ class Lens:
         print(f"Test Loss: {test_loss}, Test MAE: {test_mae}")
 
         predictions = self.model.predict(test_df[:10])
-        print(test_labels[:10])
         print(f'Len predictions {len(predictions)} \n predictions: \n{predictions}')
+
+        correlation = np.corrcoef(predictions, test_labels)[0,1]
+        print(f'Coeficiente de correlación - R: {correlation:.2f}')
+        print(f'Coeficiente de determinación - R^2: {correlation**2:.2f}')
 
     def Save_model(self):
         self.model.save('./cnn_model/my_model.h5')
@@ -194,8 +197,8 @@ class Lens:
                 
                     rotated_data = rotate(img, 45, reshape = False)
                     hdr['e1'], hdr['e2'], hdr['gamma1'], hdr['gamma2'] = self.Rotate_Parameters(
-                        hdr['e1'], hdr['e2'], hdr['gamma1'], hdr['gamma2']
-                    )
+                        hdr['e1'], hdr['e2'], hdr['gamma1'], hdr['gamma2'])
+                    
                     new_hdu = fits.ImageHDU(rotated_data, header = hdr)
                     hdul.append(new_hdu)
                 hdul.flush()
