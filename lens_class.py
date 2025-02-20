@@ -94,9 +94,9 @@ class Lens:
     
     # Se entrena el modelo
     def Train_and_Val(self, epochs):
-        train_df, test_df, self.train_labels, self.test_labels = train_test_split(self.train_images, self.train_lbs, test_size = 0.33, random_state = 42)
+        train_df, test_df, train_labels, test_labels = train_test_split(self.train_images, self.train_lbs, test_size = 0.33, random_state = 42, shuffle = True)
         #train_df, test_df = train_df / 255., test_df / 255.
-        val_df, val_labels = train_df[-100:], self.train_labels[-100:]
+        val_df, val_labels = train_df[-100:], train_labels[-100:]
 
         optimizer = Adam(learning_rate = 1e-3) # 'adam', 'sgd'
         self.model = alexnet.AlexNet(input_shape = self.input_shape, classes = 7)
@@ -104,17 +104,17 @@ class Lens:
                            loss = 'mean_squared_error',
                            metrics = ['mae'])
 
-        self.history = self.model.fit(train_df, self.train_labels, epochs = epochs, validation_data = (val_df, val_labels))
+        self.history = self.model.fit(train_df, train_labels, epochs = epochs, validation_data = (val_df, val_labels))
         self.Plot_Results('mae')
         self.Plot_Results('loss')
 
-        test_loss, test_mae = self.model.evaluate(test_df, self.test_labels, batch_size = 128)
+        test_loss, test_mae = self.model.evaluate(test_df, test_labels, batch_size = 128)
         print(f"Test Loss: {test_loss}, Test MAE: {test_mae}")
 
         predictions = self.model.predict(test_df[:10])
+        print(test_labels[:10])
         print(f'Len predictions {len(predictions)} \n predictions: \n{predictions}')
 
-    # Se guarda el modelo
     def Save_model(self):
         self.model.save('./cnn_model/my_model.h5')
 
@@ -172,7 +172,7 @@ class Lens:
         hdu.writeto(self.fits_name, overwrite = True)
 
         if augment == True:
-                self.Augment_Data()
+            self.Augment_Data()
     
     def Rotate_Parameters(self, e1, e2, gamma1, gamma2, angle=45):
         theta = np.radians(angle)
@@ -202,7 +202,7 @@ class Lens:
         except FileNotFoundError:
             print(f'File {self.fits_name} not found.')
 
-Lens_instance = Lens(total_images = 300)
+Lens_instance = Lens(total_images = 400)
 
 if args.database:
     Lens_instance.Generate_Images()
