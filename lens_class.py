@@ -35,7 +35,7 @@ class Lens:
         self.batch_size = 64
         self.input_shape = (100, 100, 1)
 
-    # Genera una matriz de las imégenes de lentes gravitacionales para entrenamiento
+    # Genera una matriz de las imágenes de lentes gravitacionales para entrenamiento
     def Examples(self):
         try:
             with fits.open(self.fits_name) as hdul:
@@ -177,14 +177,12 @@ class Lens:
         if augment == True:
             self.Augment_Data()
     
-    def Rotate_Parameters(self, e1, e2, gamma1, gamma2, angle=45):
-        theta = np.radians(angle)
-        cos_theta = np.cos(2 * theta)
-        sin_theta = np.sin(2 * theta)
-        e1_new = e1 * cos_theta - e2 * sin_theta
-        e2_new = e1 * sin_theta + e2 * cos_theta
-        gamma1_new = gamma1 * cos_theta - gamma2 * sin_theta
-        gamma2_new = gamma1 * sin_theta + gamma2 * cos_theta
+    def Rotate_Parameters(self, e1, e2, gamma1, gamma2, angle = 45):
+        pa = angle/180*np.pi
+        e1_new = e1 * np.cos(2*pa) - e2 * np.sin(2*pa)
+        e2_new = e1 * np.sin(2*pa) + e2 * np.cos(2*pa)
+        gamma1_new = gamma1 * np.cos(2*pa) - gamma2 * np.sin(2*pa)
+        gamma2_new = gamma1 * np.sin(2*pa) + gamma2 * np.cos(2*pa)
         return e1_new, e2_new, gamma1_new, gamma2_new
     
     def Augment_Data(self):
@@ -194,10 +192,11 @@ class Lens:
                     file = hdul[i]
                     hdr = file.header
                     img = file.data
-                
                     rotated_data = rotate(img, 45, reshape = False)
-                    hdr['e1'], hdr['e2'], hdr['gamma1'], hdr['gamma2'] = self.Rotate_Parameters(
-                        hdr['e1'], hdr['e2'], hdr['gamma1'], hdr['gamma2'])
+                    hdr['e1'], hdr['e2'], hdr['gamma1'], hdr['gamma2'] = self.Rotate_Parameters(hdr['e1'],
+                                                                                                hdr['e2'],
+                                                                                                hdr['gamma1'],
+                                                                                                hdr['gamma2'])
                     
                     new_hdu = fits.ImageHDU(rotated_data, header = hdr)
                     hdul.append(new_hdu)
