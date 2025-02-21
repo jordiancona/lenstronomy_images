@@ -105,8 +105,8 @@ class Lens:
                            metrics = ['mae'])
 
         self.history = self.model.fit(train_df, train_labels, epochs = epochs, validation_data = (val_df, val_labels))
-        self.Plot_Results('mae')
-        self.Plot_Results('loss')
+        self.Plot_Metrics('mae')
+        self.Plot_Metrics('loss')
 
         test_loss, test_mae = self.model.evaluate(test_df, test_labels, batch_size = 128)
         print(f"Test Loss: {test_loss}, Test MAE: {test_mae}")
@@ -114,14 +114,44 @@ class Lens:
         predictions = self.model.predict(test_df[:10])
         print(f'Len predictions {len(predictions)} \n predictions: \n{predictions}')
 
-        correlation = np.corrcoef(predictions, test_labels)[0,1]
+        correlation = np.corrcoef(predictions, test_labels[:10])[0,1]
         print(f'Coeficiente de correlación - R: {correlation:.2f}')
         print(f'Coeficiente de determinación - R^2: {correlation**2:.2f}')
+
+        for i, val in enumerate(predictions):
+            _, e1, e2, gamma1, gamma2, center_x, center_y = val
+            lss.makelens(n = i,
+                        e1 = e1,
+                        e2 = e2,
+                        sigmav = 200,
+                        zl = 0.3,
+                        zs = 1.5,
+                        gamma1 = gamma1,
+                        gamma2 = gamma2,
+                        center_x = center_x,
+                        center_y = center_y)
+        
+            lss.Create_FITS(path = './results/predictions/')
+
+        for i, val in enumerate(test_labels[:10]):
+            _, e1, e2, gamma1, gamma2, center_x, center_y = val
+            lss.makelens(n = i,
+                        e1 = e1,
+                        e2 = e2,
+                        sigmav = 200,
+                        zl = 0.3,
+                        zs = 1.5,
+                        gamma1 = gamma1,
+                        gamma2 = gamma2,
+                        center_x = center_x,
+                        center_y = center_y)
+        
+            lss.Create_FITS(path = './results/original/')
 
     def Save_model(self):
         self.model.save('./cnn_model/my_model.h5')
 
-    def Plot_Results(self, metric):
+    def Plot_Metrics(self, metric):
         plt.figure()
         plt.plot(self.history.history[f'{metric}'], label = f'Trainning {metric}', c = 'k', lw = 0.8)
         plt.plot(self.history.history[f'val_{metric}'], label = f'Validation {metric}', c = 'r', lw = 0.8)
@@ -144,8 +174,8 @@ class Lens:
                          e1 = self.e1,
                          e2 = self.e2,
                          sigmav = 200,
-                         zl = rd.uniform(0.5,1.0),
-                         zs = rd.uniform(1.,3.),
+                         zl = 0.3,#rd.uniform(0.5,1.0),
+                         zs = 1.5,#rd.uniform(1.,3.),
                          gamma1 = rd.uniform(0,.1),
                          gamma2 = rd.uniform(0,.1),
                          center_x = 0.,
