@@ -115,10 +115,10 @@ class Lens:
         test_loss, test_mae = self.model.evaluate(test_df, test_labels, batch_size = 128)
         print(f"Test Loss: {test_loss}, Test MAE: {test_mae}")
 
-        predictions = self.model.predict(test_df[:10])
+        predictions = self.model.predict(test_df[:12])
         print(f'Len predictions {len(predictions)} \n predictions: \n{predictions}')
 
-        correlation = np.corrcoef(predictions, test_labels[:10])[0,1]
+        correlation = np.corrcoef(predictions, test_labels[:12])[0,1]
         print(f'Coeficiente de correlación - R: {correlation:.2f}')
         print(f'Coeficiente de determinación - R^2: {correlation**2:.2f}')
 
@@ -137,7 +137,7 @@ class Lens:
         
             lss.Create_FITS(path = './results/predictions/')
 
-        for i, val in enumerate(test_labels[:10]):
+        for i, val in enumerate(test_labels[:12]):
             _, e1, e2, gamma1, gamma2, center_x, center_y = val
             lss.makelens(n = i,
                         e1 = e1,
