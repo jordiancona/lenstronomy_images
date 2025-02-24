@@ -6,6 +6,7 @@ import random as rd
 import matplotlib.pyplot as plt
 import argparse
 from PIL import Image
+import cv2
 from time import gmtime, strftime
 from create_lens import Lenses as lss
 from models import alexnet
@@ -27,8 +28,6 @@ args = parser.parse_args()
 class Lens:
     def __init__(self, total_images):
         self.total_images = total_images
-        self.train_path = './dataset/train/lenses/'
-        self.test_path = './dataset/test/'
         self.fits_path = './fits/'
         self.fits_name = './lens_fits.fits'
         self.labels = ['theta_E','e1','e2','gamma1','gamma2','center_x','center_y']
@@ -83,7 +82,7 @@ class Lens:
                     hdr = file.header
                     file_name = hdr['NAME']
                     img = file.data
-                    #img_resized = img.resize((224, 224), Image.BILINEAR)
+                    #img_resized = cv2.resize(img, (224, 224), interpolation = cv2.INTER_LINEAR)
                     self.train_lbs.append([hdr[label] for label in self.labels])
                     self.train_images.append(np.asarray(np.log10(img)))
 
@@ -95,7 +94,6 @@ class Lens:
     # Se entrena el modelo
     def Train_and_Val(self, epochs):
         train_df, test_df, train_labels, test_labels = train_test_split(self.train_images, self.train_lbs, test_size = 0.2, random_state = 42, shuffle = True)
-        #train_df, test_df = train_df / 255., test_df / 255.
         val_df, val_labels = train_df[-100:], train_labels[-100:]
         
         print(f'Imágenes de entrenamiento:{len(train_df)}')
@@ -115,10 +113,10 @@ class Lens:
         test_loss, test_mae = self.model.evaluate(test_df, test_labels, batch_size = 128)
         print(f"Test Loss: {test_loss}, Test MAE: {test_mae}")
 
-        predictions = self.model.predict(test_df[:12])
+        predictions = self.model.predict(test_df[:20])
         print(f'Len predictions {len(predictions)} \n predictions: \n{predictions}')
 
-        correlation = np.corrcoef(predictions, test_labels[:12])[0,1]
+        correlation = np.corrcoef(predictions, test_labels[:20])[0,1]
         print(f'Coeficiente de correlación - R: {correlation:.2f}')
         print(f'Coeficiente de determinación - R^2: {correlation**2:.2f}')
 
@@ -137,7 +135,7 @@ class Lens:
         
             lss.Create_FITS(path = './results/predictions/')
 
-        for i, val in enumerate(test_labels[:12]):
+        for i, val in enumerate(test_labels[:20]):
             _, e1, e2, gamma1, gamma2, center_x, center_y = val
             lss.makelens(n = i,
                         e1 = e1,
@@ -167,7 +165,7 @@ class Lens:
         plt.close()
     
     # Se generan las imágenes y archivos FITS
-    def Generate_Images(self, augment = False):
+    def Generate_Images(self):
         #self.__dict__.update(kwargs)
         for i in tqdm(range(self.total_images)):
             f = rd.uniform(0,1.)
@@ -238,7 +236,7 @@ class Lens:
         except FileNotFoundError:
             print(f'File {self.fits_name} not found.')
 
-Lens_instance = Lens(total_images = 400)
+Lens_instance = Lens(total_images = 500)
 
 if args.database:
     Lens_instance.Generate_Images()
