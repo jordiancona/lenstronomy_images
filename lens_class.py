@@ -182,8 +182,8 @@ class Lens:
                          thetaE = self.thetaE,
                          e1 = self.e1,
                          e2 = self.e2,
-                         gamma1 = rd.uniform(0,.1),
-                         gamma2 = rd.uniform(0,.1),
+                         gamma1 = rd.uniform(0.0,0.5),
+                         gamma2 = rd.uniform(0.0,0.5),
                          center_x = 0.,
                          center_y = 0.)
             
