@@ -15,25 +15,20 @@ from lenstronomy.LensModel.Solver.lens_equation_solver import LensEquationSolver
 from lenstronomy.LightModel.light_model import LightModel
 from lenstronomy.Data.psf import PSF
 import astropy.io.fits as fits
-from astropy.cosmology import FlatLambdaCDM
-from astropy.constants import c
 from dataclasses import dataclass
 
 @dataclass
 class Lenses:
     # Se simulan las lentes
     @classmethod
-    def makelens(self, n, e1, e2, sigmav, zl , zs, gamma1, gamma2, center_x, center_y):
-        co = FlatLambdaCDM(H0 = 70, Om0 = 0.3)
-        dl = co.angular_diameter_distance(zl)
-        ds = co.angular_diameter_distance(zs)
-        dls = co.angular_diameter_distance_z1z2(zl, zs)
+    def makelens(self, n, thetaE, e1, e2, gamma1, gamma2, center_x, center_y):
 
         self.file_name = f'lens{n+1}'
         # Einstein radius
-        self.thetaE = 1e6*(4.0*np.pi*sigmav**2/c**2*dls/ds*180.0/np.pi*3600.0).value
+        
         
         # eccentricity computation
+        self.thetaE = thetaE
         self.e1, self.e2 = e1, e2
         self.gamma1 = gamma1
         self.gamma2 = gamma2

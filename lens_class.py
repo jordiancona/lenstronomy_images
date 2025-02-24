@@ -5,13 +5,13 @@ import numpy as np
 import random as rd
 import matplotlib.pyplot as plt
 import argparse
-from PIL import Image
-import cv2
 from time import gmtime, strftime
 from create_lens import Lenses as lss
 from models import alexnet
 from keras.optimizers import Adam # type: ignore
 import astropy.io.fits as fits
+from astropy.cosmology import FlatLambdaCDM
+from astropy.constants import c
 from sklearn.model_selection import train_test_split
 from tqdm import tqdm
 from scipy.ndimage import rotate
@@ -104,49 +104,46 @@ class Lens:
         self.model = alexnet.AlexNet(input_shape = self.input_shape, classes = 7)
         self.model.compile(optimizer = optimizer,
                            loss = 'mean_squared_error',
-                           metrics = ['mae'])
+                           metrics = ['mae','mse'])
 
         self.history = self.model.fit(train_df, train_labels, epochs = epochs, validation_data = (val_df, val_labels))
         self.Plot_Metrics('mae')
+        self.Plot_Metrics('mse')
         self.Plot_Metrics('loss')
 
-        test_loss, test_mae = self.model.evaluate(test_df, test_labels, batch_size = 128)
-        print(f"Test Loss: {test_loss}, Test MAE: {test_mae}")
+        test_loss, test_mae, test_mse = self.model.evaluate(test_df, test_labels, batch_size = 128)
+        print(f"Test Loss: {test_loss:.4f}, Test MAE: {test_mae:.4f}, Test MSE: {test_mse:.4f}")
 
         predictions = self.model.predict(test_df[:20])
-        print(f'Len predictions {len(predictions)} \n predictions: \n{predictions}')
+        #print(f'Len predictions {len(predictions)} \n predictions: \n{predictions}')
 
         correlation = np.corrcoef(predictions, test_labels[:20])[0,1]
         print(f'Coeficiente de correlación - R: {correlation:.2f}')
         print(f'Coeficiente de determinación - R^2: {correlation**2:.2f}')
 
         for i, val in enumerate(predictions):
-            _, e1, e2, gamma1, gamma2, center_x, center_y = val
+            thetaE, e1, e2, gamma1, gamma2, center_x, center_y = val
             lss.makelens(n = i,
-                        e1 = e1,
-                        e2 = e2,
-                        sigmav = 200,
-                        zl = 0.3,
-                        zs = 1.5,
-                        gamma1 = gamma1,
-                        gamma2 = gamma2,
-                        center_x = center_x,
-                        center_y = center_y)
+                         thetaE = thetaE,
+                         e1 = e1,
+                         e2 = e2,
+                         gamma1 = gamma1,
+                         gamma2 = gamma2,
+                         center_x = center_x,
+                         center_y = center_y)
         
             lss.Create_FITS(path = './results/predictions/')
 
         for i, val in enumerate(test_labels[:20]):
-            _, e1, e2, gamma1, gamma2, center_x, center_y = val
+            thetaE, e1, e2, gamma1, gamma2, center_x, center_y = val
             lss.makelens(n = i,
-                        e1 = e1,
-                        e2 = e2,
-                        sigmav = 200,
-                        zl = 0.3,
-                        zs = 1.5,
-                        gamma1 = gamma1,
-                        gamma2 = gamma2,
-                        center_x = center_x,
-                        center_y = center_y)
+                         thetaE = thetaE,
+                         e1 = e1,
+                         e2 = e2,
+                         gamma1 = gamma1,
+                         gamma2 = gamma2,
+                         center_x = center_x,
+                         center_y = center_y)
         
             lss.Create_FITS(path = './results/original/')
 
@@ -168,16 +165,23 @@ class Lens:
     def Generate_Images(self):
         #self.__dict__.update(kwargs)
         for i in tqdm(range(self.total_images)):
-            f = rd.uniform(0,1.)
+            f = rd.uniform(0.2,1.)
             deg = 60
             pa = deg/180*np.pi
+            sigmav = 200
+            zl = rd.uniform(0.5,1.)
+            zs = rd.uniform(1.,2.)
+            co = FlatLambdaCDM(H0 = 70, Om0 = 0.3)
+            dl = co.angular_diameter_distance(zl)
+            ds = co.angular_diameter_distance(zs)
+            dls = co.angular_diameter_distance_z1z2(zl, zs)
+            
             self.e1, self.e2 = (1 - f)/(1 + f)*np.cos(2*pa), (1 - f)/(1 + f)*np.sin(2*pa)
+            self.thetaE = 1e6*(4.0*np.pi*sigmav**2/c**2*dls/ds*180.0/np.pi*3600.0).value
             lss.makelens(n = i,
+                         thetaE = self.thetaE,
                          e1 = self.e1,
                          e2 = self.e2,
-                         sigmav = 200,
-                         zl = 0.3,#rd.uniform(0.5,1.0),
-                         zs = 1.5,#rd.uniform(1.,3.),
                          gamma1 = rd.uniform(0,.1),
                          gamma2 = rd.uniform(0,.1),
                          center_x = 0.,
