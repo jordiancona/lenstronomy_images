@@ -20,6 +20,11 @@ from dataclasses import dataclass
 @dataclass
 class Lenses:
     # Se simulan las lentes
+
+    @classmethod
+    def lens_sie():
+        pass
+    
     @classmethod
     def makelens(self, n, thetaE, e1, e2, gamma1, gamma2, center_x, center_y):
 

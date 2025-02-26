@@ -70,8 +70,34 @@ class Lens:
         except FileNotFoundError:
             print(f"File {self.fits_name} not found.")
 
+    def Rotate_Parameters(self, e1, e2, gamma1, gamma2, angle = 45):
+        pa = angle/180*np.pi
+        e1_new = e1 * np.cos(2*pa) - e2 * np.sin(2*pa)
+        e2_new = e1 * np.sin(2*pa) + e2 * np.cos(2*pa)
+        gamma1_new = gamma1 * np.cos(2*pa) - gamma2 * np.sin(2*pa)
+        gamma2_new = gamma1 * np.sin(2*pa) + gamma2 * np.cos(2*pa)
+        return e1_new, e2_new, gamma1_new, gamma2_new
+    
+    def Augment_Data(self):
+        try:
+            with fits.open(self.fits_name, mode = 'update') as hdul:
+                for i in range(1, len(hdul)):
+                    file = hdul[i]
+                    hdr = file.header
+                    img = file.data
+                    rotated_data = rotate(img, 45, reshape = False)
+                    hdr['e1'], hdr['e2'], hdr['gamma1'], hdr['gamma2'] = self.Rotate_Parameters(hdr['e1'],
+                                                                                                hdr['e2'],
+                                                                                                hdr['gamma1'],
+                                                                                                hdr['gamma2'])
+                    
+                    new_hdu = fits.ImageHDU(rotated_data, header = hdr)
+                    hdul.append(new_hdu)
+                hdul.flush()
+        except FileNotFoundError:
+            print(f'File {self.fits_name} not found.')
     # Genera la base de datos para entrenamiento y validación
-    def Train_and_Val_Images(self, augment = False):
+    def Train_and_Val_Images(self):
         try:
             with fits.open(self.fits_name) as hdul:
                 self.train_lbs = []
@@ -85,6 +111,7 @@ class Lens:
                     #img_resized = cv2.resize(img, (224, 224), interpolation = cv2.INTER_LINEAR)
                     self.train_lbs.append([hdr[label] for label in self.labels])
                     self.train_images.append(np.asarray(np.log10(img)))
+                print(len(self.train_images))
 
                 self.train_images, self.train_lbs = np.array(self.train_images), np.array(self.train_lbs)
         
@@ -93,7 +120,7 @@ class Lens:
     
     # Se entrena el modelo
     def Train_and_Val(self, epochs):
-        train_df, test_df, train_labels, test_labels = train_test_split(self.train_images, self.train_lbs, test_size = 0.2, random_state = 42, shuffle = True)
+        train_df, test_df, train_labels, test_labels = train_test_split(self.train_images, self.train_lbs, test_size = 0.2, random_state = 42)
         val_df, val_labels = train_df[-100:], train_labels[-100:]
         
         print(f'Imágenes de entrenamiento:{len(train_df)}')
@@ -104,15 +131,14 @@ class Lens:
         self.model = alexnet.AlexNet(input_shape = self.input_shape, classes = 7)
         self.model.compile(optimizer = optimizer,
                            loss = 'mean_squared_error',
-                           metrics = ['mae','mse'])
+                           metrics = ['mae'])
 
         self.history = self.model.fit(train_df, train_labels, epochs = epochs, validation_data = (val_df, val_labels))
         self.Plot_Metrics('mae')
-        self.Plot_Metrics('mse')
         self.Plot_Metrics('loss')
 
-        test_loss, test_mae, test_mse = self.model.evaluate(test_df, test_labels, batch_size = 128)
-        print(f"Test Loss: {test_loss:.4f}, Test MAE: {test_mae:.4f}, Test MSE: {test_mse:.4f}")
+        test_loss, test_mae = self.model.evaluate(test_df, test_labels, batch_size = 128)
+        print(f'Test Loss: {test_loss:.4f}, Test MAE: {test_mae:.4f}')
 
         predictions = self.model.predict(test_df[:20])
         #print(f'Len predictions {len(predictions)} \n predictions: \n{predictions}')
@@ -182,8 +208,8 @@ class Lens:
                          thetaE = self.thetaE,
                          e1 = self.e1,
                          e2 = self.e2,
-                         gamma1 = rd.uniform(0.0,0.5),
-                         gamma2 = rd.uniform(0.0,0.5),
+                         gamma1 = rd.uniform(0.1,0.2),
+                         gamma2 = rd.uniform(0.1,0.2),
                          center_x = 0.,
                          center_y = 0.)
             
@@ -209,38 +235,11 @@ class Lens:
 
         hdu = fits.HDUList([primary_hdu] + images_hdus)
         hdu.writeto(self.fits_name, overwrite = True)
-
         if augment == True:
             self.Augment_Data()
-    
-    def Rotate_Parameters(self, e1, e2, gamma1, gamma2, angle = 45):
-        pa = angle/180*np.pi
-        e1_new = e1 * np.cos(2*pa) - e2 * np.sin(2*pa)
-        e2_new = e1 * np.sin(2*pa) + e2 * np.cos(2*pa)
-        gamma1_new = gamma1 * np.cos(2*pa) - gamma2 * np.sin(2*pa)
-        gamma2_new = gamma1 * np.sin(2*pa) + gamma2 * np.cos(2*pa)
-        return e1_new, e2_new, gamma1_new, gamma2_new
-    
-    def Augment_Data(self):
-        try:
-            with fits.open(self.fits_name, mode = 'update') as hdul:
-                for i in range(1, len(hdul)):
-                    file = hdul[i]
-                    hdr = file.header
-                    img = file.data
-                    rotated_data = rotate(img, 45, reshape = False)
-                    hdr['e1'], hdr['e2'], hdr['gamma1'], hdr['gamma2'] = self.Rotate_Parameters(hdr['e1'],
-                                                                                                hdr['e2'],
-                                                                                                hdr['gamma1'],
-                                                                                                hdr['gamma2'])
-                    
-                    new_hdu = fits.ImageHDU(rotated_data, header = hdr)
-                    hdul.append(new_hdu)
-                hdul.flush()
-        except FileNotFoundError:
-            print(f'File {self.fits_name} not found.')
+        
 
-Lens_instance = Lens(total_images = 500)
+Lens_instance = Lens(total_images = 600)
 
 if args.database:
     Lens_instance.Generate_Images()
