@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 import argparse
 from time import gmtime, strftime
 from create_lens import Lenses as lss
+from create_lens import sie_lens
 from models import alexnet
 from keras.optimizers import Adam # type: ignore
 import astropy.io.fits as fits
@@ -201,15 +202,19 @@ class Lens:
             dl = co.angular_diameter_distance(zl)
             ds = co.angular_diameter_distance(zs)
             dls = co.angular_diameter_distance_z1z2(zl, zs)
+            y1, y2 = 0, 0
+            SIE = sie_lens(co, zl = zl, zs = zs, sigmav = sigmav, f = f, pa = pa)
+            x,phi = SIE.phi_ima(y1,y2)
+            gamma1, gamma2 = SIE.gamma(x, phi)
             
-            self.e1, self.e2 = (1 - f)/(1 + f)*np.cos(2*pa), (1 - f)/(1 + f)*np.sin(2*pa)
-            self.thetaE = 1e6*(4.0*np.pi*sigmav**2/c**2*dls/ds*180.0/np.pi*3600.0).value
+            e1, e2 = (1 - f)/(1 + f)*np.cos(2*pa), (1 - f)/(1 + f)*np.sin(2*pa)
+            thetaE = 1e6*(4.0*np.pi*sigmav**2/c**2*dls/ds*180.0/np.pi*3600.0).value
             lss.makelens(n = i,
-                         thetaE = self.thetaE,
-                         e1 = self.e1,
-                         e2 = self.e2,
-                         gamma1 = rd.uniform(0.1,0.2),
-                         gamma2 = rd.uniform(0.1,0.2),
+                         thetaE = thetaE,
+                         e1 = e1,
+                         e2 = e2,
+                         gamma1 = gamma1[0],
+                         gamma2 = gamma2[0],
                          center_x = 0.,
                          center_y = 0.)
             
