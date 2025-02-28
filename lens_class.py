@@ -9,6 +9,8 @@ from time import gmtime, strftime
 from create_lens import Lenses as lss
 from create_lens import sie_lens
 from models import alexnet
+#from models import efficientnet
+#from models import cnn
 from keras.optimizers import Adam # type: ignore
 import astropy.io.fits as fits
 from astropy.cosmology import FlatLambdaCDM
@@ -23,7 +25,6 @@ parser.add_argument('-sh', '--show', action = 'store_true', help = 'Return an ex
 parser.add_argument('-sm', '--summary', action = 'store_true', help = 'Gives a summary of the dataset.')
 parser.add_argument('-tr', '--train', help = 'Train the DL model.')
 parser.add_argument('-sv', '--save', action = 'store_true', help = 'Save the model.')
-parser.add_argument('-ag', '--augment', help = 'Generate a Data Augmentation.')
 args = parser.parse_args()
 
 class Lens:
@@ -104,7 +105,7 @@ class Lens:
                 self.train_lbs = []
                 self.train_images = []
 
-                for idx in range(self.total_images):
+                for idx in range(len(hdul)-1):
                     file = hdul[idx+1]
                     hdr = file.header
                     file_name = hdr['NAME']
@@ -192,7 +193,7 @@ class Lens:
     def Generate_Images(self):
         #self.__dict__.update(kwargs)
         for i in tqdm(range(self.total_images)):
-            f = rd.uniform(0.2,1.)
+            f = rd.uniform(0,1.)
             deg = 60
             pa = deg/180*np.pi
             sigmav = 200
@@ -213,8 +214,8 @@ class Lens:
                          thetaE = thetaE,
                          e1 = e1,
                          e2 = e2,
-                         gamma1 = gamma1[0],
-                         gamma2 = gamma2[0],
+                         gamma1 = gamma1[1],
+                         gamma2 = gamma2[1],
                          center_x = 0.,
                          center_y = 0.)
             
@@ -244,11 +245,11 @@ class Lens:
             self.Augment_Data()
         
 
-Lens_instance = Lens(total_images = 600)
+Lens_instance = Lens(total_images = 1000)
 
 if args.database:
     Lens_instance.Generate_Images()
-    Lens_instance.Save_FITS(bool(args.augment))
+    Lens_instance.Save_FITS(False)
 
 if args.show:
     Lens_instance.Examples()

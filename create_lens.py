@@ -178,8 +178,6 @@ class Lenses:
     def makelens(self, n, thetaE, e1, e2, gamma1, gamma2, center_x, center_y):
 
         self.file_name = f'lens{n+1}'
-        # Einstein radius
-        
         
         # eccentricity computation
         self.thetaE = thetaE
