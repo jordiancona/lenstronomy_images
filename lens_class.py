@@ -8,6 +8,7 @@ import argparse
 from time import gmtime, strftime
 from create_lens import Lenses as lss
 from create_lens import sie_lens
+from make_lens import MakeLens
 from models import alexnet
 #from models import efficientnet
 #from models import cnn
@@ -17,7 +18,6 @@ from astropy.cosmology import FlatLambdaCDM
 from astropy.constants import c
 from sklearn.model_selection import train_test_split
 from tqdm import tqdm
-from scipy.ndimage import rotate
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-db', '--database', action = 'store_true', help = 'Generate the images for training.')
@@ -87,11 +87,18 @@ class Lens:
                     file = hdul[i]
                     hdr = file.header
                     img = file.data
-                    rotated_data = rotate(img, 45, reshape = False)
+                    #rotated_data = rotate(img, 45, reshape = False)
                     hdr['e1'], hdr['e2'], hdr['gamma1'], hdr['gamma2'] = self.Rotate_Parameters(hdr['e1'],
                                                                                                 hdr['e2'],
                                                                                                 hdr['gamma1'],
                                                                                                 hdr['gamma2'])
+                    rotated_data = MakeLens(thetaE = hdr['theta_E'],
+                                            e1 = hdr['e1'],
+                                            e2 = hdr['e2'],
+                                            gamma1 = hdr['gamma1'],
+                                            gamma2 = hdr['gamma2'],
+                                            center_x = hdr['center_x'],
+                                            center_y = hdr['center_y'])
                     
                     new_hdu = fits.ImageHDU(rotated_data, header = hdr)
                     hdul.append(new_hdu)
@@ -198,7 +205,7 @@ class Lens:
             pa = deg/180*np.pi
             sigmav = 200
             zl = rd.uniform(0.5,1.)
-            zs = rd.uniform(1.,2.)
+            zs = rd.uniform(1.5,2.)
             co = FlatLambdaCDM(H0 = 70, Om0 = 0.3)
             dl = co.angular_diameter_distance(zl)
             ds = co.angular_diameter_distance(zs)
@@ -249,7 +256,7 @@ Lens_instance = Lens(total_images = 1000)
 
 if args.database:
     Lens_instance.Generate_Images()
-    Lens_instance.Save_FITS(False)
+    Lens_instance.Save_FITS(True)
 
 if args.show:
     Lens_instance.Examples()
