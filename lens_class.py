@@ -66,7 +66,7 @@ class Lens:
     def Generate_Summary(self):
         try:
             with fits.open(self.fits_name) as hdul:
-                summary = {'total_images': len(hdul) - 1, 'file_info': hdul.info()}
+                summary = {'total_images': len(hdul) - 1}
                 print("Dataset Summary:", summary)
                 
         except FileNotFoundError:
@@ -130,7 +130,8 @@ class Lens:
     # Se entrena el modelo
     def Train_and_Val(self, epochs):
         train_df, test_df, train_labels, test_labels = train_test_split(self.train_images, self.train_lbs, test_size = 0.2, random_state = 42)
-        val_df, val_labels = train_df[-100:], train_labels[-100:]
+        val_percentage = len(train_df)*0.30
+        val_df, val_labels = train_df[-val_percentage:], train_labels[-val_percentage:]
         
         print(f'Imágenes de entrenamiento:{len(train_df)}')
         print(f'Imágenes de validación:{len(val_df)}')
