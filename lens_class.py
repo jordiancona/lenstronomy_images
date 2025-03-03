@@ -32,7 +32,7 @@ class Lens:
         self.total_images = total_images
         self.fits_path = './fits/'
         self.fits_name = './lens_fits.fits'
-        self.labels = ['theta_E','e1','e2','gamma1','gamma2','center_x','center_y']
+        self.labels = ['theta_E','e1','e2','gamma1','gamma2']
         self.batch_size = 64
         self.input_shape = (100, 100, 1)
 
@@ -136,8 +136,8 @@ class Lens:
         print(f'Imágenes de validación:{len(val_df)}')
         print(f'Imágenes de prueba:{len(test_df)}')
 
-        optimizer = Adam(learning_rate = 1e-3) # 'adam', 'sgd'
-        self.model = alexnet.AlexNet(input_shape = self.input_shape, classes = 7)
+        optimizer = Adam(learning_rate = 1e-4) # 'adam', 'sgd'
+        self.model = alexnet.AlexNet(input_shape = self.input_shape, classes = 5)
         self.model.compile(optimizer = optimizer,
                            loss = 'mean_squared_error',
                            metrics = ['mae'])
@@ -157,7 +157,8 @@ class Lens:
         print(f'Coeficiente de determinación - R^2: {correlation**2:.2f}')
 
         for i, val in enumerate(predictions):
-            thetaE, e1, e2, gamma1, gamma2, center_x, center_y = val
+            thetaE, e1, e2, gamma1, gamma2 = val
+            center_x, center_y = 0.,0.
             lss.makelens(n = i,
                          thetaE = thetaE,
                          e1 = e1,
@@ -170,7 +171,8 @@ class Lens:
             lss.Create_FITS(path = './results/predictions/')
 
         for i, val in enumerate(test_labels[:20]):
-            thetaE, e1, e2, gamma1, gamma2, center_x, center_y = val
+            thetaE, e1, e2, gamma1, gamma2 = val
+            center_x, center_y = 0.,0.
             lss.makelens(n = i,
                          thetaE = thetaE,
                          e1 = e1,
@@ -252,7 +254,7 @@ class Lens:
             self.Augment_Data()
         
 
-Lens_instance = Lens(total_images = 1000)
+Lens_instance = Lens(total_images = 5000)
 
 if args.database:
     Lens_instance.Generate_Images()
