@@ -131,7 +131,7 @@ class Lens:
     def Train_and_Val(self, epochs):
         train_df, test_df, train_labels, test_labels = train_test_split(self.train_images, self.train_lbs, test_size = 0.2, random_state = 42)
         val_percentage = len(train_df)*0.30
-        val_df, val_labels = train_df[-val_percentage:], train_labels[-val_percentage:]
+        val_df, val_labels = train_df[-200:], train_labels[-200:]
         
         print(f'Imágenes de entrenamiento:{len(train_df)}')
         print(f'Imágenes de validación:{len(val_df)}')

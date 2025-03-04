@@ -14,7 +14,6 @@ from lenstronomy.LensModel.Solver.lens_equation_solver import LensEquationSolver
 from lenstronomy.LightModel.light_model import LightModel
 from lenstronomy.Data.psf import PSF
 import astropy.io.fits as fits
-from astropy.cosmology import FlatLambdaCDM
 from astropy.constants import c
 from scipy.optimize import brentq
 from dataclasses import dataclass
