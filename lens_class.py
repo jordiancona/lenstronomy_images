@@ -117,6 +117,7 @@ class Lens:
                     hdr = file.header
                     file_name = hdr['NAME']
                     img = file.data
+                    print(type(img))
                     #img_resized = cv2.resize(img, (224, 224), interpolation = cv2.INTER_LINEAR)
                     self.train_lbs.append([hdr[label] for label in self.labels])
                     self.train_images.append(np.asarray(np.log10(img)))
@@ -196,7 +197,7 @@ class Lens:
         plt.xlabel('epoch')
         plt.ylabel(metric)
         plt.legend()
-        plt.savefig(f'{metric.upper()}.png')
+        plt.savefig(f'{metric}.png')
         plt.close()
     
     # Se generan las imágenes y archivos FITS

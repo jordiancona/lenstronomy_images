@@ -361,5 +361,5 @@ class Lenses:
         for parameter in parameters:
             outhdr.append(parameter, end = True)
         
-        outlist = fits.ImageHDU(data = outimage.astype('float32'), header = outhdr)
+        outlist = fits.ImageHDU(data = outimage, header = outhdr) # .astype('float32')
         outlist.writeto(outfile, overwrite = True)
