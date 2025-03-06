@@ -44,13 +44,14 @@ class Lens:
             with fits.open(self.fits_name) as hdul:
                 plt.figure(figsize = (10,8))
                 for i in range(9):
-                    file = hdul[i+1]
+                    file = hdul[i+2]
                     hdr = file.header
                     data = file.data
                     plt.subplot(3, 3, i+1)
                     plt.grid(False)
                     plt.imshow(np.log10(data), cmap = 'gist_heat', aspect = 'auto')
-                    text_values = [f'{label}: {hdr[label]:.2f}' for label in self.labels]
+                    plt.axis('equal')
+                    text_values = [f'{label}: {hdr[label]:.4f}' for label in self.labels]
                     y_start = 50
                     y_step = 8
                     for j, text in enumerate(text_values):
@@ -218,9 +219,8 @@ class Lens:
             dls = co.angular_diameter_distance_z1z2(zl, zs)
             y1, y2 = 0, 0
             SIE = sie_lens(co, zl = zl, zs = zs, sigmav = sigmav, f = f, pa = pa)
-            x,phi = SIE.phi_ima(y1,y2)
+            x, phi = SIE.phi_ima(y1,y2)
             gamma1, gamma2 = SIE.gamma(x, phi)
-            
             e1, e2 = (1 - f)/(1 + f)*np.cos(2*pa), (1 - f)/(1 + f)*np.sin(2*pa)
             thetaE = 1e6*(4.0*np.pi*sigmav**2/c**2*dls/ds*180.0/np.pi*3600.0).value
             lss.makelens(n = i,
@@ -258,7 +258,7 @@ class Lens:
             self.Augment_Data()
         
 
-Lens_instance = Lens(total_images = 10000)
+Lens_instance = Lens(total_images = 5000)
 
 if args.database:
     Lens_instance.Generate_Images()

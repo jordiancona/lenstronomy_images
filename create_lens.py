@@ -20,18 +20,18 @@ from dataclasses import dataclass
 
 class sie_lens():
     def __init__(self,co, zl = 0.3, zs = 2.0, sigmav = 200,f = 0.6,pa = 45.0):
-        self.sigmav = sigmav # velocity dispersion
+        self.sigmav = sigmav 
         self.co = co # cosmological model
         self.zl = zl # lens redshift
         self.zs = zs # source redshift
         self.f = f # axis ratio
-        self.pa = pa#*np.pi/180.0 # position angle
+        self.pa = pa #*np.pi/180.0 # position angle
         # compute the angular diameter distances:
         self.dl = self.co.angular_diameter_distance(self.zl)
         self.ds = self.co.angular_diameter_distance(self.zs)
         self.dls = self.co.angular_diameter_distance_z1z2(self.zl,self.zs)
-        # calculates the Einstein radius of the SIS lens
-        # in arcsec
+        
+        # calculates the Einstein radius of the SIS lens in arcsec
         self.theta0 = np.rad2deg((4.0*np.pi*sigmav**2/(c.to("km/s"))**2*self.dls/self.ds).value)*3600.0
 
     def delta(self,f,phi):
@@ -70,38 +70,36 @@ class sie_lens():
         """
         Lensing potential at polar coordinates x,phi
         """
-        psi=x*self.psi_tilde(phi)
+        psi = x*self.psi_tilde(phi)
         return psi
 
     def alpha(self,phi):
         """
         Deflection angle as a function of the polar angle phi
         """
-        fp=np.sqrt(1.0-self.f**2)
-        a1=np.sqrt(self.f)/fp*np.arcsinh(fp/self.f*np.cos(phi))
-        a2=np.sqrt(self.f)/fp*np.arcsin(fp*np.sin(phi))
+        fp = np.sqrt(1.0-self.f**2)
+        a1 = np.sqrt(self.f)/fp*np.arcsinh(fp/self.f*np.cos(phi))
+        a2 = np.sqrt(self.f)/fp*np.arcsin(fp*np.sin(phi))
         return a1,a2
 
-    def cut(self,phi_min=0,phi_max=2.0*np.pi,nphi=1000):
+    def cut(self, phi_min = 0, phi_max = 2.0*np.pi, nphi=1000):
         """
-        Coordinates of the points on the cut.
-        The arguments phi_min, phi_max, nphi define the range of
+        Coordinates of the points on the cut. The arguments phi_min, phi_max, nphi define the range of
         polar angles used.
         """
-        phi=np.linspace(phi_min,phi_max,nphi)
-        y1_,y2_=self.alpha(phi)
+        phi = np.linspace(phi_min,phi_max,nphi)
+        y1_, y2_ = self.alpha(phi)
         y1 = y1_ * np.cos(self.pa) - y2_ * np.sin(self.pa)
         y2 = y1_ * np.sin(self.pa) + y2_ * np.cos(self.pa)
         return -y1,-y2
     
     def tan_caustic(self,phi_min=0,phi_max=2.0*np.pi,nphi=1000):
         """
-        Coordinates of the points on the tangential caustic.
-        The arguments phi_min, phi_max, nphi define the range of
-        polar angles used.
+        Coordinates of the points on the tangential caustic. The arguments phi_min, phi_max, nphi
+        define the range ofpolar angles used.
         """
-        phi=np.linspace(phi_min,phi_max,nphi)
-        delta=np.sqrt(np.cos(phi)**2+self.f**2*np.sin(phi)**2)
+        phi = np.linspace(phi_min,phi_max,nphi)
+        delta = np.sqrt(np.cos(phi)**2+self.f**2*np.sin(phi)**2)
         a1,a2=self.alpha(phi)
         y1_=np.sqrt(self.f)/delta*np.cos(phi)-a1
         y2_=np.sqrt(self.f)/delta*np.sin(phi)-a2
@@ -111,9 +109,8 @@ class sie_lens():
     
     def tan_cc(self,phi_min=0,phi_max=2.0*np.pi,nphi=1000):
         """
-        Coordinates of the points on the tangential critical line.
-        The arguments phi_min, phi_max, nphi define the range of
-        polar angles used.
+        Coordinates of the points on the tangential critical line. The arguments phi_min, phi_max, nphi
+        define the range of polar angles used.
         """
         phi = np.linspace(phi_min,phi_max,nphi)
         delta = np.sqrt(np.cos(phi)**2+self.f**2*np.sin(phi)**2)
@@ -126,7 +123,7 @@ class sie_lens():
         x = y1*np.cos(phi)+y2*np.sin(phi)+(self.psi_tilde(phi+self.pa))
         return x
     
-    def phi_ima(self,y1,y2,checkplot=True,eps=0.001,nphi=100):
+    def phi_ima(self, y1, y2, checkplot = True, eps = 0.001, nphi = 100):
         """
         Solve the lens Equation for a given source position (y1,y2)
         """
@@ -166,18 +163,15 @@ class sie_lens():
         phi = np.array(phi)
             # returns radii and polar angles of the images. Add position angle
             # to go back to the rotated frame of the lens.
-        return xphi,phi+self.pa
+        return xphi, phi+self.pa
 
 @dataclass
 class Lenses:
-    # Se simulan las lentes
-    
     @classmethod
     def makelens(self, n, thetaE, e1, e2, gamma1, gamma2, center_x, center_y):
 
         self.file_name = f'lens{n+1}'
         
-        # eccentricity computation
         self.thetaE = thetaE
         self.e1, self.e2 = e1, e2
         self.gamma1 = gamma1
