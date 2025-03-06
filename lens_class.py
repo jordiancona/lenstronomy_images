@@ -13,6 +13,7 @@ from models import alexnet
 #from models import efficientnet
 #from models import cnn
 from keras.optimizers import Adam # type: ignore
+from keras.callbacks import EarlyStopping # type: ignore
 import astropy.io.fits as fits
 from astropy.cosmology import FlatLambdaCDM
 from astropy.constants import c
@@ -33,6 +34,7 @@ class Lens:
         self.fits_path = './fits/'
         self.fits_name = './lens_fits.fits'
         self.labels = ['theta_E','e1','e2','gamma1','gamma2']
+        self.classes = 5
         self.batch_size = 64
         self.input_shape = (100, 100, 1)
 
@@ -117,7 +119,6 @@ class Lens:
                     hdr = file.header
                     file_name = hdr['NAME']
                     img = file.data
-                    print(type(img))
                     #img_resized = cv2.resize(img, (224, 224), interpolation = cv2.INTER_LINEAR)
                     self.train_lbs.append([hdr[label] for label in self.labels])
                     self.train_images.append(np.asarray(np.log10(img)))
@@ -138,13 +139,14 @@ class Lens:
         print(f'Imágenes de validación:{len(val_df)}')
         print(f'Imágenes de prueba:{len(test_df)}')
 
+        callback = EarlyStopping(monitor = 'val_loss', start_from_epoch = 10, patience = 3)
         optimizer = Adam(learning_rate = 1e-4) # 'adam', 'sgd'
-        self.model = alexnet.AlexNet(input_shape = self.input_shape, classes = 5)
+        self.model = alexnet.AlexNet(input_shape = self.input_shape, classes = self.classes)
         self.model.compile(optimizer = optimizer,
                            loss = 'mean_squared_error',
                            metrics = ['mae'])
 
-        self.history = self.model.fit(train_df, train_labels, epochs = epochs, validation_data = (val_df, val_labels))
+        self.history = self.model.fit(train_df, train_labels, epochs = epochs, validation_data = (val_df, val_labels), callbacks = [callback])
         self.Plot_Metrics('mae')
         self.Plot_Metrics('loss')
 
@@ -197,7 +199,7 @@ class Lens:
         plt.xlabel('epoch')
         plt.ylabel(metric)
         plt.legend()
-        plt.savefig(f'{metric}.png')
+        plt.savefig(f'{metric.lower()}.png')
         plt.close()
     
     # Se generan las imágenes y archivos FITS
@@ -256,7 +258,7 @@ class Lens:
             self.Augment_Data()
         
 
-Lens_instance = Lens(total_images = 5000)
+Lens_instance = Lens(total_images = 400)
 
 if args.database:
     Lens_instance.Generate_Images()
