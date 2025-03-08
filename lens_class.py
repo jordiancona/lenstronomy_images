@@ -133,8 +133,8 @@ class Lens:
     # Se entrena el modelo
     def Train_and_Val(self, epochs):
         train_df, test_df, train_labels, test_labels = train_test_split(self.train_images, self.train_lbs, test_size = 0.2, random_state = 42)
-        val_percentage = len(train_df)*0.30
-        val_df, val_labels = train_df[-200:], train_labels[-200:]
+        val_df, val_labels = train_df[-2000:], train_labels[-2000:]
+        train_df, train_labels = train_df[:-2000], train_labels[:-2000]
         
         print(f'Imágenes de entrenamiento:{len(train_df)}')
         print(f'Imágenes de validación:{len(val_df)}')
@@ -143,9 +143,7 @@ class Lens:
         callback = EarlyStopping(monitor = 'val_loss', start_from_epoch = 10, patience = 3)
         optimizer = Adam(learning_rate = 1e-4) # 'adam', 'sgd'
         self.model = alexnet.AlexNet(input_shape = self.input_shape, classes = self.classes)
-        self.model.compile(optimizer = optimizer,
-                           loss = 'mean_squared_error',
-                           metrics = ['mae'])
+        self.model.compile(optimizer = optimizer, loss = 'mean_squared_error', metrics = ['mae'])
 
         self.history = self.model.fit(train_df, train_labels, epochs = epochs, validation_data = (val_df, val_labels), callbacks = [callback])
         self.Plot_Metrics('mae')
@@ -154,10 +152,10 @@ class Lens:
         test_loss, test_mae = self.model.evaluate(test_df, test_labels, batch_size = 128)
         print(f'Test Loss: {test_loss:.4f}, Test MAE: {test_mae:.4f}')
 
-        predictions = self.model.predict(test_df[:20])
+        predictions = self.model.predict(test_df)
         #print(f'Len predictions {len(predictions)} \n predictions: \n{predictions}')
 
-        correlation = np.corrcoef(predictions, test_labels[:20])[0,1]
+        correlation = np.corrcoef(predictions, test_labels)[0,1]
         print(f'Coeficiente de correlación - R: {correlation:.2f}')
         print(f'Coeficiente de determinación - R^2: {correlation**2:.2f}')
 
@@ -175,7 +173,7 @@ class Lens:
         
             lss.Create_FITS(path = './results/predictions/')
 
-        for i, val in enumerate(test_labels[:20]):
+        for i, val in enumerate(test_labels):
             thetaE, e1, e2, gamma1, gamma2 = val
             center_x, center_y = 0.,0.
             lss.makelens(n = i,
@@ -258,7 +256,7 @@ class Lens:
             self.Augment_Data()
         
 
-Lens_instance = Lens(total_images = 5000)
+Lens_instance = Lens(total_images = 7000)
 
 if args.database:
     Lens_instance.Generate_Images()

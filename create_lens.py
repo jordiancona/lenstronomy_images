@@ -169,7 +169,6 @@ class sie_lens():
 class Lenses:
     @classmethod
     def makelens(self, n, thetaE, e1, e2, gamma1, gamma2, center_x, center_y):
-
         self.file_name = f'lens{n+1}'
         
         self.thetaE = thetaE
