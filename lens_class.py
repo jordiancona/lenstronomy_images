@@ -256,7 +256,7 @@ class Lens:
             self.Augment_Data()
         
 
-Lens_instance = Lens(total_images = 7000)
+Lens_instance = Lens(total_images = 50000)
 
 if args.database:
     Lens_instance.Generate_Images()
