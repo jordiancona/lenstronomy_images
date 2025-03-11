@@ -132,7 +132,7 @@ class Lens:
     
     # Se entrena el modelo
     def Train_and_Val(self, epochs):
-        train_df, test_df, train_labels, test_labels = train_test_split(self.train_images, self.train_lbs, test_size = 0.2, random_state = 42)
+        train_df, test_df, train_labels, test_labels = train_test_split(self.train_images, self.train_lbs, test_size = 0.2, random_state = 42, shuffle = True)
         val_df, val_labels = train_df[-2000:], train_labels[-2000:]
         train_df, train_labels = train_df[:-2000], train_labels[:-2000]
         
@@ -145,11 +145,11 @@ class Lens:
         self.model = alexnet.AlexNet(input_shape = self.input_shape, classes = self.classes)
         self.model.compile(optimizer = optimizer, loss = 'mean_squared_error', metrics = ['mae'])
 
-        self.history = self.model.fit(train_df, train_labels, epochs = epochs, validation_data = (val_df, val_labels), callbacks = [callback])
+        self.history = self.model.fit(train_df, train_labels, epochs = epochs, validation_data = (val_df, val_labels), callbacks = [callback], batch_size = 64)
         self.Plot_Metrics('mae')
         self.Plot_Metrics('loss')
 
-        test_loss, test_mae = self.model.evaluate(test_df, test_labels, batch_size = 128)
+        test_loss, test_mae = self.model.evaluate(test_df, test_labels, batch_size = 64)
         print(f'Test Loss: {test_loss:.4f}, Test MAE: {test_mae:.4f}')
 
         predictions = self.model.predict(test_df)
@@ -256,7 +256,7 @@ class Lens:
             self.Augment_Data()
         
 
-Lens_instance = Lens(total_images = 50000)
+Lens_instance = Lens(total_images = 10000)
 
 if args.database:
     Lens_instance.Generate_Images()
