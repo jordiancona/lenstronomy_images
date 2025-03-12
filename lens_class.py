@@ -121,7 +121,7 @@ class Lens:
                     hdr = file.header
                     file_name = hdr['NAME']
                     img = file.data
-                    #img_resized = cv2.resize(img, (224, 224), interpolation = cv2.INTER_LINEAR)
+                    # img_resized = cv2.resize(img, (224, 224), interpolation = cv2.INTER_LINEAR)
                     self.train_lbs.append([hdr[label] for label in self.labels])
                     self.train_images.append(np.asarray(np.log10(img)))
                 print(len(self.train_images))
@@ -132,9 +132,9 @@ class Lens:
             print(f"File {self.fits_name} not found.")
     
     # Se entrena el modelo
-    def Train_and_Val(self, epochs, cpu = False):
+    def Train_and_Val(self, epochs, device):
         
-        if cpu == True:
+        if device == True:
             tf.config.set_visible_devices([],'GPU')
         
         train_df, test_df, train_labels, test_labels = train_test_split(self.train_images, self.train_lbs, test_size = 0.2, random_state = 42, shuffle = True)
@@ -230,8 +230,8 @@ class Lens:
                          thetaE = thetaE,
                          e1 = e1,
                          e2 = e2,
-                         gamma1 = gamma1[1],
-                         gamma2 = gamma2[1],
+                         gamma1 = gamma1[1], # gamma[1]
+                         gamma2 = gamma2[1], # gamma2[1]
                          center_x = 0.,
                          center_y = 0.)
             
@@ -261,7 +261,7 @@ class Lens:
             self.Augment_Data()
         
 
-Lens_instance = Lens(total_images = 10000)
+Lens_instance = Lens(total_images = 1000)
 
 if args.database:
     Lens_instance.Generate_Images()
@@ -275,4 +275,4 @@ if args.summary:
 
 if args.train:
     Lens_instance.Train_and_Val_Images()
-    Lens_instance.Train_and_Val(int(args.train), cpu = True)
+    Lens_instance.Train_and_Val(int(args.train), device = False)
