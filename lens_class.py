@@ -12,6 +12,7 @@ from make_lens import MakeLens
 from models import alexnet
 #from models import efficientnet
 #from models import cnn
+import tensorflow as tf
 from keras.optimizers import Adam # type: ignore
 from keras.callbacks import EarlyStopping # type: ignore
 import astropy.io.fits as fits
@@ -131,7 +132,9 @@ class Lens:
             print(f"File {self.fits_name} not found.")
     
     # Se entrena el modelo
-    def Train_and_Val(self, epochs):
+    def Train_and_Val(self, epochs, device):
+        if device == 'CPU':
+            tf.config.set_visible_devices([],'GPU')
         train_df, test_df, train_labels, test_labels = train_test_split(self.train_images, self.train_lbs, test_size = 0.2, random_state = 42, shuffle = True)
         val_df, val_labels = train_df[-2000:], train_labels[-2000:]
         train_df, train_labels = train_df[:-2000], train_labels[:-2000]
