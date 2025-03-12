@@ -132,9 +132,11 @@ class Lens:
             print(f"File {self.fits_name} not found.")
     
     # Se entrena el modelo
-    def Train_and_Val(self, epochs, device):
-        if device == 'CPU':
+    def Train_and_Val(self, epochs, cpu = False):
+        
+        if cpu == True:
             tf.config.set_visible_devices([],'GPU')
+        
         train_df, test_df, train_labels, test_labels = train_test_split(self.train_images, self.train_lbs, test_size = 0.2, random_state = 42, shuffle = True)
         val_df, val_labels = train_df[-2000:], train_labels[-2000:]
         train_df, train_labels = train_df[:-2000], train_labels[:-2000]
@@ -273,4 +275,4 @@ if args.summary:
 
 if args.train:
     Lens_instance.Train_and_Val_Images()
-    Lens_instance.Train_and_Val(int(args.train))
+    Lens_instance.Train_and_Val(int(args.train), cpu = True)
