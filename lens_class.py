@@ -38,6 +38,8 @@ class Lens:
         self.classes = 5
         self.batch_size = 64
         self.input_shape = (100, 100, 1)
+        self.e1, self.e2 = 0.5, 0.3
+        self.gamma1, self.gamma2 = 0.1, 0.1
 
     # Genera una matriz de las imágenes de lentes gravitacionales para entrenamiento
     def Examples(self):
@@ -124,7 +126,6 @@ class Lens:
                     # img_resized = cv2.resize(img, (224, 224), interpolation = cv2.INTER_LINEAR)
                     self.train_lbs.append([hdr[label] for label in self.labels])
                     self.train_images.append(np.asarray(np.log10(img)))
-                print(len(self.train_images))
 
                 self.train_images, self.train_lbs = np.array(self.train_images), np.array(self.train_lbs)
         
@@ -132,14 +133,15 @@ class Lens:
             print(f"File {self.fits_name} not found.")
     
     # Se entrena el modelo
-    def Train_and_Val(self, epochs, device):
+    def Train_and_Val(self, epochs, device, percentage):
         
         if device == True:
             tf.config.set_visible_devices([],'GPU')
         
         train_df, test_df, train_labels, test_labels = train_test_split(self.train_images, self.train_lbs, test_size = 0.2, random_state = 42, shuffle = True)
-        val_df, val_labels = train_df[-2000:], train_labels[-2000:]
-        train_df, train_labels = train_df[:-2000], train_labels[:-2000]
+        pcg = percentage*len(train_df)//100
+        val_df, val_labels = train_df[-pcg:], train_labels[-pcg:]
+        train_df, train_labels = train_df[:-pcg], train_labels[:-pcg]
         
         print(f'Imágenes de entrenamiento:{len(train_df)}')
         print(f'Imágenes de validación:{len(val_df)}')
@@ -261,7 +263,7 @@ class Lens:
             self.Augment_Data()
         
 
-Lens_instance = Lens(total_images = 1000)
+Lens_instance = Lens(total_images = 10000)
 
 if args.database:
     Lens_instance.Generate_Images()
@@ -275,4 +277,4 @@ if args.summary:
 
 if args.train:
     Lens_instance.Train_and_Val_Images()
-    Lens_instance.Train_and_Val(int(args.train), device = False)
+    Lens_instance.Train_and_Val(int(args.train), device = False, percentage = 25)
