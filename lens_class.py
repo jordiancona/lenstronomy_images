@@ -194,6 +194,7 @@ class Lens:
         
             lss.Create_FITS(path = './results/original/')
 
+
     def Save_model(self):
         self.model.save('./cnn_model/my_model.h5')
 
