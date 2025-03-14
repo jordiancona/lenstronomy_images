@@ -38,8 +38,6 @@ class Lens:
         self.classes = 5
         self.batch_size = 64
         self.input_shape = (100, 100, 1)
-        self.e1, self.e2 = 0.5, 0.3
-        self.gamma1, self.gamma2 = 0.1, 0.1
 
     # Genera una matriz de las imágenes de lentes gravitacionales para entrenamiento
     def Examples(self):
@@ -147,7 +145,7 @@ class Lens:
         print(f'Imágenes de validación:{len(val_df)}')
         print(f'Imágenes de prueba:{len(test_df)}')
 
-        callback = EarlyStopping(monitor = 'val_loss', start_from_epoch = 10, patience = 3)
+        callback = EarlyStopping(monitor = 'val_loss', start_from_epoch = 4, patience = 3)
         optimizer = Adam(learning_rate = 1e-4) # 'adam', 'sgd'
         self.model = alexnet.AlexNet(input_shape = self.input_shape, classes = self.classes)
         self.model.compile(optimizer = optimizer, loss = 'mean_squared_error', metrics = ['mae'])
@@ -264,7 +262,7 @@ class Lens:
             self.Augment_Data()
         
 
-Lens_instance = Lens(total_images = 20000)
+Lens_instance = Lens(total_images = 30000)
 
 if args.database:
     Lens_instance.Generate_Images()
