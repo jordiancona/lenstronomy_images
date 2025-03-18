@@ -253,8 +253,8 @@ class Lenses:
         # lensed image positions (solution of the lens equation) #
         point_source_model_list = ['LENSED_POSITION']
         pointSource = PointSource(point_source_type_list = point_source_model_list,
-                                lens_model=lensModel,
-                                fixed_magnification_list = [False])
+                                  lens_model = lensModel,
+                                  fixed_magnification_list = [False])
 
         kwargs_ps = [{'ra_image': theta_ra, 'dec_image': theta_dec, 'point_amp': np.abs(mag)*30}]
         # return image positions and amplitudes #
@@ -303,7 +303,7 @@ class Lenses:
         
         # simulate image with the parameters we have defined above #
         self.image = imageModel.image(kwargs_lens = kwargs_lens, kwargs_source = kwargs_light_source,
-                                kwargs_lens_light = kwargs_light_lens, kwargs_ps = kwargs_ps)
+                                      kwargs_lens_light = kwargs_light_lens, kwargs_ps = kwargs_ps)
 
         # image with noise
         exp_time = 100  # exposure time to quantify the Poisson noise level
@@ -311,14 +311,6 @@ class Lenses:
         poisson = image_util.add_poisson(self.image, exp_time = exp_time)
         bkg = image_util.add_background(self.image, sigma_bkd = background_rms)
         image_noisy = self.image + bkg + poisson
-
-        #f, ax = plt.subplots(1, 1, figsize=(4, 4), sharex = False, sharey = False)
-        #ax.matshow(np.log10(image), origin = 'lower', cmap = 'gist_heat')
-        #plt.axis('off')
-        #axes[1].matshow(np.log10(image_noisy), origin='lower', cmap = 'gray')
-        #f.tight_layout()
-        #plt.savefig(path+self.file_name, bbox_inches = "tight")
-        #plt.close()
 
     # Se crean los archivos FITS a partir de los PNG
     @classmethod
