@@ -89,13 +89,16 @@ class Lens:
                     file = hdul[i]
                     hdr = file.header
                     img = file.data
+                    hdr['e1'] = rd.uniform(0.5, 0.9)
+                    hdr['e2'] = rd.uniform(0.5, 0.9)
                     rotated_data = MakeLens(thetaE = hdr['theta_E'],
-                                            e1 = rd.uniform(0.5,0.9),
-                                            e2 = rd.uniform(0.5,0.9),
+                                            e1 = hdr['e1'],
+                                            e2 = hdr['e2'],
                                             gamma1 = hdr['gamma1'],
                                             gamma2 = hdr['gamma2'],
                                             center_x = hdr['center_x'],
                                             center_y = hdr['center_y'])
+                    
                     new_hdu = fits.ImageHDU(rotated_data, header = hdr)
                     hdul.append(new_hdu)
                 hdul.flush()
@@ -279,7 +282,7 @@ class Lens:
             self.Augment_Data()
             self.Augment_Data_Special()
 
-Lens_instance = Lens(total_images = 15000)
+Lens_instance = Lens(total_images = 7500)
 
 if args.database:
     Lens_instance.Generate_Images()
