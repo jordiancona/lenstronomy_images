@@ -10,8 +10,6 @@ from create_lens import Lenses as lss
 from create_lens import sie_lens
 from make_lens import MakeLens
 from models import alexnet
-#from models import efficientnet
-#from models import cnn
 import tensorflow as tf
 from keras.optimizers import Adam # type: ignore
 from keras.callbacks import EarlyStopping # type: ignore
@@ -84,6 +82,26 @@ class Lens:
         gamma2_new = gamma1 * np.sin(2*pa) + gamma2 * np.cos(2*pa)
         return e1_new, e2_new, gamma1_new, gamma2_new
     
+    def Augment_Data_Special(self):
+        try:
+            with fits.open(self.fits_name, mode = 'update') as hdul:
+                for i in range(1, len(hdul)):
+                    file = hdul[i]
+                    hdr = file.header
+                    img = file.data
+                    rotated_data = MakeLens(thetaE = hdr['theta_E'],
+                                            e1 = rd.uniform(0.5,0.9),
+                                            e2 = rd.uniform(0.5,0.9),
+                                            gamma1 = hdr['gamma1'],
+                                            gamma2 = hdr['gamma2'],
+                                            center_x = hdr['center_x'],
+                                            center_y = hdr['center_y'])
+                    new_hdu = fits.ImageHDU(rotated_data, header = hdr)
+                    hdul.append(new_hdu)
+                hdul.flush()
+        except FileNotFoundError:
+            print(f'File {self.fits_name} not found.')
+
     def Augment_Data(self):
         try:
             with fits.open(self.fits_name, mode = 'update') as hdul:
@@ -91,7 +109,6 @@ class Lens:
                     file = hdul[i]
                     hdr = file.header
                     img = file.data
-                    #rotated_data = rotate(img, 45, reshape = False)
                     hdr['e1'], hdr['e2'], hdr['gamma1'], hdr['gamma2'] = self.Rotate_Parameters(hdr['e1'],
                                                                                                 hdr['e2'],
                                                                                                 hdr['gamma1'],
@@ -109,6 +126,7 @@ class Lens:
                 hdul.flush()
         except FileNotFoundError:
             print(f'File {self.fits_name} not found.')
+
     # Genera la base de datos para entrenamiento y validación
     def Train_and_Val_Images(self):
         try:
@@ -158,7 +176,6 @@ class Lens:
         print(f'Test Loss: {test_loss:.4f}, Test MAE: {test_mae:.4f}')
 
         predictions = self.model.predict(test_df)
-        #print(f'Len predictions {len(predictions)} \n predictions: \n{predictions}')
 
         correlation = np.corrcoef(predictions, test_labels)[0,1]
         print(f'Coeficiente de correlación - R: {correlation:.2f}')
@@ -260,9 +277,9 @@ class Lens:
         hdu.writeto(self.fits_name, overwrite = True)
         if augment == True:
             self.Augment_Data()
-        
+            self.Augment_Data_Special()
 
-Lens_instance = Lens(total_images = 30000)
+Lens_instance = Lens(total_images = 15000)
 
 if args.database:
     Lens_instance.Generate_Images()
