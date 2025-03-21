@@ -17,7 +17,6 @@ import astropy.io.fits as fits
 from astropy.cosmology import FlatLambdaCDM
 from astropy.constants import c
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import root_mean_squared_error
 from tqdm import tqdm
 
 parser = argparse.ArgumentParser()
