@@ -11,12 +11,13 @@ from create_lens import sie_lens
 from make_lens import MakeLens
 from models import alexnet
 import tensorflow as tf
-from keras.optimizers import Adam # type: ignore
-from keras.callbacks import EarlyStopping # type: ignore
+from keras.optimizers import Adam, Nadam # type: ignore
+from keras.callbacks import EarlyStopping, ReduceLROnPlateau # type: ignore
 import astropy.io.fits as fits
 from astropy.cosmology import FlatLambdaCDM
 from astropy.constants import c
 from sklearn.model_selection import train_test_split
+from sklearn.metrics import root_mean_squared_error
 from tqdm import tqdm
 
 parser = argparse.ArgumentParser()
@@ -162,16 +163,24 @@ class Lens:
         val_df, val_labels = train_df[-pcg:], train_labels[-pcg:]
         train_df, train_labels = train_df[:-pcg], train_labels[:-pcg]
         
-        print(f'Imágenes de entrenamiento:{len(train_df)}')
-        print(f'Imágenes de validación:{len(val_df)}')
-        print(f'Imágenes de prueba:{len(test_df)}')
+        print(f'Imágenes de entrenamiento: {len(train_df)}')
+        print(f'Imágenes de validación: {len(val_df)}')
+        print(f'Imágenes de prueba: {len(test_df)}')
 
-        callback = EarlyStopping(monitor = 'val_loss', start_from_epoch = 4, patience = 3)
-        optimizer = Adam(learning_rate = 1e-4) # 'adam', 'sgd'
+        early_stopping = EarlyStopping(monitor = 'val_loss', start_from_epoch = 4, patience = 3)
+        reduce_lr = ReduceLROnPlateau(monitor = 'val_loss', factor = 0.1, patience = 4, min_lr = 1e-5)
+        optimizer = Nadam(learning_rate = 1e-4) # 'adam', 'sgd', 'test ema momentum'
+
         self.model = alexnet.AlexNet(input_shape = self.input_shape, classes = self.classes)
         self.model.compile(optimizer = optimizer, loss = 'mean_squared_error', metrics = ['mae'])
 
-        self.history = self.model.fit(train_df, train_labels, epochs = epochs, validation_data = (val_df, val_labels), callbacks = [callback], batch_size = 64)
+        self.history = self.model.fit(train_df,
+                                      train_labels, 
+                                      epochs = epochs,
+                                      validation_data = (val_df, val_labels), 
+                                      callbacks = [early_stopping, reduce_lr], 
+                                      batch_size = 64)
+        
         self.Plot_Metrics('mae')
         self.Plot_Metrics('loss')
 
@@ -218,7 +227,7 @@ class Lens:
 
     def Plot_Metrics(self, metric):
         plt.figure()
-        plt.plot(self.history.history[f'{metric}'], label = f'Trainning {metric}', c = 'k', lw = 0.8)
+        plt.plot(self.history.history[f'{metric}'], label = f'Training {metric}', c = 'k', lw = 0.8)
         plt.plot(self.history.history[f'val_{metric}'], label = f'Validation {metric}', c = 'r', lw = 0.8)
         plt.title(metric.upper())
         plt.xlabel('epoch')
@@ -232,7 +241,7 @@ class Lens:
         #self.__dict__.update(kwargs)
         for i in tqdm(range(self.total_images)):
             f = rd.uniform(0,1.)
-            deg = 60
+            deg = 30
             pa = deg/180*np.pi
             sigmav = 200
             zl = rd.uniform(0.5,1.)
@@ -279,10 +288,10 @@ class Lens:
         hdu = fits.HDUList([primary_hdu] + images_hdus)
         hdu.writeto(self.fits_name, overwrite = True)
         if augment == True:
+            #self.Augment_Data_Special()
             self.Augment_Data()
-            self.Augment_Data_Special()
 
-Lens_instance = Lens(total_images = 7500)
+Lens_instance = Lens(total_images = 20000)
 
 if args.database:
     Lens_instance.Generate_Images()
