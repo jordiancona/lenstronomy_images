@@ -58,18 +58,18 @@ class Lens:
                     plt.axis('off')
                 plt.suptitle('Example of lenses')
                 plt.tight_layout()
-                plt.savefig('lenses_images.png', bbox_inches = "tight")
+                plt.savefig('lenses_images.png', bbox_inches = 'tight')
                 plt.close()
 
         except FileNotFoundError:
-            print(f"File {self.fits_name} not found.")
+            print(f'File {self.fits_name} not found.')
 
     # Da un resumen del archivo general FITS
     def Generate_Summary(self):
         try:
             with fits.open(self.fits_name) as hdul:
                 summary = {'total_images': len(hdul) - 1}
-                print("Dataset Summary:", summary)
+                print('Dataset Summary:', summary)
                 
         except FileNotFoundError:
             print(f"File {self.fits_name} not found.")
@@ -194,7 +194,7 @@ class Lens:
 
         for i, val in enumerate(predictions):
             thetaE, e1, e2, gamma1, gamma2 = val
-            center_x, center_y = 0.,0.
+            center_x, center_y = 0., 0.
             lss.makelens(n = i,
                          thetaE = thetaE,
                          e1 = e1,
@@ -208,7 +208,7 @@ class Lens:
 
         for i, val in enumerate(test_labels):
             thetaE, e1, e2, gamma1, gamma2 = val
-            center_x, center_y = 0.,0.
+            center_x, center_y = 0., 0.
             lss.makelens(n = i,
                          thetaE = thetaE,
                          e1 = e1,
@@ -242,19 +242,19 @@ class Lens:
             f = rd.uniform(0,1.)
             deg = 30
             pa = deg/180*np.pi
-            sigmav = 200
-            zl = rd.uniform(0.5,1.)
-            zs = rd.uniform(1.5,2.)
-            co = FlatLambdaCDM(H0 = 70, Om0 = 0.3)
-            dl = co.angular_diameter_distance(zl)
-            ds = co.angular_diameter_distance(zs)
-            dls = co.angular_diameter_distance_z1z2(zl, zs)
+            self.sigmav = 200
+            self.zl = 0.5
+            self.zs = 1.5
+            self.co = FlatLambdaCDM(H0 = 70, Om0 = 0.3)
+            dl = self.co.angular_diameter_distance(self.zl)
+            ds = self.co.angular_diameter_distance(self.zs)
+            dls = self.co.angular_diameter_distance_z1z2(self.zl, self.zs)
             y1, y2 = 0, 0
-            SIE = sie_lens(co, zl = zl, zs = zs, sigmav = sigmav, f = f, pa = pa)
+            SIE = sie_lens(self.co, zl = self.zl, zs = self.zs, sigmav = self.sigmav, f = f, pa = pa)
             x, phi = SIE.phi_ima(y1,y2)
             gamma1, gamma2 = SIE.gamma(x, phi)
             e1, e2 = (1 - f)/(1 + f)*np.cos(2*pa), (1 - f)/(1 + f)*np.sin(2*pa)
-            thetaE = 1e6*(4.0*np.pi*sigmav**2/c**2*dls/ds*180.0/np.pi*3600.0).value
+            thetaE = 1e6*(4.0*np.pi*self.sigmav**2/c**2*dls/ds*180.0/np.pi*3600.0).value
             lss.makelens(n = i,
                          thetaE = thetaE,
                          e1 = e1,
@@ -290,7 +290,7 @@ class Lens:
             #self.Augment_Data_Special()
             self.Augment_Data()
 
-Lens_instance = Lens(total_images = 20000)
+Lens_instance = Lens(total_images = 5000)
 
 if args.database:
     Lens_instance.Generate_Images()

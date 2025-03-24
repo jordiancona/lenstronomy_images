@@ -195,8 +195,8 @@ class Lenses:
         kwargs_lens = [kwargs_spep, kwargs_shear]
 
         # image plane coordinate #
-        theta_ra, theta_dec = 1., .5
-        # source plane coordinate #
+        # image plane coordinate #
+        theta_ra, theta_dec = 1.,.5
         beta_ra, beta_dec = lensModel.ray_shooting(theta_ra, theta_dec, kwargs_lens)
         # Fermat potential #
         fermat_pot = lensModel.fermat_potential(x_image = theta_ra, y_image = theta_dec, x_source = beta_ra, y_source=beta_dec, kwargs_lens = kwargs_lens)

@@ -38,7 +38,7 @@ def MakeLens(thetaE, e1, e2, gamma1, gamma2, center_x, center_y):
     kwargs_lens = [kwargs_spep, kwargs_shear]
 
     # image plane coordinate #
-    theta_ra, theta_dec = 0., 0.
+    theta_ra, theta_dec = np.array(0.), np.array(0.)
     # source plane coordinate #
     beta_ra, beta_dec = lensModel.ray_shooting(theta_ra, theta_dec, kwargs_lens)
     # Fermat potential #
