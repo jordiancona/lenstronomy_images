@@ -27,3 +27,5 @@ lenses
 __pycache__/
 results/
 pruebas/*
+__pycache__/create_lens.cpython-311.pyc
+pruebas/30000_imagenes_earlystopping_2/errors.csv
