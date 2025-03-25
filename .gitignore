@@ -26,4 +26,4 @@ models
 lenses
 __pycache__/
 results/
-pruebas/
+pruebas/*
