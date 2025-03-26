@@ -183,7 +183,7 @@ class Lens:
         self.Plot_Metrics('mae')
         self.Plot_Metrics('loss')
 
-        test_loss, test_mae = self.model.evaluate(test_df, test_labels, batch_size = 64)
+        test_loss, test_mae = self.model.evaluate(test_df, test_labels, batch_size = 128)
         print(f'Test Loss: {test_loss:.4f}, Test MAE: {test_mae:.4f}')
 
         predictions = self.model.predict(test_df)
@@ -290,7 +290,7 @@ class Lens:
             #self.Augment_Data_Special()
             self.Augment_Data()
 
-Lens_instance = Lens(total_images = 20000)
+Lens_instance = Lens(total_images = 10000)
 
 if args.database:
     Lens_instance.Generate_Images()
