@@ -138,7 +138,8 @@ class Lens:
                 self.train_lbs = []
                 self.train_images = []
 
-                for idx in range(len(hdul)-1):
+                for _ in range(self.total_images):
+                    idx = np.random.randint(0,self.total_images)
                     file = hdul[idx+1]
                     hdr = file.header
                     file_name = hdr['NAME']
@@ -290,11 +291,11 @@ class Lens:
 
         hdu = fits.HDUList([primary_hdu] + images_hdus)
         hdu.writeto(self.fits_name, overwrite = True)
-        if augment == True:
+        #if augment == True:
             #self.Augment_Data_Special()
-            self.Augment_Data()
+            #self.Augment_Data()
 
-Lens_instance = Lens(total_images = 25000)
+Lens_instance = Lens(total_images = 5000)
 
 if args.database:
     Lens_instance.Generate_Images()
