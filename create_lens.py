@@ -155,7 +155,7 @@ class sie_lens():
                 x = self.x_ima(y1_,y2_,u)
                 # append solution to a list if it corresponds to radial
                 # distances x>0; discard otherwise (spurious solutions)
-                if (x>0):
+                if (x > 0):
                     phi.append(u)
                     xphi.append(x)
             # convert lists to numpy arrays
@@ -168,9 +168,10 @@ class sie_lens():
 @dataclass
 class Lenses:
     @classmethod
-    def makelens(self, n, thetaE, e1, e2, gamma1, gamma2, center_x, center_y):
+    def makelens(self, n, f, thetaE, e1, e2, gamma1, gamma2, center_x, center_y):
         self.file_name = f'lens{n+1}'
         
+        self.f = f
         self.thetaE = thetaE
         self.e1, self.e2 = e1, e2
         self.gamma1 = gamma1
@@ -331,17 +332,18 @@ class Lenses:
 
         # Lens parameters
         c1 = fits.Card('theta_E', self.thetaE, 'Einstein Radius')
-        c2 = fits.Card('e1', self.e1, 'elipticity1')
-        c3 = fits.Card('e2', self.e2, 'elipticity2')
+        c2 = fits.Card('f_axis', self.f, 'axial radio')
+        c3 = fits.Card('e1', self.e1, 'elipticity1')
+        c4 = fits.Card('e2', self.e2, 'elipticity2')
 
         # Shear components
-        c4 = fits.Card('gamma1', self.gamma1, 'first shear component')
-        c5 = fits.Card('gamma2', self.gamma2, 'second shear component')
+        c5 = fits.Card('gamma1', self.gamma1, 'first shear component')
+        c6 = fits.Card('gamma2', self.gamma2, 'second shear component')
 
         # Lens Coordinates
-        c6 = fits.Card('center_x', self.center_x, 'x coordinate')
-        c7 = fits.Card('center_y', self.center_y, 'y coordinate')
-        parameters = [c1, c2, c3, c4, c5, c6, c7]
+        c7 = fits.Card('center_x', self.center_x, 'x coordinate')
+        c8 = fits.Card('center_y', self.center_y, 'y coordinate')
+        parameters = [c1, c2, c3, c4, c5, c6, c7, c8]
 
         for parameter in parameters:
             outhdr.append(parameter, end = True)
