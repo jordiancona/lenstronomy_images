@@ -32,8 +32,8 @@ class Lens:
         self.total_images = total_images
         self.fits_path = './fits/'
         self.fits_name = './lens_fits.fits'
-        self.labels = ['theta_E','f_axis']
-        self.classes = 2
+        self.labels = ['theta_E','f_axis','e1','e2','gamma1','gamma2']
+        self.classes = 6
         self.batch_size = 64
         self.input_shape = (100, 100, 1)
 
@@ -43,7 +43,8 @@ class Lens:
             with fits.open(self.fits_name) as hdul:
                 plt.figure(figsize = (10,8))
                 for i in range(9):
-                    file = hdul[i+2]
+                    idx = np.random.randint(1,self.total_images)
+                    file = hdul[idx]
                     hdr = file.header
                     data = file.data
                     plt.subplot(3, 3, i+1)
@@ -157,11 +158,6 @@ class Lens:
         if device == True:
             tf.config.set_visible_devices([],'GPU')
         
-        sigmav = 200
-        zl = 0.5
-        zs = 1.5
-        co = FlatLambdaCDM(H0 = 70, Om0 = 0.3)
-        
         train_df, test_df, train_labels, test_labels = train_test_split(self.train_images, self.train_lbs, test_size = 0.2, random_state = 42, shuffle = True)
         pcg = percentage*len(train_df)//100
         val_df, val_labels = train_df[-pcg:], train_labels[-pcg:]
@@ -198,46 +194,30 @@ class Lens:
         print(f'Coeficiente de determinación - R^2: {correlation**2:.2f}')
 
         for i, val in enumerate(predictions):
-            thetaE, f = val
-            deg = 30
-            pa = deg/180*np.pi
-            y1, y2 = 0, 0
-            SIE = sie_lens(co, zl = zl, zs = zs, sigmav = sigmav, f = f, pa = pa)
-            x, phi = SIE.phi_ima(y1,y2)
-            gamma1, gamma2 = SIE.gamma(x, phi)
-            print(f, gamma1, gamma2)
-            e1, e2 = (1 - f)/(1 + f)*np.cos(2*pa), (1 - f)/(1 + f)*np.sin(2*pa)
+            thetaE, f, e1, e2, gamma1, gamma2 = val
             center_x, center_y = 0., 0.
             lss.makelens(n = i,
                          f = f,
                          thetaE = thetaE,
                          e1 = e1,
                          e2 = e2,
-                         gamma1 = gamma1[1],
-                         gamma2 = gamma2[1],
+                         gamma1 = gamma1,
+                         gamma2 = gamma2,
                          center_x = center_x,
                          center_y = center_y)
         
             lss.Create_FITS(path = './results/predictions/')
 
         for i, val in enumerate(test_labels):
-            thetaE, f = val
-            deg = 30
-            pa = deg/180*np.pi
-            y1, y2 = 0, 0
-            SIE = sie_lens(co, zl = zl, zs = zs, sigmav = sigmav, f = f, pa = pa)
-            x, phi = SIE.phi_ima(y1,y2)
-            gamma1, gamma2 = SIE.gamma(x, phi)
-            e1, e2 = (1 - f)/(1 + f)*np.cos(2*pa), (1 - f)/(1 + f)*np.sin(2*pa)
-            center_x, center_y = 0., 0.
+            thetaE, f, e1, e2, gamma1, gamma2 = val
             center_x, center_y = 0., 0.
             lss.makelens(n = i,
                          f = f,
                          thetaE = thetaE,
                          e1 = e1,
                          e2 = e2,
-                         gamma1 = gamma1[1],
-                         gamma2 = gamma2[1],
+                         gamma1 = gamma1,
+                         gamma2 = gamma2,
                          center_x = center_x,
                          center_y = center_y)
         
@@ -314,7 +294,7 @@ class Lens:
             #self.Augment_Data_Special()
             self.Augment_Data()
 
-Lens_instance = Lens(total_images = 10000)
+Lens_instance = Lens(total_images = 5000)
 
 if args.database:
     Lens_instance.Generate_Images()
