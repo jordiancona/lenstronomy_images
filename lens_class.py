@@ -185,12 +185,12 @@ class Lens:
         self.Plot_Metrics('mae')
         self.Plot_Metrics('loss')
 
-        test_loss, test_mae = self.model.evaluate(test_df, test_labels, batch_size = 128)
+        test_loss, test_mae = self.model.evaluate(test_df[:1000], test_labels[:1000], batch_size = 128)
         print(f'Test Loss: {test_loss:.4f}, Test MAE: {test_mae:.4f}')
 
-        predictions = self.model.predict(test_df)
+        predictions = self.model.predict(test_df[:1000])
 
-        correlation = np.corrcoef(predictions, test_labels)[0,1]
+        correlation = np.corrcoef(predictions, test_labels[:1000])[0,1]
         print(f'Coeficiente de correlación - R: {correlation:.2f}')
         print(f'Coeficiente de determinación - R^2: {correlation**2:.2f}')
 
@@ -295,7 +295,7 @@ class Lens:
             #self.Augment_Data_Special()
             #self.Augment_Data()
 
-Lens_instance = Lens(total_images = 5000)
+Lens_instance = Lens(total_images = 50000)
 
 if args.database:
     Lens_instance.Generate_Images()
