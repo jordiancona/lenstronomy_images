@@ -185,12 +185,12 @@ class Lens:
         self.Plot_Metrics('mae')
         self.Plot_Metrics('loss')
 
-        test_loss, test_mae = self.model.evaluate(test_df[:1000], test_labels[:1000], batch_size = 128)
+        test_loss, test_mae = self.model.evaluate(test_df[:1000], test_labels[:2000], batch_size = 128)
         print(f'Test Loss: {test_loss:.4f}, Test MAE: {test_mae:.4f}')
 
-        predictions = self.model.predict(test_df[:1000])
+        predictions = self.model.predict(test_df[:2000])
 
-        correlation = np.corrcoef(predictions, test_labels[:1000])[0,1]
+        correlation = np.corrcoef(predictions, test_labels[:2000])[0,1]
         print(f'Coeficiente de correlación - R: {correlation:.2f}')
         print(f'Coeficiente de determinación - R^2: {correlation**2:.2f}')
 
@@ -206,10 +206,9 @@ class Lens:
                          gamma2 = gamma2,
                          center_x = center_x,
                          center_y = center_y)
-        
             lss.Create_FITS(path = './results/predictions/')
 
-        for i, val in enumerate(test_labels):
+        for i, val in enumerate(test_labels[:2000]):
             thetaE, f, e1, e2, gamma1, gamma2 = val
             center_x, center_y = 0., 0.
             lss.makelens(n = i,
@@ -226,7 +225,7 @@ class Lens:
 
 
     def Save_model(self):
-        self.model.save('./cnn_model/my_model.h5')
+        self.model.save('./cnn_model/my_model.keras')
 
     def Plot_Metrics(self, metric):
         plt.figure()
@@ -247,8 +246,8 @@ class Lens:
             deg = 30
             pa = deg/180*np.pi
             self.sigmav = 200
-            self.zl = 0.5
-            self.zs = 1.5
+            self.zl = rd.uniform(0.5,1.0)
+            self.zs = rd.uniform(1.0,2.)
             self.co = FlatLambdaCDM(H0 = 70, Om0 = 0.3)
             dl = self.co.angular_diameter_distance(self.zl)
             ds = self.co.angular_diameter_distance(self.zs)
@@ -264,8 +263,8 @@ class Lens:
                          thetaE = thetaE,
                          e1 = e1,
                          e2 = e2,
-                         gamma1 = gamma1[1], # gamma[1]
-                         gamma2 = gamma2[1], # gamma2[1]
+                         gamma1 = gamma1[1],
+                         gamma2 = gamma2[1],
                          center_x = 0.,
                          center_y = 0.)
             
@@ -310,3 +309,6 @@ if args.summary:
 if args.train:
     Lens_instance.Train_and_Val_Images()
     Lens_instance.Train_and_Val(int(args.train), device = False, percentage = 25)
+
+if args.save:
+    Lens_instance.Save_model()
