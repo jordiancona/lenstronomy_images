@@ -185,7 +185,7 @@ class Lens:
         self.Plot_Metrics('mae')
         self.Plot_Metrics('loss')
 
-        test_loss, test_mae = self.model.evaluate(test_df[:1000], test_labels[:2000], batch_size = 128)
+        test_loss, test_mae = self.model.evaluate(test_df[:2000], test_labels[:2000], batch_size = 128)
         print(f'Test Loss: {test_loss:.4f}, Test MAE: {test_mae:.4f}')
 
         predictions = self.model.predict(test_df[:2000])

@@ -16,7 +16,7 @@ analize_lens.py
 illustrating_lenses.py
 Lens_doc.ipynb
 test.py
-cnn_model/my_model.h5
+cnn_model/my_model.keras
 
 # directories
 images/
