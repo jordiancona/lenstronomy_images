@@ -258,6 +258,7 @@ class Lens:
             gamma1, gamma2 = SIE.gamma(x, phi)
             e1, e2 = (1 - f)/(1 + f)*np.cos(2*pa), (1 - f)/(1 + f)*np.sin(2*pa)
             thetaE = 1e6*(4.0*np.pi*self.sigmav**2/c**2*dls/ds*180.0/np.pi*3600.0).value
+            # Graficar los params de input
             lss.makelens(n = i,
                          f = f,
                          thetaE = thetaE,
