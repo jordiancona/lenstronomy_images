@@ -10,6 +10,7 @@ from create_lens import Lenses as lss
 from create_lens import sie_lens
 from make_lens import MakeLens
 from models import alexnet
+from models import hybrid_model
 import tensorflow as tf
 from keras.optimizers import Adam, Nadam # type: ignore
 from keras.callbacks import EarlyStopping, ReduceLROnPlateau # type: ignore
@@ -172,23 +173,36 @@ class Lens:
         reduce_lr = ReduceLROnPlateau(monitor = 'val_loss', factor = 0.1, patience = 4, min_lr = 1e-5)
         optimizer = Nadam(learning_rate = 1e-4) # 'adam', 'sgd', 'test ema momentum'
 
-        self.model = alexnet.AlexNet(input_shape = self.input_shape, classes = self.classes)
-        self.model.compile(optimizer = optimizer, loss = 'mean_squared_error', metrics = ['mae'])
+        self.model = hybrid_model.Hybird_Model(input_shape = self.input_shape, classes = self.classes)
+        self.model.compile(optimizer = optimizer, loss = ['mean_squared_error','mean_squared_error'], metrics = ['mae','mae'])
 
         self.history = self.model.fit(train_df,
-                                      train_labels, 
+                                      [train_df, train_labels], 
                                       epochs = epochs,
-                                      validation_data = (val_df, val_labels), 
+                                      validation_data = (val_df, [val_df, val_labels]), 
                                       callbacks = [early_stopping, reduce_lr], 
                                       batch_size = 64)
         
         self.Plot_Metrics('mae')
         self.Plot_Metrics('loss')
 
-        test_loss, test_mae = self.model.evaluate(test_df[:2000], test_labels[:2000], batch_size = 128)
+        test_loss, test_mae = self.model.evaluate(test_df[:2000], [test_df[:2000],test_labels[:2000]], batch_size = 128)
         print(f'Test Loss: {test_loss:.4f}, Test MAE: {test_mae:.4f}')
 
-        predictions = self.model.predict(test_df[:2000])
+        #predictions = self.model.predict(test_df[:2000])
+
+        reconstructed, predictions = hybrid_model.predict(test_df[:5])
+
+        fig, ax = plt.subplots(2, 5, figsize=(10, 4))
+        for i in range(5):
+            ax[0, i].imshow(test_df[i].squeeze(), cmap = "gist_heat")
+            ax[0, i].axis("off")
+            ax[1, i].imshow(reconstructed[i].squeeze(), cmap = "gist_heat")
+            ax[1, i].axis("off")
+            ax[0, 0].set_title("Original")
+            ax[1, 0].set_title("Reconstruida")
+            plt.savefig(f'./pruebas_hybrid/comparissons_{i}.png')
+            plt.close()
 
         correlation = np.corrcoef(predictions, test_labels[:2000])[0,1]
         print(f'Coeficiente de correlación - R: {correlation:.2f}')
@@ -225,7 +239,7 @@ class Lens:
 
 
     def Save_model(self):
-        self.model.save('./cnn_model/my_model.keras')
+        self.model.save('./cnn_model/my_model_hybrid.keras')
 
     def Plot_Metrics(self, metric):
         plt.figure()
