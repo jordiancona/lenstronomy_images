@@ -188,11 +188,11 @@ class Lens:
 
         #test_loss, test_mae = self.model.evaluate(test_df[:2000], [test_df[:2000],test_labels[:2000]], batch_size = 128)
         #print(f'Test Loss: {test_loss:.4f}, Test MAE: {test_mae:.4f}')
-        losses = self.model.evaluate(test_df[:2000], [test_df[:2000],test_labels[:2000]], batch_size = 128)
+        losses = self.model.evaluate(test_df[:5000], [test_df[:5000],test_labels[:5000]], batch_size = 128)
         print(f'Loss reconstructions: {losses[1]}, Loss parameters: {losses[2]}')
 
-        #predictions = self.model.predict(test_df[:2000])
-        reconstructed, predictions = self.model.predict(test_df[:2000])
+        #predictions = self.model.predict(test_df[:5000])
+        reconstructed, predictions = self.model.predict(test_df[:5000])
 
         fig, ax = plt.subplots(1, 2, figsize = (10, 4))
         for i in range(6):
@@ -205,7 +205,7 @@ class Lens:
             plt.savefig(f'./reconstructed_images/comparissons_{i}.png')
             plt.close()
 
-        correlation = np.corrcoef(predictions, test_labels[:2000])[0,1]
+        correlation = np.corrcoef(predictions, test_labels[:5000])[0,1]
         print(f'Coeficiente de correlación - R: {correlation:.2f}')
         print(f'Coeficiente de determinación - R^2: {correlation**2:.2f}')
 
