@@ -16,7 +16,6 @@ analize_lens.py
 illustrating_lenses.py
 Lens_doc.ipynb
 test.py
-cnn_model/my_model.keras
 
 # directories
 images/
@@ -31,3 +30,4 @@ results/
 pruebas/*
 __pycache__/create_lens.cpython-311.pyc
 pruebas/30000_imagenes_earlystopping_2/errors.csv
+cnn_model/

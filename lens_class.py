@@ -44,7 +44,7 @@ class Lens:
             with fits.open(self.fits_name) as hdul:
                 plt.figure(figsize = (10,8))
                 for i in range(9):
-                    idx = np.random.randint(1,self.total_images)
+                    idx = np.random.randint(1, self.total_images)
                     file = hdul[idx]
                     hdr = file.header
                     data = file.data
@@ -183,25 +183,26 @@ class Lens:
                                       callbacks = [early_stopping, reduce_lr], 
                                       batch_size = 64)
         
-        self.Plot_Metrics('mae')
-        self.Plot_Metrics('loss')
+        self.Plot_Metrics('Regressor_mae')
+        self.Plot_Metrics('Regressor_loss')
 
-        test_loss, test_mae = self.model.evaluate(test_df[:2000], [test_df[:2000],test_labels[:2000]], batch_size = 128)
-        print(f'Test Loss: {test_loss:.4f}, Test MAE: {test_mae:.4f}')
+        #test_loss, test_mae = self.model.evaluate(test_df[:2000], [test_df[:2000],test_labels[:2000]], batch_size = 128)
+        losses = self.model.evaluate(test_df[:2000], [test_df[:2000],test_labels[:2000]], batch_size = 128)
+        #print(f'Test Loss: {test_loss:.4f}, Test MAE: {test_mae:.4f}')
+        print(f'Loss reconstructions: {losses[1]}, Loss parameters: {losses[2]}')
 
         #predictions = self.model.predict(test_df[:2000])
+        reconstructed, predictions = self.model.predict(test_df[:2000])
 
-        reconstructed, predictions = hybrid_model.predict(test_df[:5])
-
-        fig, ax = plt.subplots(2, 5, figsize=(10, 4))
-        for i in range(5):
-            ax[0, i].imshow(test_df[i].squeeze(), cmap = "gist_heat")
-            ax[0, i].axis("off")
-            ax[1, i].imshow(reconstructed[i].squeeze(), cmap = "gist_heat")
-            ax[1, i].axis("off")
-            ax[0, 0].set_title("Original")
-            ax[1, 0].set_title("Reconstruida")
-            plt.savefig(f'./pruebas_hybrid/comparissons_{i}.png')
+        fig, ax = plt.subplots(2, 6, figsize = (10, 4))
+        for i in range(6):
+            ax[0,i].imshow(test_df[i].squeeze(), cmap = "gist_heat")
+            ax[0,i].axis("off")
+            ax[1,i].imshow(reconstructed[i].squeeze(), cmap = "gist_heat")
+            ax[1,i].axis("off")
+            ax[0,0].set_title("Original")
+            ax[1,0].set_title("Reconstruida")
+            plt.savefig(f'./reconstructed_images/comparissons_{i}.png')
             plt.close()
 
         correlation = np.corrcoef(predictions, test_labels[:2000])[0,1]
