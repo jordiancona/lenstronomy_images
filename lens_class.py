@@ -49,6 +49,7 @@ class Lens:
                     hdr = file.header
                     data = file.data
                     plt.subplot(3, 3, i+1)
+                    plt.title(f'image: {idx}')
                     plt.grid(False)
                     plt.imshow(np.log10(data), cmap = 'gist_heat', aspect = 'auto')
                     plt.axis('equal')
@@ -193,8 +194,8 @@ class Lens:
         print(f'Loss reconstructions: {losses[1]}, Loss parameters: {losses[2]}')
 
         #predictions = self.model.predict(test_df[:test_n])
-        reconstructed, predictions = self.model.predict(test_df[:test_n])
-
+        #reconstructed, predictions = self.model.predict(test_df[:test_n])
+        '''
         fig, ax = plt.subplots(1, 2, figsize = (10, 4))
         for i in range(6):
             ax[0].imshow(test_df[i].squeeze(), cmap = "gist_heat")
@@ -209,37 +210,8 @@ class Lens:
         correlation = np.corrcoef(predictions, test_labels[:test_n])[0,1]
         print(f'Coeficiente de correlación - R: {correlation:.2f}')
         print(f'Coeficiente de determinación - R^2: {correlation**2:.2f}')
-
-        for i, val in enumerate(predictions):
-            thetaE, f, e1, e2, gamma1, gamma2 = val
-            center_x, center_y = 0., 0.
-            lss.makelens(n = i,
-                         f = f,
-                         thetaE = thetaE,
-                         e1 = e1,
-                         e2 = e2,
-                         gamma1 = gamma1,
-                         gamma2 = gamma2,
-                         center_x = center_x,
-                         center_y = center_y)
-            lss.Create_FITS(path = './results/predictions/')
-
-        for i, val in enumerate(test_labels[:2000]):
-            thetaE, f, e1, e2, gamma1, gamma2 = val
-            center_x, center_y = 0., 0.
-            lss.makelens(n = i,
-                         f = f,
-                         thetaE = thetaE,
-                         e1 = e1,
-                         e2 = e2,
-                         gamma1 = gamma1,
-                         gamma2 = gamma2,
-                         center_x = center_x,
-                         center_y = center_y)
+         '''
         
-            lss.Create_FITS(path = './results/original/')
-
-
     def Save_model(self):
         self.model.save('./cnn_model/my_model_hybrid.keras')
 
