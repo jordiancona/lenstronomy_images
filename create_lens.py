@@ -1,7 +1,6 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
-#import imageio
 from time import gmtime, strftime
 import lenstronomy
 from lenstronomy.Util import util
