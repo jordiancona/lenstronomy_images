@@ -108,7 +108,7 @@ class Lens:
         except FileNotFoundError:
             print(f'File {self.fits_name} not found.')
 
-    def Augment_Data(self):
+    def Augment_Data(self, angle):
         try:
             with fits.open(self.fits_name, mode = 'update') as hdul:
                 for i in range(1, len(hdul)):
@@ -118,7 +118,8 @@ class Lens:
                     hdr['e1'], hdr['e2'], hdr['gamma1'], hdr['gamma2'] = self.Rotate_Parameters(hdr['e1'],
                                                                                                 hdr['e2'],
                                                                                                 hdr['gamma1'],
-                                                                                                hdr['gamma2'])
+                                                                                                hdr['gamma2'],
+                                                                                                angle = angle)
                     rotated_data = MakeLens(thetaE = hdr['theta_E'],
                                             e1 = hdr['e1'],
                                             e2 = hdr['e2'],
@@ -281,7 +282,8 @@ class Lens:
         hdu.writeto(self.fits_name, overwrite = True)
         #if augment == True:
             #self.Augment_Data_Special()
-            #self.Augment_Data()
+            #self.Augment_Data(30)
+            #self.Augment_Data(270)
 
 Lens_instance = Lens(total_images = 50000)
 
