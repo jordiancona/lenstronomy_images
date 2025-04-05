@@ -20,6 +20,9 @@ from astropy.constants import c
 from sklearn.model_selection import train_test_split
 from tqdm import tqdm
 
+np.random.seed(42)
+tf.random.set_seed(42)
+
 parser = argparse.ArgumentParser()
 parser.add_argument('-db', '--database', action = 'store_true', help = 'Generate the images for training.')
 parser.add_argument('-sh', '--show', action = 'store_true', help = 'Return an example of the images for the training.')
@@ -33,8 +36,8 @@ class Lens:
         self.total_images = total_images
         self.fits_path = './fits/'
         self.fits_name = './lens_fits.fits'
-        self.labels = ['theta_E','f_axis','e1','e2','gamma1','gamma2']
-        self.classes = 6
+        self.labels = ['theta_E','f_axis','gamma1','gamma2']
+        self.classes = 4
         self.batch_size = 64
         self.input_shape = (100, 100, 1)
 
@@ -174,16 +177,18 @@ class Lens:
         early_stopping = EarlyStopping(monitor = 'val_loss', start_from_epoch = 4, patience = 3)
         reduce_lr = ReduceLROnPlateau(monitor = 'val_loss', factor = 0.1, patience = 4, min_lr = 1e-5)
         optimizer = Nadam(learning_rate = 1e-4) # 'adam', 'sgd', 'test ema momentum'
-
+    
         self.model = hybrid_model.Hybird_Model(input_shape = self.input_shape, classes = self.classes)
-        self.model.compile(optimizer = optimizer, loss = ['mean_squared_error','mean_squared_error'], metrics = ['mae','mae'])
+        self.model.compile(optimizer = optimizer, 
+                           loss = {'Decoder':'mse', 'Regressor':'mse'},
+                           metrics = ['mae','mae'])
 
         self.history = self.model.fit(train_df,
                                       [train_df, train_labels], 
                                       epochs = epochs,
                                       validation_data = (val_df, [val_df, val_labels]), 
                                       callbacks = [early_stopping, reduce_lr], 
-                                      batch_size = 64)
+                                      batch_size = 128)
         
         self.Plot_Metrics('Regressor_mae')
         self.Plot_Metrics('Regressor_loss')
@@ -191,7 +196,7 @@ class Lens:
         test_n = 5000
         #test_loss, test_mae = self.model.evaluate(test_df[:2000], [test_df[:2000],test_labels[:2000]], batch_size = 128)
         #print(f'Test Loss: {test_loss:.4f}, Test MAE: {test_mae:.4f}')
-        losses = self.model.evaluate(test_df[:test_n], [test_df[:test_n],test_labels[:test_n]], batch_size = 128)
+        losses = self.model.evaluate(test_df[:test_n], [test_df[:test_n],test_labels[:test_n]], batch_size = 64)
         print(f'Loss reconstructions: {losses[1]}, Loss parameters: {losses[2]}')
 
         #predictions = self.model.predict(test_df[:test_n])
@@ -282,8 +287,8 @@ class Lens:
         hdu.writeto(self.fits_name, overwrite = True)
         #if augment == True:
             #self.Augment_Data_Special()
-            #self.Augment_Data(30)
-            #self.Augment_Data(270)
+        #    self.Augment_Data(30)
+        #    self.Augment_Data(270)
 
 Lens_instance = Lens(total_images = 50000)
 
