@@ -36,8 +36,8 @@ class Lens:
         self.total_images = total_images
         self.fits_path = './fits/'
         self.fits_name = './lens_fits.fits'
-        self.labels = ['theta_E','f_axis','gamma1','gamma2']
-        self.classes = 4
+        self.labels = ['theta_E','f_axis','e1','e2','gamma1','gamma2']
+        self.classes = 6
         self.batch_size = 64
         self.input_shape = (100, 100, 1)
 
@@ -162,7 +162,7 @@ class Lens:
     # Se entrena el modelo
     def Train_and_Val(self, epochs, device, percentage):
         
-        if device == True:
+        if device == 'yes':
             tf.config.set_visible_devices([],'GPU')
         
         train_df, test_df, train_labels, test_labels = train_test_split(self.train_images, self.train_lbs, test_size = 0.2, random_state = 42, shuffle = True)
@@ -304,7 +304,7 @@ if args.summary:
 
 if args.train:
     Lens_instance.Train_and_Val_Images()
-    Lens_instance.Train_and_Val(int(args.train), device = False, percentage = 25)
+    Lens_instance.Train_and_Val(int(args.train), device = 'no', percentage = 25)
 
 if args.save:
     Lens_instance.Save_model()
