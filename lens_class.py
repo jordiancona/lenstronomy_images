@@ -179,24 +179,26 @@ class Lens:
         optimizer = Nadam(learning_rate = 1e-4) # 'adam', 'sgd', 'test ema momentum'
     
         self.model = hybrid_model.Hybird_Model(input_shape = self.input_shape, classes = self.classes)
+        #self.model = alexnet.AlexNet(input_shape = self.input_shape, classes = self.classes)
         self.model.compile(optimizer = optimizer, 
                            loss = {'Decoder':'mse', 'Regressor':'mse'},
-                           metrics = ['mae','mae'])
+                           metrics = ['mae','mae'],
+                           loss_weights = [0.5, 0.5]) 
 
         self.history = self.model.fit(train_df,
-                                      [train_df, train_labels], 
+                                      [train_df, train_labels], #[train_df, train_labels]
                                       epochs = epochs,
-                                      validation_data = (val_df, [val_df, val_labels]), 
+                                      validation_data = (val_df, [val_df, val_labels]), # [val_df, val_labels]
                                       callbacks = [early_stopping, reduce_lr], 
-                                      batch_size = 128)
+                                      batch_size = 32)
         
         self.Plot_Metrics('Regressor_mae')
         self.Plot_Metrics('Regressor_loss')
 
         test_n = 5000
-        #test_loss, test_mae = self.model.evaluate(test_df[:2000], [test_df[:2000],test_labels[:2000]], batch_size = 128)
+        #test_loss, test_mae = self.model.evaluate(test_df[:test_n], test_labels[:test_n], batch_size = 128)
         #print(f'Test Loss: {test_loss:.4f}, Test MAE: {test_mae:.4f}')
-        losses = self.model.evaluate(test_df[:test_n], [test_df[:test_n],test_labels[:test_n]], batch_size = 64)
+        losses = self.model.evaluate(test_df[:test_n], [test_df[:test_n], test_labels[:test_n]], batch_size = 64) #
         print(f'Loss reconstructions: {losses[1]}, Loss parameters: {losses[2]}')
 
         #predictions = self.model.predict(test_df[:test_n])
@@ -252,7 +254,7 @@ class Lens:
             gamma1, gamma2 = SIE.gamma(x, phi)
             e1, e2 = (1 - f)/(1 + f)*np.cos(2*pa), (1 - f)/(1 + f)*np.sin(2*pa)
             thetaE = 1e6*(4.0*np.pi*self.sigmav**2/c**2*dls/ds*180.0/np.pi*3600.0).value
-            # Graficar los params de input
+
             lss.makelens(n = i,
                          f = f,
                          thetaE = thetaE,
