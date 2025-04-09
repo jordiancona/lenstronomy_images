@@ -178,10 +178,26 @@ class Lens:
         reduce_lr = ReduceLROnPlateau(monitor = 'val_loss', factor = 0.1, patience = 4, min_lr = 1e-5)
         optimizer = Nadam(learning_rate = 1e-4) # 'adam', 'sgd', 'test ema momentum'
     
+        @tf.keras.utils.register_keras_serializable(package = 'CustomLoss')
+        def physics_informed_loss(y_true, y_pred):
+
+            lambda_physics = 0.1
+            loss_mse = tf.reduce_mean(tf.square(y_true - y_pred))
+            
+            theta_E_true, f_true, e1_true, e2_true, gamma1_true, gamma2_true = tf.unstack(y_true, axis = 1)
+            theta_E_pred, f_pred, e1_pred, e2_pred, gamma1_pred, gamma2_pred = tf.unstack(y_pred, axis = 1)
+
+            loss_e = tf.maximum(tf.reduce_mean(e1_pred**2 + e2_pred**2 - 1.0), 0.0)
+            loss_thetaE = tf.reduce_mean(tf.square(theta_E_pred - f_pred*0.5))
+            loss_gamma = tf.reduce_mean(tf.square(gamma1_pred - e1_pred)) + tf.reduce_mean(tf.square(gamma2_pred - e2_pred))
+
+            loss_physics = loss_e + loss_thetaE  + loss_gamma
+            return loss_mse + lambda_physics*loss_physics
+
         #self.model = hybrid_model.Hybird_Model(input_shape = self.input_shape, classes = self.classes)
         self.model = alexnet.AlexNet(input_shape = self.input_shape, classes = self.classes)
         self.model.compile(optimizer = optimizer, 
-                           loss = 'mse',#{'Decoder':'mse', 'Regressor':'mse'},
+                           loss = physics_informed_loss,#{'Decoder':'mse', 'Regressor':'mse'},
                            metrics = ['mae'],) 
 
         self.history = self.model.fit(train_df,
@@ -202,22 +218,6 @@ class Lens:
 
         #predictions = self.model.predict(test_df[:test_n])
         #reconstructed, predictions = self.model.predict(test_df[:test_n])
-        '''
-        fig, ax = plt.subplots(1, 2, figsize = (10, 4))
-        for i in range(6):
-            ax[0].imshow(test_df[i].squeeze(), cmap = "gist_heat")
-            ax[0].axis("off")
-            ax[1].imshow(reconstructed[i].squeeze(), cmap = "gist_heat")
-            ax[1].axis("off")
-            ax[0].set_title("Original")
-            ax[1].set_title("Reconstruida")
-            plt.savefig(f'./reconstructed_images/comparissons_{i}.png')
-            plt.close()
-
-        correlation = np.corrcoef(predictions, test_labels[:test_n])[0,1]
-        print(f'Coeficiente de correlación - R: {correlation:.2f}')
-        print(f'Coeficiente de determinación - R^2: {correlation**2:.2f}')
-         '''
         
     def Save_model(self):
         self.model.save('./cnn_model/my_model.keras')
@@ -291,7 +291,7 @@ class Lens:
         #    self.Augment_Data(30)
         #    self.Augment_Data(270)
 
-Lens_instance = Lens(total_images = 50000)
+Lens_instance = Lens(total_images = 80000)
 
 if args.database:
     Lens_instance.Generate_Images()
