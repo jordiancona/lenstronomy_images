@@ -199,7 +199,7 @@ class Lens:
         #self.model = hybrid_model.Hybird_Model(input_shape = self.input_shape, classes = self.classes)
         self.model = alexnet.AlexNet(input_shape = self.input_shape, classes = self.classes)
         self.model.compile(optimizer = optimizer, 
-                           loss = physics_informed_loss,#{'Decoder':'mse', 'Regressor':'mse'},
+                           loss = 'mse',#{'Decoder':'mse', 'Regressor':'mse'},
                            metrics = ['mae'],) 
 
         self.history = self.model.fit(train_df,
