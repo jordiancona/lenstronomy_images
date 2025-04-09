@@ -178,28 +178,27 @@ class Lens:
         reduce_lr = ReduceLROnPlateau(monitor = 'val_loss', factor = 0.1, patience = 4, min_lr = 1e-5)
         optimizer = Nadam(learning_rate = 1e-4) # 'adam', 'sgd', 'test ema momentum'
     
-        self.model = hybrid_model.Hybird_Model(input_shape = self.input_shape, classes = self.classes)
-        #self.model = alexnet.AlexNet(input_shape = self.input_shape, classes = self.classes)
+        #self.model = hybrid_model.Hybird_Model(input_shape = self.input_shape, classes = self.classes)
+        self.model = alexnet.AlexNet(input_shape = self.input_shape, classes = self.classes)
         self.model.compile(optimizer = optimizer, 
-                           loss = {'Decoder':'mse', 'Regressor':'mse'},
-                           metrics = ['mae','mae'],
-                           loss_weights = [0.5, 0.5]) 
+                           loss = 'mse',#{'Decoder':'mse', 'Regressor':'mse'},
+                           metrics = ['mae'],) 
 
         self.history = self.model.fit(train_df,
-                                      [train_df, train_labels], #[train_df, train_labels]
+                                      train_labels, #[train_df, train_labels]
                                       epochs = epochs,
-                                      validation_data = (val_df, [val_df, val_labels]), # [val_df, val_labels]
+                                      validation_data = (val_df, val_labels), # [val_df, val_labels]
                                       callbacks = [early_stopping, reduce_lr], 
                                       batch_size = 32)
         
-        self.Plot_Metrics('Regressor_mae')
-        self.Plot_Metrics('Regressor_loss')
+        self.Plot_Metrics('mae')
+        self.Plot_Metrics('loss')
 
         test_n = 5000
-        #test_loss, test_mae = self.model.evaluate(test_df[:test_n], test_labels[:test_n], batch_size = 128)
-        #print(f'Test Loss: {test_loss:.4f}, Test MAE: {test_mae:.4f}')
-        losses = self.model.evaluate(test_df[:test_n], [test_df[:test_n], test_labels[:test_n]], batch_size = 64) #
-        print(f'Loss reconstructions: {losses[1]}, Loss parameters: {losses[2]}')
+        test_loss, test_mae = self.model.evaluate(test_df[:test_n], test_labels[:test_n], batch_size = 128)
+        print(f'Test Loss: {test_loss:.4f}, Test MAE: {test_mae:.4f}')
+        #losses = self.model.evaluate(test_df[:test_n], [test_df[:test_n], test_labels[:test_n]], batch_size = 32) #
+        #print(f'Loss reconstructions: {losses[1]}, Loss parameters: {losses[2]}')
 
         #predictions = self.model.predict(test_df[:test_n])
         #reconstructed, predictions = self.model.predict(test_df[:test_n])
@@ -221,7 +220,7 @@ class Lens:
          '''
         
     def Save_model(self):
-        self.model.save('./cnn_model/my_model_hybrid.keras')
+        self.model.save('./cnn_model/my_model.keras')
 
     def Plot_Metrics(self, metric):
         plt.figure()
