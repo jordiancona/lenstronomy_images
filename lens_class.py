@@ -188,7 +188,7 @@ class Lens:
 
             e_from_f = (1 - f_pred**2)/(1 + f_pred**2)
             #loss_e = tf.maximum(tf.reduce_mean(e1_pred**2 + e2_pred**2 - 1.0), 0.0)
-            e_pred = np.sqrt(e1_pred**2 + e2_pred**2)
+            e_pred = tf.sqrt(e1_pred**2 + e2_pred**2)
             loss_e = tf.reduce_mean(tf.square(e_pred - e_from_f))
             loss_thetaE = tf.reduce_mean(tf.square(theta_E_true - theta_E_pred))
             loss_gamma = tf.reduce_mean(tf.square(gamma1_pred - e1_pred)) + tf.reduce_mean(tf.square(gamma2_pred - e2_pred))
