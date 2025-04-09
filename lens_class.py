@@ -180,15 +180,17 @@ class Lens:
     
         @tf.keras.utils.register_keras_serializable(package = 'CustomLoss')
         def physics_informed_loss(y_true, y_pred):
-
             lambda_physics = 0.1
             loss_mse = tf.reduce_mean(tf.square(y_true - y_pred))
             
             theta_E_true, f_true, e1_true, e2_true, gamma1_true, gamma2_true = tf.unstack(y_true, axis = 1)
             theta_E_pred, f_pred, e1_pred, e2_pred, gamma1_pred, gamma2_pred = tf.unstack(y_pred, axis = 1)
 
-            loss_e = tf.maximum(tf.reduce_mean(e1_pred**2 + e2_pred**2 - 1.0), 0.0)
-            loss_thetaE = tf.reduce_mean(tf.square(theta_E_pred - f_pred*0.5))
+            e_from_f = (1 - f_pred**2)/(1 + f_pred**2)
+            #loss_e = tf.maximum(tf.reduce_mean(e1_pred**2 + e2_pred**2 - 1.0), 0.0)
+            e_pred = np.sqrt(e1_pred**2 + e2_pred**2)
+            loss_e = tf.reduce_mean(tf.square(e_pred - e_from_f))
+            loss_thetaE = tf.reduce_mean(tf.square(theta_E_true - theta_E_pred))
             loss_gamma = tf.reduce_mean(tf.square(gamma1_pred - e1_pred)) + tf.reduce_mean(tf.square(gamma2_pred - e2_pred))
 
             loss_physics = loss_e + loss_thetaE  + loss_gamma
