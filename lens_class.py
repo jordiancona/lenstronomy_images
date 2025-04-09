@@ -177,46 +177,41 @@ class Lens:
         early_stopping = EarlyStopping(monitor = 'val_loss', start_from_epoch = 4, patience = 3)
         reduce_lr = ReduceLROnPlateau(monitor = 'val_loss', factor = 0.1, patience = 4, min_lr = 1e-5)
         optimizer = Nadam(learning_rate = 1e-4) # 'adam', 'sgd', 'test ema momentum'
-    
-        @tf.keras.utils.register_keras_serializable(package = 'CustomLoss')
-        def physics_informed_loss(y_true, y_pred):
-            lambda_physics = 0.1
-            loss_mse = tf.reduce_mean(tf.square(y_true - y_pred))
-            
-            theta_E_true, f_true, e1_true, e2_true, gamma1_true, gamma2_true = tf.unstack(y_true, axis = 1)
-            theta_E_pred, f_pred, e1_pred, e2_pred, gamma1_pred, gamma2_pred = tf.unstack(y_pred, axis = 1)
 
-            e_from_f = (1 - f_pred**2)/(1 + f_pred**2)
-            #loss_e = tf.maximum(tf.reduce_mean(e1_pred**2 + e2_pred**2 - 1.0), 0.0)
-            e_pred = tf.sqrt(e1_pred**2 + e2_pred**2)
-            loss_e = tf.reduce_mean(tf.square(e_pred - e_from_f))
-            loss_thetaE = tf.reduce_mean(tf.square(theta_E_true - theta_E_pred))
-            loss_gamma = tf.reduce_mean(tf.square(gamma1_pred - e1_pred)) + tf.reduce_mean(tf.square(gamma2_pred - e2_pred))
+        def weighted_mse_loss(weights):
 
-            loss_physics = loss_e + loss_thetaE  + loss_gamma
-            return loss_mse + lambda_physics*loss_physics
+            weights = tf.constant(weights, dtype = tf.float32)
 
-        self.model = hybrid_model.Hybird_Model(input_shape = self.input_shape, classes = self.classes)
-        #self.model = alexnet.AlexNet(input_shape = self.input_shape, classes = self.classes)
+            def loss(y_true, y_pred):
+                squared_diff = tf.square(y_true - y_pred)
+                weighted_squared_diff = squared_diff * weights
+                return tf.reduce_mean(weighted_squared_diff)
+            return loss
+
+        weights = [2.0, 1.0, 1.5, 1.5, 0.5, 0.5]
+        loss_fn = weighted_mse_loss(weights)
+        #self.model = hybrid_model.Hybird_Model(input_shape = self.input_shape, classes = self.classes)
+        self.model = alexnet.AlexNet(input_shape = self.input_shape, classes = self.classes)
+        
         self.model.compile(optimizer = optimizer, 
-                           loss = {'Decoder':'mse', 'Regressor':'mse'},
-                           metrics = ['mae','mae'],) 
+                           loss = loss_fn,#{'Decoder':'mse', 'Regressor':'mse'},
+                           metrics = ['mae']) 
 
         self.history = self.model.fit(train_df,
-                                      [train_df, train_labels], #[train_df, train_labels]
+                                      train_labels, #[train_df, train_labels]
                                       epochs = epochs,
-                                      validation_data = (val_df, [val_df, val_labels]), # [val_df, val_labels]
+                                      validation_data = (val_df, val_labels), # [val_df, val_labels]
                                       callbacks = [early_stopping, reduce_lr], 
                                       batch_size = 32)
         
-        self.Plot_Metrics('Regressor_mae')
-        self.Plot_Metrics('Regressor_loss')
+        self.Plot_Metrics('mae')
+        self.Plot_Metrics('loss')
 
         test_n = 5000
-        #test_loss, test_mae = self.model.evaluate(test_df[:test_n], test_labels[:test_n], batch_size = 128)
-        #print(f'Test Loss: {test_loss:.4f}, Test MAE: {test_mae:.4f}')
-        losses = self.model.evaluate(test_df[:test_n], [test_df[:test_n], test_labels[:test_n]], batch_size = 32) #
-        print(f'Loss reconstructions: {losses[1]}, Loss parameters: {losses[2]}')
+        test_loss, test_mae = self.model.evaluate(test_df[:test_n], test_labels[:test_n], batch_size = 128)
+        print(f'Test Loss: {test_loss:.4f}, Test MAE: {test_mae:.4f}')
+        #losses = self.model.evaluate(test_df[:test_n], [test_df[:test_n], test_labels[:test_n]], batch_size = 32) #
+        #print(f'Loss reconstructions: {losses[1]}, Loss parameters: {losses[2]}')
 
         #predictions = self.model.predict(test_df[:test_n])
         #reconstructed, predictions = self.model.predict(test_df[:test_n])
