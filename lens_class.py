@@ -217,7 +217,7 @@ class Lens:
         #reconstructed, predictions = self.model.predict(test_df[:test_n])
         
     def Save_model(self):
-        self.model.save('./cnn_model/my_model_hybrid.keras')
+        self.model.save('./cnn_model/my_model.keras')
 
     def Plot_Metrics(self, metric):
         plt.figure()
