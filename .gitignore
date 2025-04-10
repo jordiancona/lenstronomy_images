@@ -18,6 +18,8 @@ Lens_doc.ipynb
 test.py
 test2.py
 plot_models.py
+theta_E_relationship.py
+read_dataset.py
 
 # directories
 images/
