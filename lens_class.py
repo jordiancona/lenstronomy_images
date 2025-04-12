@@ -1,6 +1,7 @@
 #!/Users/juananconaflores/.pyenv/shims/python
 
 import os
+import pandas as pd
 import numpy as np
 import random as rd
 import matplotlib.pyplot as plt
@@ -10,7 +11,7 @@ from create_lens import Lenses as lss
 from create_lens import sie_lens
 from make_lens import MakeLens
 from models import alexnet
-from models import hybrid_model
+from models import cnn_mpl
 import tensorflow as tf
 from keras.optimizers import Adam, Nadam # type: ignore
 from keras.callbacks import EarlyStopping, ReduceLROnPlateau # type: ignore
@@ -188,10 +189,11 @@ class Lens:
                 return tf.reduce_mean(weighted_squared_diff)
             return loss
 
-        weights = [2.9, 1.0, 1.5, 1.5, 0.5, 0.5]
+        weights = [3.0, 1.0, 1.5, 1.5, 0.5, 0.5]
         loss_fn = weighted_mse_loss(weights)
         #self.model = hybrid_model.Hybird_Model(input_shape = self.input_shape, classes = self.classes)
         self.model = alexnet.AlexNet(input_shape = self.input_shape, classes = self.classes)
+        #self.model = cnn_mpl.CNNNew(input_shape = self.input_shape, classes = self.classes)
         
         self.model.compile(optimizer = optimizer, 
                            loss = loss_fn,#{'Decoder':'mse', 'Regressor':'mse'},
@@ -203,21 +205,15 @@ class Lens:
                                       validation_data = (val_df, val_labels), # [val_df, val_labels]
                                       callbacks = [early_stopping, reduce_lr], 
                                       batch_size = 32)
-        
         self.Plot_Metrics('mae')
         self.Plot_Metrics('loss')
 
         test_n = 5000
         test_loss, test_mae = self.model.evaluate(test_df[:test_n], test_labels[:test_n], batch_size = 128)
         print(f'Test Loss: {test_loss:.4f}, Test MAE: {test_mae:.4f}')
-        #losses = self.model.evaluate(test_df[:test_n], [test_df[:test_n], test_labels[:test_n]], batch_size = 32) #
-        #print(f'Loss reconstructions: {losses[1]}, Loss parameters: {losses[2]}')
-
-        #predictions = self.model.predict(test_df[:test_n])
-        #reconstructed, predictions = self.model.predict(test_df[:test_n])
         
     def Save_model(self):
-        self.model.save('./cnn_model/my_model.keras')
+        self.model.save('./cnn_model/my_model_cnn_mpl.keras')
 
     def Plot_Metrics(self, metric):
         plt.figure()
