@@ -189,7 +189,7 @@ class Lens:
                 return tf.reduce_mean(weighted_squared_diff)
             return loss
 
-        weights = [3.0, 1.0, 1.5, 1.5, 0.5, 0.5]
+        weights = [2.9, 1.0, 1.5, 1.5, 0.5, 0.5]
         loss_fn = weighted_mse_loss(weights)
         #self.model = hybrid_model.Hybird_Model(input_shape = self.input_shape, classes = self.classes)
         self.model = alexnet.AlexNet(input_shape = self.input_shape, classes = self.classes)
