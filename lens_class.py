@@ -10,9 +10,7 @@ from time import gmtime, strftime
 from create_lens import Lenses as lss
 from create_lens import sie_lens
 from make_lens import MakeLens
-from models import alexnet_informed
 from models import alexnet
-from models import physics_informed_loss
 import tensorflow as tf
 from keras.optimizers import Adam, Nadam # type: ignore
 from keras.callbacks import EarlyStopping, ReduceLROnPlateau # type: ignore
@@ -189,11 +187,32 @@ class Lens:
                 weighted_squared_diff = squared_diff * weights
                 return tf.reduce_mean(weighted_squared_diff)
             return loss
+    
+        def weighted_mse_loss_phys(weights, penalty_weight = 1.0):
+
+            weights = tf.constant(weights, dtype = tf.float32)
+
+            def loss(y_true, y_pred):
+                squared_diff = tf.square(y_true - y_pred)
+                weighted_squared_diff = squared_diff * weights
+                mse_loss = tf.reduce_mean(weighted_squared_diff)
+
+                einstein_index = 0
+                shear_x = y_pred[:,4]
+                shear_y = y_pred[:,5]
+                shear_norm = tf.sqrt(tf.square(shear_x) + tf.square(shear_y))
+
+                negative_penalty = tf.nn.relu(-y_pred[:,einstein_index])
+                shear_penalty = tf.nn.relu(shear_norm - 1.)
+
+                penaltty_loss = tf.reduce_mean(negative_penalty + shear_penalty)
+                return mse_loss + penalty_weight*penaltty_loss
+            return loss
 
         weights = [2.9, 1.0, 1.5, 1.5, 0.5, 0.5]
-        loss_fn = weighted_mse_loss(weights)
+        loss_fn = weighted_mse_loss_phys(weights)
         #self.model = hybrid_model.Hybird_Model(input_shape = self.input_shape, classes = self.classes)
-        self.model = alexnet_informed.AlexNet(input_shape = self.input_shape, classes = self.classes)
+        self.model = alexnet.AlexNet(input_shape = self.input_shape, classes = self.classes)
         
         self.model.compile(optimizer = optimizer, 
                            loss = loss_fn,#{'Decoder':'mse', 'Regressor':'mse'},
