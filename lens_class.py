@@ -10,8 +10,9 @@ from time import gmtime, strftime
 from create_lens import Lenses as lss
 from create_lens import sie_lens
 from make_lens import MakeLens
+from models import alexnet_informed
 from models import alexnet
-from models import cnn_mpl
+from models import physics_informed_loss
 import tensorflow as tf
 from keras.optimizers import Adam, Nadam # type: ignore
 from keras.callbacks import EarlyStopping, ReduceLROnPlateau # type: ignore
@@ -192,8 +193,7 @@ class Lens:
         weights = [2.9, 1.0, 1.5, 1.5, 0.5, 0.5]
         loss_fn = weighted_mse_loss(weights)
         #self.model = hybrid_model.Hybird_Model(input_shape = self.input_shape, classes = self.classes)
-        self.model = alexnet.AlexNet(input_shape = self.input_shape, classes = self.classes)
-        #self.model = cnn_mpl.CNNNew(input_shape = self.input_shape, classes = self.classes)
+        self.model = alexnet_informed.AlexNet(input_shape = self.input_shape, classes = self.classes)
         
         self.model.compile(optimizer = optimizer, 
                            loss = loss_fn,#{'Decoder':'mse', 'Regressor':'mse'},
@@ -213,7 +213,7 @@ class Lens:
         print(f'Test Loss: {test_loss:.4f}, Test MAE: {test_mae:.4f}')
         
     def Save_model(self):
-        self.model.save('./cnn_model/my_model_cnn_mpl.keras')
+        self.model.save('./cnn_model/my_model_informed.keras')
 
     def Plot_Metrics(self, metric):
         plt.figure()

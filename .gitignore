@@ -20,7 +20,7 @@ test2.py
 plot_models.py
 theta_E_relationship.py
 read_dataset.py
-lens_tests.py
+physics_informed_loss.py
 
 # directories
 images/
