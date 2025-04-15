@@ -210,7 +210,7 @@ class Lens:
             return loss
 
         weights = [2.9, 1.0, 1.5, 1.5, 0.5, 0.5]
-        loss_fn = weighted_mse_loss_phys(weights)
+        loss_fn = weighted_mse_loss(weights)
         #self.model = hybrid_model.Hybird_Model(input_shape = self.input_shape, classes = self.classes)
         self.model = alexnet.AlexNet(input_shape = self.input_shape, classes = self.classes)
         
@@ -303,7 +303,7 @@ class Lens:
         #    self.Augment_Data(30)
         #    self.Augment_Data(270)
 
-Lens_instance = Lens(total_images = 80000)
+Lens_instance = Lens(total_images = 30000)
 
 if args.database:
     Lens_instance.Generate_Images()
