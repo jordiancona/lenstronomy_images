@@ -222,7 +222,7 @@ class Lens:
                                       train_labels, #[train_df, train_labels]
                                       epochs = epochs,
                                       validation_data = (val_df, val_labels), # [val_df, val_labels]
-                                      callbacks = [early_stopping, reduce_lr], 
+                                      callbacks = [reduce_lr], 
                                       batch_size = 32)
         self.Plot_Metrics('mae')
         self.Plot_Metrics('loss')
@@ -303,7 +303,7 @@ class Lens:
         #    self.Augment_Data(30)
         #    self.Augment_Data(270)
 
-Lens_instance = Lens(total_images = 30000)
+Lens_instance = Lens(total_images = 90000)
 
 if args.database:
     Lens_instance.Generate_Images()
