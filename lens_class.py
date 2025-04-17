@@ -303,7 +303,7 @@ class Lens:
         #    self.Augment_Data(30)
         #    self.Augment_Data(270)
 
-Lens_instance = Lens(total_images = 90000)
+Lens_instance = Lens(total_images = 100000)
 
 if args.database:
     Lens_instance.Generate_Images()
