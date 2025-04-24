@@ -174,9 +174,6 @@ class Lens:
         print(f'Imágenes de validación: {len(val_df)}')
         print(f'Imágenes de prueba: {len(test_df)}')
 
-        early_stopping = EarlyStopping(monitor = 'val_loss', start_from_epoch = 4, patience = 3)
-        reduce_lr = ReduceLROnPlateau(monitor = 'val_loss', factor = 0.1, patience = 4, min_lr = 1e-5)
-        optimizer = Nadam(learning_rate = 1e-4) # 'adam', 'sgd', 'test ema momentum'
 
         def weighted_mse_loss(weights):
 
@@ -208,9 +205,13 @@ class Lens:
                 penaltty_loss = tf.reduce_mean(negative_penalty + shear_penalty)
                 return mse_loss + penalty_weight*penaltty_loss
             return loss
-
+        
         weights = [2.9, 1.0, 1.5, 1.5, 0.5, 0.5]
-        loss_fn = weighted_mse_loss(weights)
+        loss_fn = weighted_mse_loss_phys(weights)
+
+        early_stopping = EarlyStopping(monitor = 'val_loss', start_from_epoch = 4, patience = 3)
+        reduce_lr = ReduceLROnPlateau(monitor = 'val_loss', factor = 0.1, patience = 4, min_lr = 1e-5)
+        optimizer = Nadam(learning_rate = 1e-4) # 'adam', 'sgd', 'test ema momentum'
         #self.model = hybrid_model.Hybird_Model(input_shape = self.input_shape, classes = self.classes)
         self.model = alexnet.AlexNet(input_shape = self.input_shape, classes = self.classes)
         
@@ -222,7 +223,7 @@ class Lens:
                                       train_labels, #[train_df, train_labels]
                                       epochs = epochs,
                                       validation_data = (val_df, val_labels), # [val_df, val_labels]
-                                      callbacks = [reduce_lr], 
+                                      callbacks = [reduce_lr, early_stopping], 
                                       batch_size = 32)
         self.Plot_Metrics('mae')
         self.Plot_Metrics('loss')
@@ -232,7 +233,7 @@ class Lens:
         print(f'Test Loss: {test_loss:.4f}, Test MAE: {test_mae:.4f}')
         
     def Save_model(self):
-        self.model.save('./cnn_model/my_model_informed.keras')
+        self.model.save('./cnn_model/my_model_informed_phy.keras')
 
     def Plot_Metrics(self, metric):
         plt.figure()
@@ -303,7 +304,7 @@ class Lens:
         #    self.Augment_Data(30)
         #    self.Augment_Data(270)
 
-Lens_instance = Lens(total_images = 100000)
+Lens_instance = Lens(total_images = 50000)
 
 if args.database:
     Lens_instance.Generate_Images()
