@@ -206,7 +206,7 @@ class Lens:
                 return mse_loss + penalty_weight*penaltty_loss
             return loss
         
-        weights = [2.9, 1.0, 1.5, 1.5, 1.5, 1.5]
+        weights = [2.5, 1.0, 1.0, 1.0, 1.8, 1.8]
         loss_fn = weighted_mse_loss_phys(weights)
 
         early_stopping = EarlyStopping(monitor = 'val_loss', start_from_epoch = 4, patience = 3)
