@@ -21,6 +21,7 @@ plot_models.py
 theta_E_relationship.py
 read_dataset.py
 physics_informed_loss.py
+model_summary.py
 
 # directories
 images/
