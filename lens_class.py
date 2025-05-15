@@ -150,13 +150,13 @@ class Lens:
                     hdr = file.header
                     file_name = hdr['NAME']
                     img = file.data
-                    img = np.asarray(np.log10(img))
-                    img_min = np.min(img)
-                    img_max = np.max(img)
-                    normalized_image = (img - img_min) / (img_max - img_min)
+                    img = np.log10(img)
+                    # img_min = np.min(img)
+                    # img_max = np.max(img)
+                    # normalized_image = (img - img_min) / (img_max - img_min)
                     # img_resized = cv2.resize(img, (224, 224), interpolation = cv2.INTER_LINEAR)
                     self.train_lbs.append([hdr[label] for label in self.labels])
-                    self.train_images.append(normalized_image)
+                    self.train_images.append(img)
 
                 self.train_images, self.train_lbs = np.array(self.train_images), np.array(self.train_lbs)
         
