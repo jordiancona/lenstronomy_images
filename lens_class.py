@@ -11,6 +11,7 @@ from create_lens import Lenses as lss
 from create_lens import sie_lens
 from make_lens import MakeLens
 from models import alexnet
+from models import branch_cnn
 import tensorflow as tf
 from keras.optimizers import Adam, Nadam # type: ignore
 from keras.callbacks import EarlyStopping, ReduceLROnPlateau # type: ignore
@@ -217,7 +218,7 @@ class Lens:
         reduce_lr = ReduceLROnPlateau(monitor = 'val_loss', factor = 0.1, patience = 4, min_lr = 1e-5)
         optimizer = Nadam(learning_rate = 1e-4) # 'adam', 'sgd', 'test ema momentum'
         #self.model = hybrid_model.Hybird_Model(input_shape = self.input_shape, classes = self.classes)
-        self.model = alexnet.AlexNet(input_shape = self.input_shape, classes = self.classes)
+        self.model = branch_cnn.Branch_cnn(input_shape = self.input_shape, classes = self.classes)
         
         self.model.compile(optimizer = optimizer, 
                            loss = loss_fn,#{'Decoder':'mse', 'Regressor':'mse'},
