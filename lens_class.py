@@ -218,7 +218,7 @@ class Lens:
         reduce_lr = ReduceLROnPlateau(monitor = 'val_loss', factor = 0.1, patience = 4, min_lr = 1e-5)
         optimizer = Nadam(learning_rate = 1e-4) # 'adam', 'sgd', 'test ema momentum'
         #self.model = hybrid_model.Hybird_Model(input_shape = self.input_shape, classes = self.classes)
-        self.model = branch_cnn.Branch_cnn(input_shape = self.input_shape, classes = self.classes)
+        self.model = alexnet.AlexNet(input_shape = self.input_shape, classes = self.classes)
         
         self.model.compile(optimizer = optimizer, 
                            loss = loss_fn,#{'Decoder':'mse', 'Regressor':'mse'},
@@ -234,11 +234,11 @@ class Lens:
         self.Plot_Metrics('loss')
 
         test_n = 5000
-        test_loss, test_mae = self.model.evaluate(test_df[:test_n], test_labels[:test_n], batch_size = 128)
+        test_loss, test_mae = self.model.evaluate(test_df[:test_n], test_labels[:test_n], batch_size = 64)
         print(f'Test Loss: {test_loss:.4f}, Test MAE: {test_mae:.4f}')
         
     def Save_model(self):
-        self.model.save('./cnn_model/my_model_informed_phy.keras')
+        self.model.save('./cnn_model/my_model.keras')
 
     def Plot_Metrics(self, metric):
         plt.figure()
@@ -309,7 +309,7 @@ class Lens:
         #    self.Augment_Data(30)
         #    self.Augment_Data(270)
 
-Lens_instance = Lens(total_images = 50000)
+Lens_instance = Lens(total_images = 74000)
 
 if args.database:
     Lens_instance.Generate_Images()
@@ -323,7 +323,7 @@ if args.summary:
 
 if args.train:
     Lens_instance.Train_and_Val_Images()
-    Lens_instance.Train_and_Val(int(args.train), device = 'no', percentage = 25)
+    Lens_instance.Train_and_Val(int(args.train), device = 'no', percentage = 20)
 
 if args.save:
     Lens_instance.Save_model()
