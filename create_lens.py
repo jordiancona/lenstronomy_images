@@ -263,10 +263,12 @@ class Lenses:
 
         deltaPix = 0.05  # size of pixel in angular coordinates #
 
+        im_dim = 224
         # setup the keyword arguments to create the Data() class #
-        ra_at_xy_0, dec_at_xy_0 = -2.5, -2.5 # coordinate in angles (RA/DEC) at the position of the pixel edge (0,0)
+        ra_at_xy_0, dec_at_xy_0 = -im_dim*deltaPix/2., -im_dim*deltaPix/2. # coordinate in angles (RA/DEC) at the position of the pixel edge (0,0)
         transform_pix2angle = np.array([[1, 0], [0, 1]]) * deltaPix  # linear translation matrix of a shift in pixel in a shift in coordinates
-        kwargs_pixel = {'nx': 100, 'ny': 100,  # number of pixels per axis
+        kwargs_pixel = {'nx': im_dim, 
+                        'ny': im_dim,  # number of pixels per axis
                         'ra_at_xy_0': ra_at_xy_0,  # RA at pixel (0,0)
                         'dec_at_xy_0': dec_at_xy_0,  # DEC at pixel (0,0)
                         'transform_pix2angle': transform_pix2angle} 

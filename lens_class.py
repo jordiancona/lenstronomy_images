@@ -36,11 +36,11 @@ class Lens:
     def __init__(self, total_images):
         self.total_images = total_images
         self.fits_path = './fits/'
-        self.fits_name = './lens_fits.fits'
+        self.fits_name = './lens_fits_224.fits'
         self.labels = ['theta_E','f_axis','e1','e2','gamma1','gamma2']
         self.classes = 6
         self.batch_size = 64
-        self.input_shape = (100, 100, 1)
+        self.input_shape = (224, 224, 1)
 
     # Genera una matriz de las imágenes de lentes gravitacionales para entrenamiento
     def Examples(self):
