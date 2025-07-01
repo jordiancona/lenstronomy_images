@@ -40,7 +40,7 @@ class Lens:
         self.labels = ['theta_E','f_axis','e1','e2','gamma1','gamma2']
         self.classes = 6
         self.batch_size = 64
-        self.input_shape = (224, 224, 1)
+        self.input_shape = (100, 100, 1)
 
     # Genera una matriz de las imágenes de lentes gravitacionales para entrenamiento
     def Examples(self):
@@ -149,15 +149,28 @@ class Lens:
                     idx = np.random.randint(0,self.total_images)
                     file = hdul[idx+1]
                     hdr = file.header
-                    file_name = hdr['NAME']
+                    #file_name = hdr['NAME']
                     img = file.data
-                    img = np.log10(img)
-                    img_min = np.min(img)
-                    img_max = np.max(img)
-                    normalized_image = (img - img_min) / (img_max - img_min)
+                    img_processed = np.log10(img)
+
+                    # Normalize the image to a 0-255 range for grayscale display/processing
+                    img_min = np.min(img_processed)
+                    img_max = np.max(img_processed)
+                    print(f'img min: {img_min} - img max: {img_max}')
+                    # Avoid division by zero if img_min and img_max are the same (e.g., flat image)
+                    if img_max == img_min:
+                        normalized_image = np.zeros_like(img_processed, dtype = np.uint8) # All black
+                    else:
+                        normalized_image = ((img_processed - img_min) / (img_max - img_min)) * 255
+                        normalized_image = normalized_image.astype(np.uint8) # Convert to 8-bit integer (0-255)
+                    resized_image = tf.image.resize(normalized_image[..., tf.newaxis], # Add channel dimension if not present
+                                                    (self.input_shape[0], self.input_shape[1])).numpy()
+
+                    if len(resized_image.shape) == 2:
+                        resized_image = resized_image[..., np.newaxis]
                     #img_resized = cv2.resize(img, (224, 224), interpolation = cv2.INTER_LINEAR)
                     self.train_lbs.append([hdr[label] for label in self.labels])
-                    self.train_images.append(normalized_image)
+                    self.train_images.append(resized_image)
 
                 self.train_images, self.train_lbs = np.array(self.train_images), np.array(self.train_lbs)
         
