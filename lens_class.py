@@ -36,11 +36,11 @@ class Lens:
     def __init__(self, total_images):
         self.total_images = total_images
         self.fits_path = './fits/'
-        self.fits_name = './lens_fits_224.fits'
+        self.fits_name = './lens_fits_200.fits'
         self.labels = ['theta_E','f_axis','e1','e2','gamma1','gamma2']
         self.classes = 6
         self.batch_size = 64
-        self.input_shape = (100, 100, 1)
+        self.input_shape = (200, 200, 1)
 
     # Genera una matriz de las imágenes de lentes gravitacionales para entrenamiento
     def Examples(self):
@@ -156,19 +156,17 @@ class Lens:
                     # Normalize the image to a 0-255 range for grayscale display/processing
                     img_min = np.min(img_processed)
                     img_max = np.max(img_processed)
-                    print(f'img min: {img_min} - img max: {img_max}')
                     # Avoid division by zero if img_min and img_max are the same (e.g., flat image)
                     if img_max == img_min:
                         normalized_image = np.zeros_like(img_processed, dtype = np.uint8) # All black
                     else:
                         normalized_image = ((img_processed - img_min) / (img_max - img_min)) * 255
                         normalized_image = normalized_image.astype(np.uint8) # Convert to 8-bit integer (0-255)
-                    resized_image = tf.image.resize(normalized_image[..., tf.newaxis], # Add channel dimension if not present
-                                                    (self.input_shape[0], self.input_shape[1])).numpy()
+                    resized_image = tf.image.resize(normalized_image[..., tf.newaxis], (self.input_shape[0], self.input_shape[1])).numpy()
 
                     if len(resized_image.shape) == 2:
                         resized_image = resized_image[..., np.newaxis]
-                    #img_resized = cv2.resize(img, (224, 224), interpolation = cv2.INTER_LINEAR)
+                    
                     self.train_lbs.append([hdr[label] for label in self.labels])
                     self.train_images.append(resized_image)
 
@@ -322,7 +320,7 @@ class Lens:
         #    self.Augment_Data(30)
         #    self.Augment_Data(270)
 
-Lens_instance = Lens(total_images = 74000)
+Lens_instance = Lens(total_images = 50000)
 
 if args.database:
     Lens_instance.Generate_Images()
