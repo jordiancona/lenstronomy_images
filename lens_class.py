@@ -21,22 +21,11 @@ from astropy.constants import c
 from sklearn.model_selection import train_test_split
 from tqdm import tqdm
 
-np.random.seed(42)
-tf.random.set_seed(42)
-
-parser = argparse.ArgumentParser()
-parser.add_argument('-db', '--database', action = 'store_true', help = 'Generate the images for training.')
-parser.add_argument('-sh', '--show', action = 'store_true', help = 'Return an example of the images for the training.')
-parser.add_argument('-sm', '--summary', action = 'store_true', help = 'Gives a summary of the dataset.')
-parser.add_argument('-tr', '--train', help = 'Train the DL model.')
-parser.add_argument('-sv', '--save', action = 'store_true', help = 'Save the model.')
-args = parser.parse_args()
-
 class Lens:
     def __init__(self, total_images):
         self.total_images = total_images
         self.fits_path = './fits/'
-        self.fits_name = './lens_fits_200.fits'
+        self.fits_name = './lens_fits_100.fits'
         self.labels = ['theta_E','f_axis','e1','e2','gamma1','gamma2']
         self.classes = 6
         self.batch_size = 64
@@ -145,11 +134,10 @@ class Lens:
                 self.train_lbs = []
                 self.train_images = []
 
-                for _ in range(self.total_images):
+                for _ in tqdm(range(self.total_images), desc = 'Cargando imágenes'):
                     idx = np.random.randint(0,self.total_images)
                     file = hdul[idx+1]
                     hdr = file.header
-                    #file_name = hdr['NAME']
                     img = file.data
                     img_processed = np.log10(img)
 
@@ -189,7 +177,6 @@ class Lens:
         print(f'Imágenes de entrenamiento: {len(train_df)}')
         print(f'Imágenes de validación: {len(val_df)}')
         print(f'Imágenes de prueba: {len(test_df)}')
-
 
         def weighted_mse_loss(weights):
 
@@ -265,12 +252,12 @@ class Lens:
     # Se generan las imágenes y archivos FITS
     def Generate_Images(self):
         #self.__dict__.update(kwargs)
-        for i in tqdm(range(self.total_images)):
+        for i in tqdm(range(self.total_images), desc = 'Generando base de datos.'):
             f = rd.uniform(0,1.)
-            deg = 30
+            deg = 0
             pa = deg/180*np.pi
             self.sigmav = 200
-            self.zl = rd.uniform(0.5,1.0)
+            self.zl = rd.uniform(0.2,1.0)
             self.zs = rd.uniform(1.0,2.)
             self.co = FlatLambdaCDM(H0 = 70, Om0 = 0.3)
             dl = self.co.angular_diameter_distance(self.zl)
@@ -315,26 +302,40 @@ class Lens:
 
         hdu = fits.HDUList([primary_hdu] + images_hdus)
         hdu.writeto(self.fits_name, overwrite = True)
-        #if augment == True:
-            #self.Augment_Data_Special()
-        #    self.Augment_Data(30)
-        #    self.Augment_Data(270)
 
-Lens_instance = Lens(total_images = 50000)
+def main():
+    np.random.seed(42)
+    tf.random.set_seed(42)
 
-if args.database:
-    Lens_instance.Generate_Images()
-    Lens_instance.Save_FITS(True)
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-db', '--database', action = 'store_true', help = 'Generate the images for training.')
+    parser.add_argument('-sh', '--show', action = 'store_true', help = 'Return an example of the images for the training.')
+    parser.add_argument('-sm', '--summary', action = 'store_true', help = 'Gives a summary of the dataset.')
+    parser.add_argument('-tr', '--train', help = 'Train the DL model.')
+    parser.add_argument('-sv', '--save', action = 'store_true', help = 'Save the model.')
+    args = parser.parse_args()
 
-if args.show:
-    Lens_instance.Examples()
+    Lens_instance = Lens(total_images = 50000)
 
-if args.summary:
-    Lens_instance.Generate_Summary()
+    if args.database:
+        Lens_instance.Generate_Images()
+        Lens_instance.Save_FITS(True)
 
-if args.train:
-    Lens_instance.Train_and_Val_Images()
-    Lens_instance.Train_and_Val(int(args.train), device = 'no', percentage = 20)
+    if args.show:
+        Lens_instance.Examples()
 
-if args.save:
-    Lens_instance.Save_model()
+    if args.summary:
+        Lens_instance.Generate_Summary()
+
+    if args.train:
+        Lens_instance.Train_and_Val_Images()
+        Lens_instance.Train_and_Val(int(args.train), device = 'no', percentage = 20)
+
+    if args.save:
+        Lens_instance.Save_model()
+
+    if not any(vars(args).values()):
+        print('No se especificó ninguna acción. Use --help para ver las opciones')
+
+if __name__ == '__main__':
+    main()
