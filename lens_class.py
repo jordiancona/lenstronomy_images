@@ -260,7 +260,7 @@ class Lens:
         #self.__dict__.update(kwargs)
         for i in tqdm(range(self.total_images), desc = 'Generando base de datos.'):
             f = rd.uniform(0,1.)
-            deg = rd.randint(0,180)
+            deg = rd.randint(0,180.)
             pa = deg/180*np.pi
             self.sigmav = 200
             self.zl = rd.uniform(0.2,1.0)
@@ -321,7 +321,7 @@ def main():
     parser.add_argument('-sv', '--save', action = 'store_true', help = 'Save the model.')
     args = parser.parse_args()
 
-    Lens_instance = Lens(total_images = 50000)
+    Lens_instance = Lens(total_images = 60000)
 
     if args.database:
         Lens_instance.Generate_Images()
