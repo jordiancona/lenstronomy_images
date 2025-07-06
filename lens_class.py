@@ -260,7 +260,7 @@ class Lens:
         #self.__dict__.update(kwargs)
         for i in tqdm(range(self.total_images), desc = 'Generando base de datos.'):
             f = rd.uniform(0,1.)
-            deg = 0
+            deg = rd.randint(0,180)
             pa = deg/180*np.pi
             self.sigmav = 200
             self.zl = rd.uniform(0.2,1.0)
