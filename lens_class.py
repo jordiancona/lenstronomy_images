@@ -220,7 +220,7 @@ class Lens:
 
         early_stopping = EarlyStopping(monitor = 'val_loss', start_from_epoch = 4, patience = 3)
         reduce_lr = ReduceLROnPlateau(monitor = 'val_loss', factor = 0.1, patience = 4, min_lr = 1e-5)
-        optimizer = Nadam(learning_rate = 1e-4) # 'adam', 'sgd', 'test ema momentum'
+        optimizer = Adam(learning_rate = 1e-4) # 'adam', 'sgd', 'test ema momentum'
         #self.model = hybrid_model.Hybird_Model(input_shape = self.input_shape, classes = self.classes)
         self.model = alexnet.AlexNet(input_shape = self.input_shape, classes = self.classes)
         
