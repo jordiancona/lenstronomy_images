@@ -21,15 +21,18 @@ from astropy.constants import c
 from sklearn.model_selection import train_test_split
 from tqdm import tqdm
 
+IMG_SHAPE = (100,100,1)
+FITS_NAME = f'./lens_fits_{IMG_SHAPE[0]}.fits'
+
 class Lens:
     def __init__(self, total_images):
         self.total_images = total_images
         self.fits_path = './fits/'
-        self.fits_name = './lens_fits_100.fits'
+        self.fits_name = FITS_NAME
         self.labels = ['theta_E','f_axis','e1','e2','gamma1','gamma2']
         self.classes = 6
         self.batch_size = 64
-        self.input_shape = (200, 200, 1)
+        self.input_shape = IMG_SHAPE
 
     # Genera una matriz de las imágenes de lentes gravitacionales para entrenamiento
     def Examples(self):
@@ -131,6 +134,7 @@ class Lens:
     def Train_and_Val_Images(self):
         try:
             with fits.open(self.fits_name) as hdul:
+                raw_images = []
                 self.train_lbs = []
                 self.train_images = []
 
@@ -138,25 +142,27 @@ class Lens:
                     idx = np.random.randint(0,self.total_images)
                     file = hdul[idx+1]
                     hdr = file.header
-                    img = file.data
-                    img_processed = np.log10(img)
-
-                    # Normalize the image to a 0-255 range for grayscale display/processing
-                    img_min = np.min(img_processed)
-                    img_max = np.max(img_processed)
-                    # Avoid division by zero if img_min and img_max are the same (e.g., flat image)
-                    if img_max == img_min:
-                        normalized_image = np.zeros_like(img_processed, dtype = np.uint8) # All black
-                    else:
-                        normalized_image = ((img_processed - img_min) / (img_max - img_min)) * 255
-                        normalized_image = normalized_image.astype(np.uint8) # Convert to 8-bit integer (0-255)
-                    resized_image = tf.image.resize(normalized_image[..., tf.newaxis], (self.input_shape[0], self.input_shape[1])).numpy()
-
-                    if len(resized_image.shape) == 2:
-                        resized_image = resized_image[..., np.newaxis]
-                    
+                    img = file.data.astype(np.float32) # Asegurar que sea float
+                
+                    raw_images.append(img)
                     self.train_lbs.append([hdr[label] for label in self.labels])
-                    self.train_images.append(resized_image)
+
+                raw_images = np.array(raw_images)
+
+                # --- PASO 2: Aplicar una escala logarítmica segura ---
+                # Se evita tomar el log de cero o valores negativos
+                epsilon = 1e-6  # Un valor pequeño para evitar log(0)
+                log_images = np.log10(np.maximum(raw_images, 0) + epsilon)
+
+                # --- PASO 3: Calcular estadísticas GLOBALES ---
+                per_image_min = np.min(log_images, axis=(1, 2), keepdims=True)
+                per_image_max = np.max(log_images, axis=(1, 2), keepdims=True)
+
+                # --- PASO 4: Normalizar CADA IMAGEN individualmente ---
+                self.train_images = (log_images - per_image_min) / (per_image_max - per_image_min + 1e-8)
+                
+                # Agrega la dimensión del canal al final (100, 100) -> (100, 100, 1)
+                self.train_images = self.train_images[..., np.newaxis]
 
                 self.train_images, self.train_lbs = np.array(self.train_images), np.array(self.train_lbs)
         
@@ -171,8 +177,8 @@ class Lens:
         
         train_df, test_df, train_labels, test_labels = train_test_split(self.train_images, self.train_lbs, test_size = 0.2, random_state = 42, shuffle = True)
         pcg = percentage*len(train_df)//100
-        val_df, val_labels = train_df[-pcg:], train_labels[-pcg:]
         train_df, train_labels = train_df[:-pcg], train_labels[:-pcg]
+        val_df, val_labels = train_df[-pcg:], train_labels[-pcg:]
         
         print(f'Imágenes de entrenamiento: {len(train_df)}')
         print(f'Imágenes de validación: {len(val_df)}')
