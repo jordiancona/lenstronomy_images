@@ -23,6 +23,7 @@ read_dataset.py
 physics_informed_loss.py
 model_summary.py
 requeriments.tex
+resnet_test.py
 
 # directories
 images/
