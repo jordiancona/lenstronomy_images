@@ -242,7 +242,7 @@ class Lens:
         print(f'Test Loss: {test_loss:.4f}, Test MAE: {test_mae:.4f}')
         
     def Save_model(self):
-        self.model.save('./cnn_model/my_model.keras')
+        self.model.save('./cnn_model/alexnet.keras')
 
     def Plot_Metrics(self, metric):
         plt.figure()
@@ -321,7 +321,7 @@ def main():
     parser.add_argument('-sv', '--save', action = 'store_true', help = 'Save the model.')
     args = parser.parse_args()
 
-    Lens_instance = Lens(total_images = 60000)
+    Lens_instance = Lens(total_images = 50000)
 
     if args.database:
         Lens_instance.Generate_Images()
