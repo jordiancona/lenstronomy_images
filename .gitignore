@@ -24,6 +24,14 @@ physics_informed_loss.py
 model_summary.py
 requeriments.tex
 resnet_test.py
+xgb_e1.joblib
+xgb_e2.joblib
+xgb_f_axis.joblib
+xgb_gamma1.joblib
+xgb_gamma2.joblib
+xgb_theta_E.joblib
+xgboost_inference.py
+xgboost_test.py
 
 # directories
 images/
