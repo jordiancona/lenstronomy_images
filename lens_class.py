@@ -218,20 +218,20 @@ class Lens:
         weights = [2.5, 1.0, 1.0, 1.0, 1.5, 1.5]
         loss_fn = weighted_mse_loss(weights)
 
-        early_stopping = EarlyStopping(monitor = 'val_loss', start_from_epoch = 4, patience = 3)
+        early_stopping = EarlyStopping(monitor = 'val_loss', start_from_epoch = 6, patience = 3)
         reduce_lr = ReduceLROnPlateau(monitor = 'val_loss', factor = 0.1, patience = 4, min_lr = 1e-5)
         optimizer = Adam(learning_rate = 1e-4) # 'adam', 'sgd', 'test ema momentum'
         #self.model = hybrid_model.Hybird_Model(input_shape = self.input_shape, classes = self.classes)
         self.model = alexnet.AlexNet(input_shape = self.input_shape, classes = self.classes)
         
         self.model.compile(optimizer = optimizer, 
-                           loss = loss_fn,#{'Decoder':'mse', 'Regressor':'mse'},
+                           loss = loss_fn,
                            metrics = ['mae']) 
 
         self.history = self.model.fit(train_df,
-                                      train_labels, #[train_df, train_labels]
+                                      train_labels,
                                       epochs = epochs,
-                                      validation_data = (val_df, val_labels), # [val_df, val_labels]
+                                      validation_data = (val_df, val_labels),
                                       callbacks = [reduce_lr, early_stopping], 
                                       batch_size = 32)
         self.Plot_Metrics('mae')
