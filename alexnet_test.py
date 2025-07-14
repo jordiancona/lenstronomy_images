@@ -23,6 +23,16 @@ val_losses = []
 maes = []
 val_maes = []
 
+def weighted_mse_loss(weights):
+
+    weights = tf.constant(weights, dtype = tf.float32)
+
+    def loss(y_true, y_pred):
+        squared_diff = tf.square(y_true - y_pred)
+        weighted_squared_diff = squared_diff * weights
+        return tf.reduce_mean(weighted_squared_diff)
+    return loss
+
 class WeightedMSE(tf.keras.losses.Loss):
     def __init__(self, weights, name="weighted_mse"):
         super().__init__(name=name)
@@ -98,7 +108,7 @@ def main():
         path = f'./results/alexnet_modified/paper/alexnet_{n+1}/'
         print(f'--------PRUEBA {n+1}--------')
         weights = [2.5, 1.0, 1.0, 1.0, 1.5, 1.5]
-        loss_fn = WeightedMSE(weights)
+        loss_fn = weighted_mse_loss(weights)
         optimizer = Nadam(learning_rate = 1e-4)
         model = alexnet.AlexNet(input_shape = input_dimensions, classes = 6, dp1 = dp1, dp2 = dp2)
         model.compile(optimizer = optimizer, loss = loss_fn, metrics = ['mae'])
