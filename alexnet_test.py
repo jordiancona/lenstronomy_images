@@ -32,20 +32,6 @@ def weighted_mse_loss(weights):
         return tf.reduce_mean(weighted_squared_diff)
     return loss
 
-class WeightedMSE(tf.keras.losses.Loss):
-    def __init__(self, weights, name="weighted_mse"):
-        super().__init__(name=name)
-        # Aseguramos que los pesos sean un tensor de TF
-        self.weights = tf.constant(weights, dtype=tf.float32)
-
-    def call(self, y_true, y_pred):
-        # TensorFlow se encarga de convertir y_true a float32 si es necesario
-        y_true = tf.cast(y_true, dtype=tf.float32)
-        
-        squared_diff = tf.square(y_true - y_pred)
-        weighted_squared_diff = squared_diff * self.weights
-        return tf.reduce_mean(weighted_squared_diff)
-
 def Plot_Metrics(history, metric, path):
         plt.figure()
         plt.plot(history.history[f'{metric}'], label = f'Training {metric}', c = 'k', lw = 0.8)
