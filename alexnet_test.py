@@ -1,10 +1,9 @@
 
 import time
 import numpy as np
+import pandas as pd
 import matplotlib.pyplot as plt
 import tensorflow as tf
-from tensorflow.keras.layers import Input, Conv2D, Dense, Flatten, Dropout # type: ignore
-from tensorflow.keras.models import Model # type: ignore
 from models import alexnet
 from tensorflow.keras.optimizers import Adam, Nadam # type: ignore
 from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau # type: ignore
@@ -17,7 +16,7 @@ total_images = 50000
 labels = ['theta_E','f_axis','e1','e2','gamma1','gamma2']
 input_dimensions = (100, 100, 1)
 percentage = 20
-dropuots = [(0.2, 0.3), (0.1, 0.5), (.05, 0.1), (0.0, 0.0)]
+dropuots = [(0.2, 0.3), (0.1, 0.5), (0.0, 0.0)]
 losses = []
 val_losses = []
 maes = []
@@ -132,6 +131,9 @@ def main():
         maes.append(history.history['mae'])
         val_losses.append(history.history['val_loss'])
         val_maes.append(history.history['val_mae'])
+
+        history_df = pd.DataFrame(history.history)
+        history_df.to_csv(path + f'training_history_{n+1}.csv', index = False)
 
         start = time.time()
         test_n = 5000
