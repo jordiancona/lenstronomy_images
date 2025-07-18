@@ -16,7 +16,7 @@ total_images = 50000
 labels = ['theta_E','f_axis','e1','e2','gamma1','gamma2']
 input_dimensions = (100, 100, 1)
 percentage = 20
-dropuots = [(0.2, 0.3), (0.1, 0.5), (0.0, 0.0)]
+dropuots = [(0.2, 0.3), (0.2, 0.2), (0.0, 0.0)]
 losses = []
 val_losses = []
 maes = []
@@ -105,9 +105,9 @@ def main():
         start = time.time()
         history = model.fit(train_df,
                             train_labels, #[train_df, train_labels]
-                            epochs = 50,
+                            epochs = 15,
                             validation_data = (val_df, val_labels), # [val_df, val_labels]
-                            callbacks = [reduce_lr, early_stopping],
+                            callbacks = [reduce_lr],
                             batch_size = 32)
         end = time.time()
         train_time = end - start
