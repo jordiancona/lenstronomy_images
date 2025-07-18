@@ -153,7 +153,7 @@ def main():
         dp1, dp2 = dpts
         plt.plot(losses[n], lw = 0.8, label = f'd1: {dp1} d2: {dp2}')
     plt.title('Loss through training')
-    plt.gca().set(xlabel = 'epoch', ylabel = 'mae')
+    plt.gca().set(xlabel = 'epoch', ylabel = 'loss')
     plt.legend()
     plt.savefig('./results/alexnet_modified/paper/losses.png')
     plt.close()
@@ -162,7 +162,7 @@ def main():
         dp1, dp2 = dpts
         plt.plot(val_losses[n], lw = 0.8, label = f'd1: {dp1} d2: {dp2}')
     plt.title('Loss through validation')
-    plt.gca().set(xlabel = 'epoch', ylabel = 'mae')
+    plt.gca().set(xlabel = 'epoch', ylabel = 'loss')
     plt.legend()
     plt.savefig('./results/alexnet_modified/paper/val_losses.png')
     plt.close()
