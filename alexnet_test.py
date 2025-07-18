@@ -105,7 +105,7 @@ def main():
         start = time.time()
         history = model.fit(train_df,
                             train_labels, #[train_df, train_labels]
-                            epochs = 15,
+                            epochs = 16,
                             validation_data = (val_df, val_labels), # [val_df, val_labels]
                             callbacks = [reduce_lr],
                             batch_size = 32)
