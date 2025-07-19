@@ -32,7 +32,7 @@ def weighted_mse_loss(weights):
         return tf.reduce_mean(weighted_squared_diff)
     return loss
 
-def Plot_Metrics(history, metric, path):
+def Plot_Metrics(history, metric, path, n):
         plt.figure()
         plt.plot(history.history[f'{metric}'], label = f'Training {metric}', c = 'k', lw = 0.8)
         plt.plot(history.history[f'val_{metric}'], label = f'Validation {metric}', c = 'r', lw = 0.8)
@@ -40,7 +40,7 @@ def Plot_Metrics(history, metric, path):
         plt.xlabel('epoch')
         plt.ylabel(metric)
         plt.legend()
-        plt.savefig(path + f'{metric.lower()}.png')
+        plt.savefig(path + f'{metric.lower()}_{n}.png')
         plt.close()
 
 def main():
@@ -111,15 +111,15 @@ def main():
                             batch_size = 32)
         end = time.time()
         train_time = end - start
-        Plot_Metrics(history, 'mae', path)
-        Plot_Metrics(history, 'loss', path)
+        Plot_Metrics(history, 'mae', './results/alexnet_modified/paper/pruebas/', n)
+        Plot_Metrics(history, 'loss', './results/alexnet_modified/paper/pruebas/', n)
         losses.append(history.history['loss'])
         maes.append(history.history['mae'])
         val_losses.append(history.history['val_loss'])
         val_maes.append(history.history['val_mae'])
 
-        history_df = pd.DataFrame(history.history)
-        history_df.to_csv(path + f'training_history_{n+1}.csv', index = False)
+        #history_df = pd.DataFrame(history.history)
+        #history_df.to_csv(path + f'training_history_{n+1}.csv', index = False)
 
         start = time.time()
         test_n = 5000
@@ -129,7 +129,7 @@ def main():
         print(f'Test Loss: {test_loss:.4f}, Test MAE: {test_mae:.4f}')
 
         print(f'training time: {train_time} - test_time: {test_time}')
-        model.save(path + 'alexnet_paper.keras')
+        #model.save(path + 'alexnet_paper.keras')
     
     for n, dpts in enumerate(dropuots):
         dp1, dp2 = dpts
@@ -137,7 +137,7 @@ def main():
     plt.title('MAE through training')
     plt.gca().set(xlabel = 'epoch', ylabel = 'mae')
     plt.legend()
-    plt.savefig('./results/alexnet_modified/paper/maes.png')
+    plt.savefig('./results/alexnet_modified/paper/pruebas/maes.png')
     plt.close()
 
     for n, dpts in enumerate(dropuots):
@@ -146,7 +146,7 @@ def main():
     plt.title('MAE through validation')
     plt.gca().set(xlabel = 'epoch', ylabel = 'mae')
     plt.legend()
-    plt.savefig('./results/alexnet_modified/paper/val_maes.png')
+    plt.savefig('./results/alexnet_modified/paper/pruebas/val_maes.png')
     plt.close()
 
     for n, dpts in enumerate(dropuots):
@@ -155,7 +155,7 @@ def main():
     plt.title('Loss through training')
     plt.gca().set(xlabel = 'epoch', ylabel = 'loss')
     plt.legend()
-    plt.savefig('./results/alexnet_modified/paper/losses.png')
+    plt.savefig('./results/alexnet_modified/paper/pruebas/losses.png')
     plt.close()
 
     for n, dpts in enumerate(dropuots):
@@ -164,7 +164,7 @@ def main():
     plt.title('Loss through validation')
     plt.gca().set(xlabel = 'epoch', ylabel = 'loss')
     plt.legend()
-    plt.savefig('./results/alexnet_modified/paper/val_losses.png')
+    plt.savefig('./results/alexnet_modified/paper/pruebas/val_losses.png')
     plt.close()
 
 if __name__=='__main__':
