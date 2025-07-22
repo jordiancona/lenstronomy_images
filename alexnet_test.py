@@ -10,6 +10,9 @@ from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau # type: 
 from sklearn.model_selection import train_test_split
 from astropy.io import fits
 from tqdm import tqdm
+plt.rc('axes', labelsize = 15)
+plt.rc('xtick', labelsize = 10)
+plt.rc('ytick', labelsize = 10)
 
 fits_name = './lens_fits_100.fits'
 total_images = 50000
