@@ -33,6 +33,9 @@ xgb_theta_E.joblib
 xgboost_inference.py
 xgboost_test.py
 read_parameters.py
+cnn_lens.keras
+cnn_test.py
+training_history_cnn.csv
 
 # directories
 images/

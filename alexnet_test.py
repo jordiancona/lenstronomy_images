@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import tensorflow as tf
-from models import alexnet
+from models import alexnet, cnn
 from tensorflow.keras.optimizers import Adam, Nadam # type: ignore
 from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau # type: ignore
 from sklearn.model_selection import train_test_split
@@ -97,8 +97,8 @@ def main():
         print(f'--------PRUEBA {n+1}--------')
         weights = [2.5, 1.0, 1.0, 1.0, 1.5, 1.5]
         loss_fn = weighted_mse_loss(weights)
-        optimizer = Nadam(learning_rate = 1e-4)
-        model = alexnet.AlexNet(input_shape = input_dimensions, classes = 6, dp1 = dp1, dp2 = dp2)
+        optimizer = Nadam(learning_rate = 3e-4)
+        model = cnn.CNN_lense(input_shape = input_dimensions, classes = 6, dp1 = dp1, dp2 = dp2)
         model.compile(optimizer = optimizer, loss = loss_fn, metrics = ['mae'])
 
         print(f'Imágenes de entrenamiento: {len(train_df)}')
