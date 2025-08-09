@@ -10,8 +10,7 @@ from time import gmtime, strftime
 from create_lens import Lenses as lss
 from create_lens import sie_lens
 from make_lens import MakeLens
-from models import alexnet
-from models import branch_cnn
+from models import alexnet 
 import tensorflow as tf
 from keras.optimizers import Adam, Nadam # type: ignore
 from keras.callbacks import EarlyStopping, ReduceLROnPlateau # type: ignore
@@ -47,7 +46,7 @@ class Lens:
                     plt.subplot(3, 3, i+1)
                     plt.title(f'image: {idx}')
                     plt.grid(False)
-                    plt.imshow(np.log10(data), cmap = 'gist_heat', aspect = 'auto')
+                    plt.imshow(np.log10(data), cmap = 'gray', aspect = 'auto')
                     plt.axis('equal')
                     text_values = [f'{label}: {hdr[label]:.4f}' for label in self.labels]
                     y_start = 50
@@ -260,8 +259,10 @@ class Lens:
         #self.__dict__.update(kwargs)
         for i in tqdm(range(self.total_images), desc = 'Generando base de datos.'):
             f = rd.uniform(0,1.)
-            deg = rd.randint(0,180.)
-            pa = deg/180*np.pi
+            deg_ellip = rd.randint(0,180.)
+            deg_gamma = rd.randint(0,180.)
+            pa_ellip = deg_ellip/180*np.pi
+            pa_gamma = deg_gamma/180*np.pi
             self.sigmav = 200
             self.zl = rd.uniform(0.2,1.0)
             self.zs = rd.uniform(1.0,2.)
@@ -270,10 +271,10 @@ class Lens:
             ds = self.co.angular_diameter_distance(self.zs)
             dls = self.co.angular_diameter_distance_z1z2(self.zl, self.zs)
             y1, y2 = 0, 0
-            SIE = sie_lens(self.co, zl = self.zl, zs = self.zs, sigmav = self.sigmav, f = f, pa = pa)
+            SIE = sie_lens(self.co, zl = self.zl, zs = self.zs, sigmav = self.sigmav, f = f, pa = pa_gamma)
             x, phi = SIE.phi_ima(y1,y2)
             gamma1, gamma2 = SIE.gamma(x, phi)
-            e1, e2 = (1 - f)/(1 + f)*np.cos(2*pa), (1 - f)/(1 + f)*np.sin(2*pa)
+            e1, e2 = (1 - f)/(1 + f)*np.cos(2*pa_ellip), (1 - f)/(1 + f)*np.sin(2*pa_ellip)
             thetaE = 1e6*(4.0*np.pi*self.sigmav**2/c**2*dls/ds*180.0/np.pi*3600.0).value
 
             lss.makelens(n = i,
@@ -321,7 +322,7 @@ def main():
     parser.add_argument('-sv', '--save', action = 'store_true', help = 'Save the model.')
     args = parser.parse_args()
 
-    Lens_instance = Lens(total_images = 50000)
+    Lens_instance = Lens(total_images = 100000)
 
     if args.database:
         Lens_instance.Generate_Images()

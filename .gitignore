@@ -36,6 +36,7 @@ read_parameters.py
 cnn_lens.keras
 cnn_test.py
 training_history_cnn.csv
+cnn_gaussian_test.py
 
 # directories
 images/
