@@ -37,6 +37,7 @@ cnn_lens.keras
 cnn_test.py
 training_history_cnn.csv
 cnn_gaussian_test.py
+predict_mcmc.py
 
 # directories
 images/
