@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import tensorflow as tf
+from keras.metrics import R2Score
 from models import alexnet, cnn
 from tensorflow.keras.optimizers import Adam, Nadam # type: ignore
 from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau # type: ignore
@@ -99,7 +100,7 @@ def main():
         loss_fn = weighted_mse_loss(weights)
         optimizer = Nadam(learning_rate = 3e-4)
         model = cnn.CNN_lense(input_shape = input_dimensions, classes = 6, dp1 = dp1, dp2 = dp2)
-        model.compile(optimizer = optimizer, loss = loss_fn, metrics = ['mae'])
+        model.compile(optimizer = optimizer, loss = loss_fn, metrics = ['mae', R2Score()])
 
         print(f'Imágenes de entrenamiento: {len(train_df)}')
         print(f'Imágenes de validación: {len(val_df)}')
