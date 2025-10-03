@@ -38,6 +38,7 @@ cnn_test.py
 training_history_cnn.csv
 cnn_gaussian_test.py
 predict_mcmc.py
+real_lens_plot.py
 
 # directories
 images/
