@@ -5,7 +5,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import tensorflow as tf
 from keras.metrics import R2Score
-from models import alexnet, cnn
+from models import alexnet, cnn, alexnet_original
 from tensorflow.keras.optimizers import Adam, Nadam # type: ignore
 from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau # type: ignore
 from sklearn.model_selection import train_test_split
@@ -20,7 +20,7 @@ total_images = 50000
 labels = ['theta_E','f_axis','e1','e2','gamma1','gamma2']
 input_dimensions = (100, 100, 1)
 percentage = 20
-dropuots = [(0.2, 0.3), (0.2, 0.2), (0.0, 0.0)]
+dropuots = [(0.2, 0.2)]
 losses = []
 val_losses = []
 maes = []
@@ -44,7 +44,7 @@ def Plot_Metrics(history, metric, path, n):
         plt.xlabel('epoch')
         plt.ylabel(metric)
         plt.legend()
-        plt.savefig(path + f'{metric.lower()}_{n}.png')
+        plt.savefig(path + f'{metric.lower()}_.png')
         plt.close()
 
 def main():
@@ -94,13 +94,13 @@ def main():
 
     for n, dpts in enumerate(dropuots):
         dp1, dp2 = dpts
-        path = f'./results/alexnet_modified/paper/alexnet_{n+1}/'
+        path = f'./results/alexnet_modified/paper/alexnet_4/'
         print(f'--------PRUEBA {n+1}--------')
         weights = [2.5, 1.0, 1.0, 1.0, 1.5, 1.5]
         loss_fn = weighted_mse_loss(weights)
         optimizer = Nadam(learning_rate = 3e-4)
-        model = cnn.CNN_lense(input_shape = input_dimensions, classes = 6, dp1 = dp1, dp2 = dp2)
-        model.compile(optimizer = optimizer, loss = loss_fn, metrics = ['mae', R2Score()])
+        model = alexnet.AlexNet(input_shape = input_dimensions, classes = 6, dp1 = dp1, dp2 = dp2)
+        model.compile(optimizer = optimizer, loss = loss_fn, metrics = ['mae'])
 
         print(f'Imágenes de entrenamiento: {len(train_df)}')
         print(f'Imágenes de validación: {len(val_df)}')
@@ -133,7 +133,7 @@ def main():
         print(f'Test Loss: {test_loss:.4f}, Test MAE: {test_mae:.4f}')
 
         print(f'training time: {train_time} - test_time: {test_time}')
-        model.save(path + 'alexnet_paper.keras')
+        model.save(path + 'alexnet_pape_original.keras')
     
     for n, dpts in enumerate(dropuots):
         dp1, dp2 = dpts
@@ -141,7 +141,7 @@ def main():
     plt.title('MAE through training')
     plt.gca().set(xlabel = 'epoch', ylabel = 'mae')
     plt.legend()
-    plt.savefig('./results/alexnet_modified/paper/maes.png')
+    plt.savefig('./results/alexnet_modified/paper/alexnet_original/maes.png')
     plt.close()
 
     for n, dpts in enumerate(dropuots):
@@ -150,7 +150,7 @@ def main():
     plt.title('MAE through validation')
     plt.gca().set(xlabel = 'epoch', ylabel = 'mae')
     plt.legend()
-    plt.savefig('./results/alexnet_modified/paper/val_maes.png')
+    plt.savefig('./results/alexnet_modified/paper/alexnet_original/val_maes.png')
     plt.close()
 
     for n, dpts in enumerate(dropuots):
@@ -159,7 +159,7 @@ def main():
     plt.title('Loss through training')
     plt.gca().set(xlabel = 'epoch', ylabel = 'loss')
     plt.legend()
-    plt.savefig('./results/alexnet_modified/paper/losses.png')
+    plt.savefig('./results/alexnet_modified/paper/alexnet_original/losses.png')
     plt.close()
 
     for n, dpts in enumerate(dropuots):
@@ -168,7 +168,7 @@ def main():
     plt.title('Loss through validation')
     plt.gca().set(xlabel = 'epoch', ylabel = 'loss')
     plt.legend()
-    plt.savefig('./results/alexnet_modified/paper/val_losses.png')
+    plt.savefig('./results/alexnet_modified/paper/alexnet_original/val_losses.png')
     plt.close()
 
 if __name__=='__main__':
