@@ -258,14 +258,14 @@ class Lens:
     def Generate_Images(self):
         #self.__dict__.update(kwargs)
         for i in tqdm(range(self.total_images), desc = 'Generando base de datos.'):
-            f = rd.uniform(0,1.)
-            deg_ellip = rd.randint(0,180.)
-            deg_gamma = rd.randint(0,180.)
+            f = rd.uniform(0.1,0.99)
+            deg_ellip = rd.randint(0,30.)
+            deg_gamma = rd.randint(0,30.)
             pa_ellip = deg_ellip/180*np.pi
             pa_gamma = deg_gamma/180*np.pi
             self.sigmav = 200
             self.zl = rd.uniform(0.2,1.0)
-            self.zs = rd.uniform(1.0,2.)
+            self.zs = rd.uniform(0.2,1.0) + rd.uniform(1.0,3.)
             self.co = FlatLambdaCDM(H0 = 70, Om0 = 0.3)
             dl = self.co.angular_diameter_distance(self.zl)
             ds = self.co.angular_diameter_distance(self.zs)
