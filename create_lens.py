@@ -221,7 +221,7 @@ class Lenses:
         lightModel_lens = LightModel(light_model_list=lens_light_model_list)
 
         # define the parameters #
-        kwargs_light_source = [{'amp': 100,
+        kwargs_light_source = [{'amp': 50,
                                 'R_sersic': 0.1,
                                 'n_sersic': 1.5, 
                                 'center_x': beta_ra, 
@@ -245,7 +245,7 @@ class Lenses:
                                   lens_model = lensModel,
                                   fixed_magnification_list = [True])
 
-        kwargs_ps = [{'ra_source': beta_ra, 'dec_source': beta_dec, 'source_amp': 100}]
+        kwargs_ps = [{'ra_source': beta_ra, 'dec_source': beta_dec, 'source_amp': 10}]
         # return image positions and amplitudes #
         x_pos, y_pos = pointSource.image_position(kwargs_ps = kwargs_ps, kwargs_lens = kwargs_lens)
         point_amp = pointSource.image_amplitude(kwargs_ps = kwargs_ps, kwargs_lens = kwargs_lens)
@@ -256,7 +256,7 @@ class Lenses:
                                   lens_model = lensModel,
                                   fixed_magnification_list = [False])
 
-        kwargs_ps = [{'ra_image': theta_ra, 'dec_image': theta_dec, 'point_amp': np.abs(mag)*30}]
+        kwargs_ps = [{'ra_image': theta_ra, 'dec_image': theta_dec, 'point_amp': np.abs(mag)*10}]
         # return image positions and amplitudes #
         x_pos, y_pos = pointSource.image_position(kwargs_ps = kwargs_ps, kwargs_lens = kwargs_lens)
         point_amp = pointSource.image_amplitude(kwargs_ps = kwargs_ps, kwargs_lens = kwargs_lens)
@@ -287,7 +287,7 @@ class Lenses:
                     'pixel_size': deltaPix  # angular scale of a pixel (required for a Gaussian PSF to translate the FWHM into a pixel scale)
                     }
 
-        psf = PSF(**kwargs_psf)
+        psf = PSF(psf_type = 'NONE')#PSF(**kwargs_psf)
         # return the pixel kernel corresponding to a point source # 
         kernel = psf.kernel_point_source
 
