@@ -167,7 +167,7 @@ class sie_lens():
 @dataclass
 class Lenses:
     @classmethod
-    def makelens(self, n, f, thetaE, e1, e2, gamma1, gamma2, center_x, center_y):
+    def makelens(self, n, f, thetaE, e1, e2, gamma1, gamma2, center_x, center_y, pa):
         self.file_name = f'lens{n+1}'
         
         self.f = f
@@ -177,6 +177,7 @@ class Lenses:
         self.gamma2 = gamma2
         self.center_x = center_x
         self.center_y = center_y
+        self.pa = pa
 
         # specify the choice of lens models #
         lens_model_list = ['SIE', 'SHEAR']
@@ -338,13 +339,14 @@ class Lenses:
         c4 = fits.Card('e2', self.e2, 'elipticity2')
 
         # Shear components
-        c5 = fits.Card('gamma1', self.gamma1, 'first shear component')
-        c6 = fits.Card('gamma2', self.gamma2, 'second shear component')
+        c5 = fits.Card('gamma1', self.center_x, 'lens coordinate x')
+        c6 = fits.Card('gamma2', self.center_y, 'lens coordinate y')
 
         # Lens Coordinates
         c7 = fits.Card('center_x', self.center_x, 'x coordinate')
         c8 = fits.Card('center_y', self.center_y, 'y coordinate')
-        parameters = [c1, c2, c3, c4, c5, c6, c7, c8]
+        c9 = fits.Card('pa_lens', self.pa, 'position angle')
+        parameters = [c1, c2, c3, c4, c5, c6, c7, c8, c9]
 
         for parameter in parameters:
             outhdr.append(parameter, end = True)
