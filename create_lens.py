@@ -339,8 +339,8 @@ class Lenses:
         c4 = fits.Card('e2', self.e2, 'elipticity2')
 
         # Shear components
-        c5 = fits.Card('gamma1', self.center_x, 'lens coordinate x')
-        c6 = fits.Card('gamma2', self.center_y, 'lens coordinate y')
+        c5 = fits.Card('gamma1', self.gamma1, 'lens coordinate x')
+        c6 = fits.Card('gamma2', self.gamma2, 'lens coordinate y')
 
         # Lens Coordinates
         c7 = fits.Card('center_x', self.center_x, 'x coordinate')

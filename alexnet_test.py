@@ -107,12 +107,12 @@ def main():
 
         print(f'--------PRUEBA {n+1}--------')
 
-        weights = [1.0, 1.0, 1.0]
+        weights = [1.5, 1.5, 1.5]
         loss_fn = weighted_mse_loss(weights)
         optimizer = Nadam(learning_rate = LEARNING_RATE) # Optimizador y LR
 
         model = alexnet.AlexNet(input_shape = input_dimensions, classes = CLASSES, dp1 = dp1, dp2 = dp2)
-        model.compile(optimizer = optimizer, loss = 'mse', metrics = ['mae'])
+        model.compile(optimizer = optimizer, loss = loss_fn, metrics = ['mae'])
 
         print(f'Imágenes de entrenamiento: {len(train_df)}')
         print(f'Imágenes de validación: {len(val_df)}')
