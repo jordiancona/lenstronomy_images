@@ -19,11 +19,11 @@ plt.rc('xtick', labelsize = 10)
 plt.rc('ytick', labelsize = 10)
 
 # --- PARAMETROS ---
-CLASSES = 3
+CLASSES = 4
 TOTAL_IMAGES = 50000
-FITS_NAME = './lens_fits_100.fits' # Imágenes de 100 x 100
+FITS_NAME = './csst_catalog/lens_fits_100.fits' # Imágenes de 100 x 100
 LEARNING_RATE = 1e-4
-labels = ['theta_E','e2','e2']
+labels = ['theta_E','f_axis','e2','e2']
 input_dimensions = (100, 100, 1)
 dropuots = [(0.3, 0.2), (0.2, 0.2), (0.0, 0.0)]
 losses = []
@@ -61,36 +61,38 @@ def Plot_Metrics(history, metric, path, n):
 
 def main():
     try:
-        with fits.open(FITS_NAME) as hdul:
-            raw_images = []
-            train_lbs = []
-            train_images = []
+        raw_images = []
+        train_lbs = []
+        train_images = []
+        for fits_file in tqdm(os.listdir('./csst_catalog/fits/'), desc = 'Loading FITS files'):
 
-            for _ in tqdm(range(TOTAL_IMAGES), desc = 'Cargando imágenes'):
-                idx = np.random.randint(0,TOTAL_IMAGES)
-                file = hdul[idx+1]
-                hdr = file.header
-                img = file.data.astype(np.float32)
-            
-                raw_images.append(img)
-                train_lbs.append([hdr[label] for label in labels])
+            hdul = fits.open('./csst_catalog/fits/' + fits_file)
+            idx = np.random.randint(0,TOTAL_IMAGES)
+            file = hdul[0]
+            hdr = file.header
+            img = file.data.astype(np.float32)
+        
+            raw_images.append(img)
+            train_lbs.append([hdr[label] for label in labels])
 
-            raw_images = np.array(raw_images)
+        raw_images = np.array(raw_images)
 
-            epsilon = 1e-6  # valor pequeño para evitar log(0)
-            log_images = np.log10(np.maximum(raw_images, 0) + epsilon)
+        epsilon = 1e-6  # valor pequeño para evitar log(0)
+        log_images = np.log10(np.maximum(raw_images, 0) + epsilon)
 
-            # Calcular estadísticas globales
-            per_image_min = np.min(log_images, axis = (1, 2), keepdims = True)
-            per_image_max = np.max(log_images, axis = (1, 2), keepdims = True)
+        # Calcular estadísticas globales
+        per_image_min = np.min(log_images, axis = (1, 2), keepdims = True)
+        per_image_max = np.max(log_images, axis = (1, 2), keepdims = True)
 
-            # Normalizar cada imagen individualmente 
-            train_images = (log_images - per_image_min) / (per_image_max - per_image_min + 1e-8)
-            
-            # Agrega la dimensión del canal al final (100, 100) -> (100, 100, 1)
-            train_images = train_images[..., np.newaxis]
+        # Normalizar cada imagen individualmente 
+        train_images = (log_images - per_image_min) / (per_image_max - per_image_min + 1e-8)
+        
+        # Agrega la dimensión del canal al final (100, 100) -> (100, 100, 1)
+        train_images = train_images[..., np.newaxis]
 
-            train_images, train_lbs = np.array(train_images), np.array(train_lbs)
+        train_images, train_lbs = np.array(train_images), np.array(train_lbs)
+
+        print(f'Train Data size :{train_images.shape} \n Train Labels size :{train_lbs.shape}')
 
     except FileNotFoundError:
         print(f"File {FITS_NAME} not found.")
@@ -103,11 +105,11 @@ def main():
 
     for n, dpts in enumerate(dropuots):
         dp1, dp2 = dpts
-        path = f'./results/alexnet_modified/paper4/alexnet_{n+1}/'
+        path = f'./csst_catalog/test1/alexnet_{n+1}/'
 
         print(f'--------PRUEBA {n+1}--------')
 
-        weights = [1.5, 1.5, 1.5]
+        weights = [1.5, 1.5, 1.5, 1.5]
         loss_fn = weighted_mse_loss(weights)
         optimizer = Nadam(learning_rate = LEARNING_RATE) # Optimizador y LR
 
