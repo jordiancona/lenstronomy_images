@@ -21,10 +21,12 @@ plt.rc('ytick', labelsize = 10)
 # --- PARAMETROS ---
 CLASSES = 4
 TOTAL_IMAGES = 50000
+MAIN_PATH = './csst_catalog/test3/'
+FITS_PATH = './csst_catalog/fits_200/' # Imágenes de 200 x 200
 FITS_NAME = './csst_catalog/lens_fits_100.fits' # Imágenes de 100 x 100
 LEARNING_RATE = 1e-4
 labels = ['theta_E','f_axis','e2','e2']
-input_dimensions = (100, 100, 1)
+input_dimensions = (200, 200, 1)
 dropuots = [(0.3, 0.2), (0.2, 0.2), (0.0, 0.0)]
 losses = []
 val_losses = []
@@ -64,9 +66,9 @@ def main():
         raw_images = []
         train_lbs = []
         train_images = []
-        for fits_file in tqdm(os.listdir('./csst_catalog/fits/'), desc = 'Loading FITS files'):
+        for fits_file in tqdm(os.listdir(FITS_PATH), desc = 'Loading FITS files'):
 
-            hdul = fits.open('./csst_catalog/fits/' + fits_file)
+            hdul = fits.open(FITS_PATH + fits_file)
             idx = np.random.randint(0,TOTAL_IMAGES)
             file = hdul[0]
             hdr = file.header
@@ -78,7 +80,7 @@ def main():
         raw_images = np.array(raw_images)
 
         epsilon = 1e-6  # valor pequeño para evitar log(0)
-        log_images = np.log10(np.maximum(raw_images, 0) + epsilon)
+        log_images = np.maximum(raw_images, 0) + epsilon # np.log10
 
         # Calcular estadísticas globales
         per_image_min = np.min(log_images, axis = (1, 2), keepdims = True)
@@ -105,7 +107,7 @@ def main():
 
     for n, dpts in enumerate(dropuots):
         dp1, dp2 = dpts
-        path = f'./csst_catalog/test1/alexnet_{n+1}/'
+        path = MAIN_PATH + f'alexnet_{n+1}/'
 
         print(f'--------PRUEBA {n+1}--------')
 
