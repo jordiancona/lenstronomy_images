@@ -21,7 +21,7 @@ plt.rc('ytick', labelsize = 10)
 # --- PARAMETROS ---
 CLASSES = 4
 TOTAL_IMAGES = 50000
-MAIN_PATH = './csst_catalog/test4/'
+MAIN_PATH = './csst_catalog/test5/'
 FITS_PATH = './csst_catalog/fits/' # Imágenes de 200 x 200
 FITS_NAME = './csst_catalog/lens_fits_100.fits' # Imágenes de 100 x 100
 LEARNING_RATE = 1e-4
@@ -50,6 +50,15 @@ def weighted_mse_loss(weights):
         return tf.reduce_mean(weighted_squared_diff)
     return loss
 
+def adaptative_weighted_mse():
+    def loss(y_true, y_pred):
+        squared_diff = tf.square(y_true - y_pred)
+        var = tf.math.reduce_mean(tf.square(y_true -tf.reduce_mean(y_true, axis = 0)), axis = 0)
+        weights = 1.0/(var + 1e-8)
+        weighted_squared_diff = weights*squared_diff
+        return tf.reduce_mean(weighted_squared_diff)
+    return loss
+
 def Plot_Metrics(history, metric, path, n):
         plt.figure()
         plt.plot(history.history[f'{metric}'], label = f'Training {metric}', c = 'k', lw = 0.8)
@@ -70,7 +79,7 @@ def main():
 
             hdul = fits.open(FITS_PATH + fits_file)
             idx = np.random.randint(0,TOTAL_IMAGES)
-            file = hdul[0]
+            file = hdul[1]
             hdr = file.header
             img = file.data.astype(np.float32)
         
@@ -113,6 +122,7 @@ def main():
 
         weights = [1.0, 1.0, 2.5, 2.5]
         loss_fn = weighted_mse_loss(weights)
+        loss_fn = adaptative_weighted_mse()
         optimizer = Nadam(learning_rate = LEARNING_RATE) # Optimizador y LR
 
         model = alexnet.AlexNet(input_shape = input_dimensions, classes = CLASSES, dp1 = dp1, dp2 = dp2)
