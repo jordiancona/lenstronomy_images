@@ -21,12 +21,12 @@ plt.rc('ytick', labelsize = 10)
 # --- PARAMETROS ---
 CLASSES = 4
 TOTAL_IMAGES = 50000
-MAIN_PATH = './csst_catalog/test3/'
-FITS_PATH = './csst_catalog/fits_200/' # Imágenes de 200 x 200
+MAIN_PATH = './csst_catalog/test4/'
+FITS_PATH = './csst_catalog/fits/' # Imágenes de 200 x 200
 FITS_NAME = './csst_catalog/lens_fits_100.fits' # Imágenes de 100 x 100
 LEARNING_RATE = 1e-4
 labels = ['theta_E','f_axis','e2','e2']
-input_dimensions = (200, 200, 1)
+input_dimensions = (100, 100, 1)
 dropuots = [(0.3, 0.2), (0.2, 0.2), (0.0, 0.0)]
 losses = []
 val_losses = []
@@ -111,7 +111,7 @@ def main():
 
         print(f'--------PRUEBA {n+1}--------')
 
-        weights = [1.5, 1.5, 1.5, 1.5]
+        weights = [1.0, 1.0, 2.5, 2.5]
         loss_fn = weighted_mse_loss(weights)
         optimizer = Nadam(learning_rate = LEARNING_RATE) # Optimizador y LR
 
