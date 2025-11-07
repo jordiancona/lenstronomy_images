@@ -32,8 +32,8 @@ xgb_gamma2.joblib
 xgb_theta_E.joblib
 xgboost_inference.py
 xgboost_test.py
-read_parameters.py
 cnn_lens.keras
+read_parameters.py
 cnn_test.py
 training_history_cnn.csv
 cnn_gaussian_test.py
@@ -59,3 +59,4 @@ deeplenstronomy/
 lens_class_2.py
 csst_catalog
 alexnet_test_2.py
+main_config.ini
