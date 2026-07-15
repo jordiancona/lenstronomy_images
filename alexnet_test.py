@@ -4,20 +4,25 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import tensorflow as tf
-from keras.metrics import R2Score
-from models import alexnet, resnet
+from models import alexnet, alexnet_original
 from tensorflow.keras.optimizers import Adam, Nadam # type: ignore
 from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau # type: ignore
 from sklearn.model_selection import train_test_split
 from astropy.io import fits
-from tqdm import tqdm
 import os
 import random
 import configparser
-
+import sys
 plt.rc('axes', labelsize = 15)
 plt.rc('xtick', labelsize = 10)
 plt.rc('ytick', labelsize = 10)
+
+# Terminal colors
+CYAN = '\033[36m'
+YELLOW = '\033[33m'
+GREEN = '\033[32m'
+RED = '\033[31m'
+ENDC = '\033[0m'
 
 # PARAMETROS
 def load_config(config_file):
@@ -26,12 +31,12 @@ def load_config(config_file):
     return config
 
 main_config = load_config('main_config.ini')
+PRUEBA = main_config['CONFIG']['prueba']
 CLASSES = int(main_config['MODEL']['classes'])
-TOTAL_IMAGES = int(main_config['MODEL']['total_images'])
 MAIN_PATH = main_config['PATHS']['main_path']
-MODEL_PATH = main_config['PATHS']['model_path']
-FITS_PATH = main_config['PATHS']['fits_path'] # Imágenes de 200 x 200
-FITS_FILE = main_config['PATHS']['fits_file'] # Si se guarda un archivo FITS con todas las imágenes
+MODEL_PATH = os.path.join(MAIN_PATH, f"alexnet_{PRUEBA}/")
+TFRECORD_PATH_TRAIN = main_config['PATHS']['tfrecords_path_train']
+TFRECORD_PATH_TEST = main_config['PATHS']['tfrecords_path_test']
 LEARNING_RATE = float(main_config['MODEL']['learning_rate'])
 LABELS = [item.strip() for item in main_config['MODEL']['labels'].split(',')]
 NUM_PIX = int(main_config['MODEL']['num_pix'])
@@ -39,46 +44,39 @@ CHANNLES = int(main_config['MODEL']['channels'])
 DROPOUTS = [float(item.strip()) for item in main_config['MODEL']['dropouts'].split(',')]
 BATCH_SIZE = int(main_config['MODEL']['batch_size'])
 EPOCHS = int(main_config['MODEL']['epochs'])
-TRAIN_SPLIT = float(main_config['MODEL']['train_split'])
-VAL_SPLIT = float(main_config['MODEL']['val_split'])
-PRUEBA = int(main_config['MODEL']['prueba'])
+TRAIN_SPLIT = float(main_config['MODEL']['train_split']) # p.ej. 0.8 (para 80% train+val)
+VAL_SPLIT = float(main_config['MODEL']['val_split'])   # p.ej. 0.2 (para 20% de validación del set de train+val)
 INPUT_SHAPE = (NUM_PIX, NUM_PIX, CHANNLES)
 
-losses = []
-val_losses = []
-maes = []
-val_maes = []
-
-# SEMILLA
+# SEED
 seed_value = 42
 os.environ['PYTHONHASHSEED'] = str(seed_value)
 random.seed(seed_value)
 np.random.seed(seed_value)
 tf.random.set_seed(seed_value)
 
-def weighted_mse_loss(weights):
+def get_weighted_loss(loss_weights=None, num_outputs=4):
     '''
-    Función de pérdida MSE ponderada.
+    Función de pérdida ponderada para múltiples salidas.
     '''
-    weights = tf.constant(weights, dtype = tf.float32)
+    if loss_weights is None:
+        loss_weights = [1.0] * num_outputs
+        if num_outputs >= 2:
+            loss_weights[-2] = 3.0
+            loss_weights[-1] = 3.0
+    
+    def weighted_mse(y_true, y_pred):
+        total_loss = 0
 
-    def loss(y_true, y_pred):
-        squared_diff = tf.square(y_true - y_pred)
-        weighted_squared_diff = squared_diff * weights
-        return tf.reduce_mean(weighted_squared_diff)
-    return loss
-
-def adaptative_weighted_mse():
-    '''
-    Función de pérdida MSE ponderada adaptativa basada en la varianza de las etiquetas verdaderas.
-    '''
-    def loss(y_true, y_pred):
-        squared_diff = tf.square(y_true - y_pred)
-        var = tf.math.reduce_mean(tf.square(y_true -tf.reduce_mean(y_true, axis = 0)), axis = 0)
-        weights = 1.0/(var + 1e-8)
-        weighted_squared_diff = weights*squared_diff
-        return tf.reduce_mean(weighted_squared_diff)
-    return loss
+        for i in range(num_outputs):
+            true_val = y_true[:, i]  # Shape: (batch,)
+            pred_val = y_pred[:, i]  # Shape: (batch,)
+            
+            mse = tf.reduce_mean(tf.square(true_val - pred_val))
+            total_loss += loss_weights[i] * mse
+        
+        return total_loss
+    return weighted_mse
 
 def Plot_Metrics(history, metric, path):
     '''
@@ -94,131 +92,156 @@ def Plot_Metrics(history, metric, path):
     plt.savefig(path + f'{metric.lower()}_{PRUEBA}.png')
     plt.close()
 
-def plot_training_results(metrics, metric_names, path):
+def parse_tfrecord(example_proto):
     '''
-    Plots and saves graphs for training and validation metrics.
+    Function to parse the TFRecord file.
     '''
-    for metric_name in metric_names:
-        dp1, dp2 = DROPOUTS
-        plt.plot(metrics['train'][metric_name][n], lw=0.8, label=f'd1: {dp1} d2: {dp2}')
-        plt.title(f'{metric_name.upper()} through training')
-        plt.gca().set(xlabel='epoch', ylabel=metric_name)
-        plt.legend()
-        plt.savefig(path + f'{metric_name.lower()}_training_{PRUEBA}.png')
-        plt.close()
+    feature_description = {
+        'image': tf.io.FixedLenFeature([], tf.string),
+        'theta_E': tf.io.FixedLenFeature([], tf.float32),
+        'f_axis': tf.io.FixedLenFeature([], tf.float32),
+        'e1': tf.io.FixedLenFeature([], tf.float32),
+        'e2': tf.io.FixedLenFeature([], tf.float32),
+        'pa_l': tf.io.FixedLenFeature([], tf.float32),
+        'center_x': tf.io.FixedLenFeature([], tf.float32),
+        'center_y': tf.io.FixedLenFeature([], tf.float32),
+        're_s': tf.io.FixedLenFeature([], tf.float32),
+        'pa_s': tf.io.FixedLenFeature([], tf.float32),
+    }
+    
+    parsed_example = tf.io.parse_single_example(example_proto, feature_description)
+    image = tf.io.decode_raw(parsed_example['image'], tf.float32)
+    image = tf.reshape(image, INPUT_SHAPE)
 
-        dp1, dp2 = DROPOUTS
-        plt.plot(metrics['val'][metric_name][n], lw=0.8, label=f'd1: {dp1} d2: {dp2}')
-        plt.title(f'{metric_name.upper()} through validation')
-        plt.gca().set(xlabel='epoch', ylabel=metric_name)
-        plt.legend()
-        plt.savefig(path + f'{metric_name.lower()}_validation_{PRUEBA}.png')
-        plt.close()
+    # Normalization to [0, 1]
+    image = (image - tf.reduce_min(image)) / (tf.reduce_max(image) + 1e-6)
+
+    label = tf.stack([parsed_example[label] for label in LABELS], axis = 0)
+    return image, label
+
+def count_tfrecord_examples(tfrecord_files):
+    '''
+    Counts the number of examples in a TFRecord file.
+    '''
+    total = 0
+    for file in tfrecord_files:
+        total += sum(1 for _ in tf.data.TFRecordDataset(file))
+    return total
+
+def load_tfrecord_dataset(tfrecord_files, batch_size, shuffle=False, repeat=False):
+    '''
+    Load and process the TFRecord dataset.
+    '''
+    dataset = tf.data.TFRecordDataset(tfrecord_files, num_parallel_reads=tf.data.AUTOTUNE)
+    dataset = dataset.map(parse_tfrecord, num_parallel_calls=tf.data.AUTOTUNE)
+
+    if shuffle:
+        dataset = dataset.shuffle(buffer_size = 1000, seed = 42, reshuffle_each_iteration = True)
+
+    dataset = dataset.batch(batch_size, drop_remainder=True)
+    dataset = dataset.prefetch(tf.data.AUTOTUNE)
+
+    if repeat:
+        dataset = dataset.repeat()
+
+    return dataset
 
 def main():
     try:
-        raw_images = []
-        train_lbs = []
-        train_images = []
-        for fits_file in tqdm(os.listdir(FITS_PATH), desc = 'Loading FITS files'):
+        print(f'{YELLOW}Loading datasets from {TFRECORD_PATH_TRAIN} and {TFRECORD_PATH_TEST}{ENDC}\n')
+        train_tfrecord_files = sorted([os.path.join(TFRECORD_PATH_TRAIN, file) for file in os.listdir(TFRECORD_PATH_TRAIN)if file.endswith('.tfrecord')])
+        test_tfrecord_files = sorted([os.path.join(TFRECORD_PATH_TEST, file)for file in os.listdir(TFRECORD_PATH_TEST)if file.endswith('.tfrecord')])
 
-            hdul = fits.open(FITS_PATH + fits_file)
-            idx = np.random.randint(0,TOTAL_IMAGES)
-            file = hdul[1]
-            hdr = file.header
-            img = file.data.astype(np.float32)
+        # Counts the number of examples
+        num_train_total = count_tfrecord_examples(train_tfrecord_files)
+        num_test_total = count_tfrecord_examples(test_tfrecord_files)
+        print(f"\nTraining examples: {num_train_total * TRAIN_SPLIT}")
+        print(f"Validation examples: {num_train_total * VAL_SPLIT}")
+        print(f"Test examples: {num_test_total}\n")
+
+        # Divide train into train and validation sets
+        steps_per_epoch = num_train_total // BATCH_SIZE
+        validation_steps = int(num_train_total * VAL_SPLIT // BATCH_SIZE)
         
-            raw_images.append(img)
-            train_lbs.append([hdr[label] for label in LABELS])
+        num_train = int(num_train_total * TRAIN_SPLIT)
+        num_val = num_train_total - num_train
 
-        raw_images = np.array(raw_images)
-
-        epsilon = 1e-6  # valor pequeño para evitar log(0)
-        log_images = np.maximum(raw_images, 0) + epsilon # np.log10
-
-        # Calcular estadísticas globales
-        per_image_min = np.min(log_images, axis = (1, 2), keepdims = True)
-        per_image_max = np.max(log_images, axis = (1, 2), keepdims = True)
-
-        # Normalizar cada imagen individualmente 
-        train_images = (log_images - per_image_min) / (per_image_max - per_image_min + 1e-8)
+        print(f"\nsteps_per_epoch = {steps_per_epoch}")
+        print(f"validation_steps = {validation_steps}\n")
         
-        # Agrega la dimensión del canal al final (100, 100) -> (100, 100, 1)
-        train_images = train_images[..., np.newaxis]
+        # Datasets
+        full_train_ds = tf.data.TFRecordDataset(train_tfrecord_files).map(parse_tfrecord)
+        train_dataset = (full_train_ds
+            .take(int(num_train_total * TRAIN_SPLIT))
+            .shuffle(1000, seed=42)
+            .batch(BATCH_SIZE)
+            .prefetch(tf.data.AUTOTUNE)
+            .repeat()
+        )
 
-        train_images, train_lbs = np.array(train_images), np.array(train_lbs)
+        val_dataset = (
+            full_train_ds
+            .skip(int(num_train_total * TRAIN_SPLIT))
+            .take(int(num_train_total * VAL_SPLIT))
+            .batch(BATCH_SIZE)
+            .prefetch(tf.data.AUTOTUNE)
+        )
 
-        print(f'Train Data size :{train_images.shape} \n Train Labels size :{train_lbs.shape}')
+        test_dataset = load_tfrecord_dataset(test_tfrecord_files, BATCH_SIZE).take(10)
 
-    except FileNotFoundError:
-        print(f"File {FITS_PATH} not found.")
+        # Callbacks
+        early_stopping = EarlyStopping(monitor='val_loss', patience=5, restore_best_weights=True)
+        reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.5, patience=3, min_lr=1e-8)
 
-    X_train, X_test, y_train, y_test = train_test_split(train_images, train_lbs, test_size = TRAIN_SPLIT, random_state = 42, shuffle = True)
-    X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size = TEST_SPLIT, random_state = 42)
+        # Model
+        dp1, dp2 = DROPOUTS
+        model = alexnet_original.AlexNet_original(input_shape=INPUT_SHAPE, classes=CLASSES)
+        
+        with open(MODEL_PATH + f'alexnet_summary_{PRUEBA}.txt', 'w') as f:
+            model.summary(print_fn=lambda x: f.write(x + '\n'))
+        print(f"{YELLOW}Model Summary saved to {MODEL_PATH}alexnet_summary_{PRUEBA}.txt{ENDC}")
 
-    early_stopping = EarlyStopping(monitor = 'val_loss', start_from_epoch = 4, patience = 3)
-    reduce_lr = ReduceLROnPlateau(monitor = 'val_loss', factor = 0.1, patience = 4, min_lr = 1e-5)
+        weights = [1.0, 1.0, 3.0, 3.0]
+        loss_fn = get_weighted_loss(weights)
+        optimizer = Nadam(learning_rate = LEARNING_RATE)
 
-    # Se definen los parámetros y entrena el modelo
-    dp1, dp2 = DROPOUTS
-    print(f'--------Inicia prueba--------\n')
-    print(f'Dropout 1: {dp1}, Dropout 2: {dp2}\n')
-    print(f'Input Shape: {INPUT_SHAPE}\n')
-    print(f'Epochs: {EPOCHS}\n')
-    print(f'Model path: {path}\n')
-    print(f'Learning Rate: {LEARNING_RATE}\n')
+        model.compile(optimizer=optimizer,
+                      loss='mse',
+                      metrics=['mae', tf.metrics.MeanAbsolutePercentageError()]
+                      )
 
-    weights = [1.0, 1.0, 2.5, 2.5]
-    loss_fn = weighted_mse_loss(weights)
-    optimizer = Nadam(learning_rate = LEARNING_RATE) # Optimizador y LR
+        print(f"\n{YELLOW}Training with {steps_per_epoch} steps and {validation_steps} validation steps{ENDC}\n")
 
-    model = alexnet.AlexNet(input_shape = INPUT_SHAPE, classes = CLASSES, dp1 = dp1, dp2 = dp2)
-    model.compile(optimizer = optimizer, loss = loss_fn, metrics = ['mae'])
+        # Training
+        start = time.time()
+        history = model.fit(train_dataset,
+                            validation_data = val_dataset,
+                            epochs = EPOCHS,
+                            steps_per_epoch = steps_per_epoch,
+                            validation_steps = validation_steps,
+                            callbacks=[reduce_lr])
+        end = time.time()
 
-    print(f'Imágenes de entrenamiento: {len(X_train)}')
-    print(f'Imágenes de validación: {len(X_val)}')
-    print(f'Imágenes de prueba: {len(X_test)}')
+        train_time = end - start
 
-    start = time.time()
-    history = model.fit(X_train,
-                        y_train,
-                        epochs = EPOCHS,
-                        validation_data = (X_val, y_val),
-                        callbacks = [reduce_lr],
-                        batch_size = BATCH_SIZE)
-    
-    end = time.time()
-    train_time = end - start
+        # Evaluation
+        test_loss, test_mae, test_mape = model.evaluate(test_dataset)
+        print(f'\n{YELLOW}Test Loss: {test_loss:.4f}, MAE: {test_mae:.4f}, MAPE: {test_mape:.4f}{ENDC}')
 
-    Plot_Metrics(history, 'mae', MODEL_PATH)
-    Plot_Metrics(history, 'loss', MODEL_PATH)
+        # plotting metrics
+        Plot_Metrics(history, 'mae', MODEL_PATH)
+        Plot_Metrics(history, 'loss', MODEL_PATH)
+        Plot_Metrics(history, 'mean_absolute_percentage_error', MODEL_PATH)
 
-    losses.append(history.history['loss'])
-    maes.append(history.history['mae'])
-    val_losses.append(history.history['val_loss'])
-    val_maes.append(history.history['val_mae'])
+        history_df = pd.DataFrame(history.history)
+        history_df.to_csv(MODEL_PATH + f'training_history_{PRUEBA}.csv', index=False)
 
-    history_df = pd.DataFrame(history.history)
-    history_df.to_csv(MODEL_PATH + f'training_history_{n+1}.csv', index = False)
+        model.save(MODEL_PATH + f'ViT_{PRUEBA}.keras')
 
-    start = time.time()
-    test_n = 5000
-    test_loss, test_mae = model.evaluate(X_test[:test_n], y_test[:test_n], batch_size = 64)
-    end = time.time()
-    test_time = end - start
-    print(f'Test Loss: {test_loss:.4f}, Test MAE: {test_mae:.4f}')
+        print(f"{YELLOW}Training time: {train_time/60:.2f} min{ENDC}")
 
-    train_time = int(train_time // 60) if train_time > 60 > 0 else train_time
-    test_time = int(test_time // 60) if test_time > 60 > 0 else test_time
-    print(f'training time: {train_time} min - test_time: {test_time:.4f} seconds')
-    model.save(MODEL_PATH + f'alexnet_paper_{PRUEBA}.keras')
+    except Exception as e:
+        print(f'{RED}Error: in line {sys.exc_info()[2].tb_lineno} - {e}{ENDC}')
 
-# Call the function to plot results
-metrics = {'train': {'mae': maes, 'loss': losses},
-           'val': {'mae': val_maes, 'loss': val_losses}
-           }
-
-plot_training_results(metrics, ['mae', 'loss'], MODEL_PATH)
-
-if __name__=='__main__':
+if __name__ == '__main__':
     main()

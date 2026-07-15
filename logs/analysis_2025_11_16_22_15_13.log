@@ -1,0 +1,15 @@
+===============================
+Starting analysis at domingo, 16 de noviembre de 2025, 22:15:13 CST
+===============================
+
+[1/4] Skipping model training.
+
+[2/4] Skipping model testing.
+
+[3/4] Running results_paper.py for results...
+Traceback (most recent call last):
+  File "/Users/juananconaflores/Documents/GitHub/lenstronomy_images/results_paper.py", line 62, in <module>
+    main_config = load_config('main_config.ini')
+                  ^^^^^^^^^^^
+NameError: name 'load_config' is not defined
+Error during results calculation. Check the log file for details.

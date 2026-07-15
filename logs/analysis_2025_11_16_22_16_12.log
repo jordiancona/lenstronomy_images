@@ -1,0 +1,15 @@
+===============================
+Starting analysis at domingo, 16 de noviembre de 2025, 22:16:12 CST
+===============================
+
+[1/4] Skipping model training.
+
+[2/4] Skipping model testing.
+
+[3/4] Running results_paper.py for results...
+Traceback (most recent call last):
+  File "/Users/juananconaflores/Documents/GitHub/lenstronomy_images/results_paper.py", line 70, in <module>
+    PRUEBA = int(main_config['CONFIG']['prueba'])
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ValueError: invalid literal for int() with base 10: ''
+Error during results calculation. Check the log file for details.

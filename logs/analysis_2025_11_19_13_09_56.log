@@ -1,0 +1,29 @@
+===============================
+Starting analysis at miércoles, 19 de noviembre de 2025, 13:09:56 CST
+===============================
+
+[1/4] Running model_test.py for model training...
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1763579399.805274 29059548 pluggable_device_factory.cc:305] Could not identify NUMA node of platform GPU ID 0, defaulting to 0. Your kernel may not have been built with NUMA support.
+I0000 00:00:1763579399.805323 29059548 pluggable_device_factory.cc:271] Created TensorFlow device (/job:localhost/replica:0/task:0/device:GPU:0 with 0 MB memory) -> physical PluggableDevice (device: 0, name: METAL, pci bus id: <undefined>)
+Loading datasets from ./csst_catalog/tfrecords/train/ and ./csst_catalog/tfrecords/test/
+Número total de ejemplos de entrenamiento: 70000
+Número total de ejemplos de prueba: 6396
+steps_per_epoch = 1093.75
+validation_steps = 17500.0
+Traceback (most recent call last):
+  File "/Users/juananconaflores/Documents/GitHub/lenstronomy_images/alexnet_test.py", line 157, in main
+    .skip(num_train)
+          ^^^^^^^^^
+NameError: name 'num_train' is not defined
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/juananconaflores/Documents/GitHub/lenstronomy_images/alexnet_test.py", line 217, in <module>
+    main()
+  File "/Users/juananconaflores/Documents/GitHub/lenstronomy_images/alexnet_test.py", line 214, in main
+    print(f'Error: in line {sys.exc_info()[2].tb_lineno} - {e}')
+                            ^^^
+NameError: name 'sys' is not defined
+Error during model training. Check the log file for details.

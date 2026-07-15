@@ -1,0 +1,37 @@
+-e {YELLOW}==============================={NC}
+-e {YELLOW}Starting analysis at miércoles, 26 de noviembre de 2025, 21:12:47 -03{NC}
+-e {YELLOW}==============================={NC}
+
+[1/4] Running model_test.py for model training...
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1764202371.583686 1473358 pluggable_device_factory.cc:305] Could not identify NUMA node of platform GPU ID 0, defaulting to 0. Your kernel may not have been built with NUMA support.
+I0000 00:00:1764202371.583728 1473358 pluggable_device_factory.cc:271] Created TensorFlow device (/job:localhost/replica:0/task:0/device:GPU:0 with 0 MB memory) -> physical PluggableDevice (device: 0, name: METAL, pci bus id: <undefined>)
+Loading datasets from ./csst_catalog/tfrecords/train/ and ./csst_catalog/tfrecords/test/
+Número total de ejemplos de entrenamiento: 70000
+Número total de ejemplos de prueba: 6396
+steps_per_epoch = 273
+validation_steps = 54
+
+Training with 273 steps and 54 validation steps
+
+Epoch 1/50
+Traceback (most recent call last):
+  File "/Users/juananconaflores/Documents/GitHub/lenstronomy_images/alexnet_test.py", line 199, in main
+    history = model.fit(train_dataset,
+              ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 122, in error_handler
+    raise e.with_traceback(filtered_tb) from None
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/keras/src/trainers/trainer.py", line 357, in compute_loss
+    raise ValueError(
+ValueError: No loss to compute. Provide a `loss` argument in `compile()`.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/juananconaflores/Documents/GitHub/lenstronomy_images/alexnet_test.py", line 229, in <module>
+    main()
+  File "/Users/juananconaflores/Documents/GitHub/lenstronomy_images/alexnet_test.py", line 226, in main
+    print(f'Error: in line {sys.exc_info()[2].tb_lineno} - {e}')
+                            ^^^
+NameError: name 'sys' is not defined
+-e {RED}Error during model training. Check the log file for details.{NC}

@@ -1,0 +1,57 @@
+===============================
+Starting analysis at viernes, 14 de noviembre de 2025, 14:51:01 CST
+===============================
+
+[1/4] Running model_test.py for model training...
+Traceback (most recent call last):
+  File "/Users/juananconaflores/Documents/GitHub/lenstronomy_images/alexnet_test.py", line 6, in <module>
+    import tensorflow as tf
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/tensorflow/__init__.py", line 49, in <module>
+    from tensorflow._api.v2 import __internal__
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/tensorflow/_api/v2/__internal__/__init__.py", line 11, in <module>
+    from tensorflow._api.v2.__internal__ import distribute
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/tensorflow/_api/v2/__internal__/distribute/__init__.py", line 8, in <module>
+    from tensorflow._api.v2.__internal__.distribute import combinations
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/tensorflow/_api/v2/__internal__/distribute/combinations/__init__.py", line 8, in <module>
+    from tensorflow.python.distribute.combinations import env # line: 456
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/tensorflow/python/distribute/combinations.py", line 33, in <module>
+    from tensorflow.python.distribute import collective_all_reduce_strategy
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/tensorflow/python/distribute/collective_all_reduce_strategy.py", line 26, in <module>
+    from tensorflow.python.distribute import cross_device_ops as cross_device_ops_lib
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/tensorflow/python/distribute/cross_device_ops.py", line 28, in <module>
+    from tensorflow.python.distribute import cross_device_utils
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/tensorflow/python/distribute/cross_device_utils.py", line 22, in <module>
+    from tensorflow.python.distribute import values as value_lib
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/tensorflow/python/distribute/values.py", line 23, in <module>
+    from tensorflow.python.distribute import distribute_lib
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/tensorflow/python/distribute/distribute_lib.py", line 205, in <module>
+    from tensorflow.python.data.ops import dataset_ops
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/tensorflow/python/data/__init__.py", line 21, in <module>
+    from tensorflow.python.data import experimental
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/tensorflow/python/data/experimental/__init__.py", line 99, in <module>
+    from tensorflow.python.data.experimental import service
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/tensorflow/python/data/experimental/service/__init__.py", line 419, in <module>
+    from tensorflow.python.data.experimental.ops.data_service_ops import distribute
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/tensorflow/python/data/experimental/ops/data_service_ops.py", line 23, in <module>
+    from tensorflow.python.data.experimental.ops import compression_ops
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/tensorflow/python/data/experimental/ops/compression_ops.py", line 16, in <module>
+    from tensorflow.python.data.util import structure
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/tensorflow/python/data/util/structure.py", line 32, in <module>
+    from tensorflow.python.ops.ragged import ragged_tensor
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/tensorflow/python/ops/ragged/__init__.py", line 28, in <module>
+    from tensorflow.python.ops.ragged import ragged_tensor
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/tensorflow/python/ops/ragged/ragged_tensor.py", line 3149, in <module>
+    from tensorflow.python.ops.ragged import ragged_ops  # pylint: disable=unused-import, g-bad-import-order, g-import-not-at-top
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/tensorflow/python/ops/ragged/ragged_ops.py", line 27, in <module>
+    from tensorflow.python.ops.ragged import ragged_array_ops
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/tensorflow/python/ops/ragged/ragged_array_ops.py", line 30, in <module>
+    from tensorflow.python.ops import data_flow_ops
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/tensorflow/python/ops/data_flow_ops.py", line 28, in <module>
+    from tensorflow.python.lib.io import python_io
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/tensorflow/python/lib/io/python_io.py", line 23, in <module>
+    from tensorflow.python.lib.io.tf_record import *
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/tensorflow/python/lib/io/tf_record.py", line 18, in <module>
+    from tensorflow.python.lib.io import _pywrap_record_io
+KeyboardInterrupt

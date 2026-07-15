@@ -1,0 +1,18 @@
+===============================
+Starting analysis at viernes,  7 de noviembre de 2025, 16:31:25 CST
+===============================
+-e 
+[1/3] Skipping model training.
+-e 
+[2/3] Skipping model testing.
+-e 
+[3/3] Running results_paper.py for results...
+Traceback (most recent call last):
+  File "/Users/juananconaflores/Documents/GitHub/lenstronomy_images/results_paper.py", line 21, in <module>
+    main_config = load_config('main_config.ini')
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/juananconaflores/Documents/GitHub/lenstronomy_images/results_paper.py", line 17, in load_config
+    config = configparser.ConfigParser()
+             ^^^^^^^^^^^^
+NameError: name 'configparser' is not defined
+Error during results calculation. Check the log file for details.

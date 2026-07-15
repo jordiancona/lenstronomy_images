@@ -1,0 +1,16 @@
+===============================
+Starting analysis at martes, 18 de noviembre de 2025, 12:24:23 CST
+===============================
+
+[1/4] Running model_test.py for model training...
+Traceback (most recent call last):
+  File "/Users/juananconaflores/Documents/GitHub/lenstronomy_images/alexnet_test.py", line 6, in <module>
+    import tensorflow as tf
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/tensorflow/__init__.py", line 40, in <module>
+    from tensorflow.python import pywrap_tensorflow as _pywrap_tensorflow  # pylint: disable=unused-import
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/tensorflow/python/pywrap_tensorflow.py", line 37, in <module>
+    self_check.preload_check()
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/tensorflow/python/platform/self_check.py", line 63, in preload_check
+    from tensorflow.python.platform import _pywrap_cpu_feature_guard
+KeyboardInterrupt

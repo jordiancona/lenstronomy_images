@@ -1,0 +1,37 @@
+===============================
+Starting analysis at jueves, 13 de noviembre de 2025, 19:15:03 CST
+===============================
+
+[1/4] Running model_test.py for model training...
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1763082908.112163 25993157 pluggable_device_factory.cc:305] Could not identify NUMA node of platform GPU ID 0, defaulting to 0. Your kernel may not have been built with NUMA support.
+I0000 00:00:1763082908.112416 25993157 pluggable_device_factory.cc:271] Created TensorFlow device (/job:localhost/replica:0/task:0/device:GPU:0 with 0 MB memory) -> physical PluggableDevice (device: 0, name: METAL, pci bus id: <undefined>)
+Loading datasets from ./csst_catalog/tfrecords/train/ and ./csst_catalog/tfrecords/test/
+Número total de ejemplos de entrenamiento: 70000
+Número total de ejemplos de prueba: 6396
+steps_per_epoch = 1400
+validation_steps = 350
+\Training with 1400 steps and 350 validation steps
+
+Epoch 1/20
+Traceback (most recent call last):
+  File "/Users/juananconaflores/Documents/GitHub/lenstronomy_images/alexnet_test.py", line 189, in main
+    history = model.fit(
+              ^^^^^^^^^^
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 122, in error_handler
+    raise e.with_traceback(filtered_tb) from None
+  File "/Users/juananconaflores/Documents/GitHub/lenstronomy_images/alexnet_test.py", line 58, in loss
+    weighted_squared_diff = squared_diff * weights
+                            ~~~~~~~~~~~~~^~~~~~~~~
+ValueError: Dimensions must be equal, but are 3 and 4 for '{{node compile_loss/loss/mul}} = Mul[T=DT_FLOAT](compile_loss/loss/Square, compile_loss/loss/mul/y)' with input shapes: [?,3], [4].
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/juananconaflores/Documents/GitHub/lenstronomy_images/alexnet_test.py", line 221, in <module>
+    main()
+  File "/Users/juananconaflores/Documents/GitHub/lenstronomy_images/alexnet_test.py", line 218, in main
+    print(f'Error: in line {sys.exc_info()[2].tb_lineno} - {e}')
+                            ^^^
+NameError: name 'sys' is not defined
+Error during model training. Check the log file for details.

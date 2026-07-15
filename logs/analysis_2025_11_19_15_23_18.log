@@ -1,0 +1,38 @@
+===============================
+Starting analysis at miércoles, 19 de noviembre de 2025, 15:23:18 CST
+===============================
+
+[1/4] Skipping model training.
+
+[2/4] Skipping model testing.
+
+[3/4] Running results_paper.py for results...
+Reading CSV: ./csst_catalog/test12/alexnet_3/predictions_vs_real.csv
+-------- R² values --------
+theta_E: -3.5209
+f_axis: -10.8565
+e1: -6.6317
+e2: -0.5055
+Analysis complete. All plots and metrics saved.
+Results calculation completed successfully.
+
+[4/4] Running compare_images.py for PSNR comparison...
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1763587423.142011 29169964 pluggable_device_factory.cc:305] Could not identify NUMA node of platform GPU ID 0, defaulting to 0. Your kernel may not have been built with NUMA support.
+I0000 00:00:1763587423.142104 29169964 pluggable_device_factory.cc:271] Created TensorFlow device (/job:localhost/replica:0/task:0/device:GPU:0 with 0 MB memory) -> physical PluggableDevice (device: 0, name: METAL, pci bus id: <undefined>)
+Image: 2019 from ./csst_catalog/test12/alexnet_3/original/lenses_original.tfrecord
+========== Results from image 2019 ==========
+--- Robust Z-score ---
+--- Robust Min-Max (p1–p99) ---
+--- Robust Affine (img2→img1) ---
+MSE Z-score: 50910.3
+MSE Min-Max: 0.178562
+MSE Affine:  257.898 
+
+Image saved in ./csst_catalog/test12/alexnet_3/
+
+PSNR comparison completed successfully.
+
+===============================
+Analysis completed at miércoles, 19 de noviembre de 2025, 15:23:53 CST
+===============================

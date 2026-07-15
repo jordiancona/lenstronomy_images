@@ -1,0 +1,46 @@
+===============================
+Starting analysis at miércoles, 12 de noviembre de 2025, 20:18:28 CST
+===============================
+
+[1/4] Skipping model training.
+
+[2/4] Running test.py for model testing...
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1763000311.714227 25444794 pluggable_device_factory.cc:305] Could not identify NUMA node of platform GPU ID 0, defaulting to 0. Your kernel may not have been built with NUMA support.
+I0000 00:00:1763000311.714270 25444794 pluggable_device_factory.cc:271] Created TensorFlow device (/job:localhost/replica:0/task:0/device:GPU:0 with 0 MB memory) -> physical PluggableDevice (device: 0, name: METAL, pci bus id: <undefined>)
+Loading dataset from ./csst_catalog/tfrecords/test/
+Total Dataset: 5000 muestras
+Loading model from ./csst_catalog/test9/alexnet_1/alexnet_paper_1.keras
+Making predictions...
+[1m  1/157[0m [37m━━━━━━━━━━━━━━━━━━━━[0m [1m20s[0m 134ms/step[1m  7/157[0m [37m━━━━━━━━━━━━━━━━━━━━[0m [1m1s[0m 9ms/step   [1m 16/157[0m [32m━━[0m[37m━━━━━━━━━━━━━━━━━━[0m [1m1s[0m 7ms/step[1m 25/157[0m [32m━━━[0m[37m━━━━━━━━━━━━━━━━━[0m [1m0s[0m 7ms/step[1m 34/157[0m [32m━━━━[0m[37m━━━━━━━━━━━━━━━━[0m [1m0s[0m 6ms/step[1m 43/157[0m [32m━━━━━[0m[37m━━━━━━━━━━━━━━━[0m [1m0s[0m 6ms/step[1m 52/157[0m [32m━━━━━━[0m[37m━━━━━━━━━━━━━━[0m [1m0s[0m 6ms/step[1m 61/157[0m [32m━━━━━━━[0m[37m━━━━━━━━━━━━━[0m [1m0s[0m 6ms/step[1m 70/157[0m [32m━━━━━━━━[0m[37m━━━━━━━━━━━━[0m [1m0s[0m 6ms/step[1m 79/157[0m [32m━━━━━━━━━━[0m[37m━━━━━━━━━━[0m [1m0s[0m 6ms/step[1m 88/157[0m [32m━━━━━━━━━━━[0m[37m━━━━━━━━━[0m [1m0s[0m 6ms/step[1m 97/157[0m [32m━━━━━━━━━━━━[0m[37m━━━━━━━━[0m [1m0s[0m 6ms/step[1m106/157[0m [32m━━━━━━━━━━━━━[0m[37m━━━━━━━[0m [1m0s[0m 6ms/step[1m115/157[0m [32m━━━━━━━━━━━━━━[0m[37m━━━━━━[0m [1m0s[0m 6ms/step[1m124/157[0m [32m━━━━━━━━━━━━━━━[0m[37m━━━━━[0m [1m0s[0m 6ms/step[1m133/157[0m [32m━━━━━━━━━━━━━━━━[0m[37m━━━━[0m [1m0s[0m 6ms/step[1m142/157[0m [32m━━━━━━━━━━━━━━━━━━[0m[37m━━[0m [1m0s[0m 6ms/step[1m151/157[0m [32m━━━━━━━━━━━━━━━━━━━[0m[37m━[0m [1m0s[0m 6ms/step[1m157/157[0m [32m━━━━━━━━━━━━━━━━━━━━[0m[37m[0m [1m0s[0m 7ms/step[1m157/157[0m [32m━━━━━━━━━━━━━━━━━━━━[0m[37m[0m [1m1s[0m 7ms/step
+CSV saved in ./csst_catalog/test9/alexnet_1/predictions_vs_real.csv
+  0%|          | 0/5000 [00:00<?, ?it/s]  0%|          | 0/5000 [00:00<?, ?it/s]
+Traceback (most recent call last):
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/pandas/core/indexes/base.py", line 3805, in get_loc
+    return self._engine.get_loc(casted_key)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "index.pyx", line 167, in pandas._libs.index.IndexEngine.get_loc
+  File "index.pyx", line 196, in pandas._libs.index.IndexEngine.get_loc
+  File "pandas/_libs/hashtable_class_helper.pxi", line 7081, in pandas._libs.hashtable.PyObjectHashTable.get_item
+  File "pandas/_libs/hashtable_class_helper.pxi", line 7089, in pandas._libs.hashtable.PyObjectHashTable.get_item
+KeyError: 'f_s'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/juananconaflores/Documents/GitHub/lenstronomy_images/test.py", line 198, in <module>
+    imgs_true.append(generate_lens_image(df.loc[i, 'thetaE_true'], df.loc[i, 'f_s'],
+                                                                   ~~~~~~^^^^^^^^^^
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/pandas/core/indexing.py", line 1183, in __getitem__
+    return self.obj._get_value(*key, takeable=self._takeable)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/pandas/core/frame.py", line 4214, in _get_value
+    series = self._get_item_cache(col)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/pandas/core/frame.py", line 4638, in _get_item_cache
+    loc = self.columns.get_loc(item)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/pandas/core/indexes/base.py", line 3812, in get_loc
+    raise KeyError(key) from err
+KeyError: 'f_s'
+Error during model testing. Check the log file for details.

@@ -1,0 +1,53 @@
+===============================
+Starting analysis at jueves, 13 de noviembre de 2025, 00:45:54 CST
+===============================
+
+[1/4] Skipping model training.
+
+[2/4] Running test.py for model testing...
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1763016357.746433 25511286 pluggable_device_factory.cc:305] Could not identify NUMA node of platform GPU ID 0, defaulting to 0. Your kernel may not have been built with NUMA support.
+I0000 00:00:1763016357.746500 25511286 pluggable_device_factory.cc:271] Created TensorFlow device (/job:localhost/replica:0/task:0/device:GPU:0 with 0 MB memory) -> physical PluggableDevice (device: 0, name: METAL, pci bus id: <undefined>)
+2025-11-13 00:45:57.838108: W tensorflow/core/framework/op_kernel.cc:1857] OP_REQUIRES failed at example_parsing_ops.cc:98 : INVALID_ARGUMENT: Feature: f_s (data type: float) is required but could not be found.
+2025-11-13 00:45:57.838181: W tensorflow/core/framework/op_kernel.cc:1857] OP_REQUIRES failed at example_parsing_ops.cc:98 : INVALID_ARGUMENT: Feature: f_s (data type: float) is required but could not be found.
+2025-11-13 00:45:57.838205: W tensorflow/core/framework/op_kernel.cc:1857] OP_REQUIRES failed at example_parsing_ops.cc:98 : INVALID_ARGUMENT: Feature: f_s (data type: float) is required but could not be found.
+2025-11-13 00:45:57.838223: W tensorflow/core/framework/op_kernel.cc:1857] OP_REQUIRES failed at example_parsing_ops.cc:98 : INVALID_ARGUMENT: Feature: f_s (data type: float) is required but could not be found.
+2025-11-13 00:45:57.838236: W tensorflow/core/framework/op_kernel.cc:1857] OP_REQUIRES failed at example_parsing_ops.cc:98 : INVALID_ARGUMENT: Feature: f_s (data type: float) is required but could not be found.
+2025-11-13 00:45:57.838251: W tensorflow/core/framework/op_kernel.cc:1857] OP_REQUIRES failed at example_parsing_ops.cc:98 : INVALID_ARGUMENT: Feature: f_s (data type: float) is required but could not be found.
+2025-11-13 00:45:57.838410: W tensorflow/core/framework/op_kernel.cc:1857] OP_REQUIRES failed at example_parsing_ops.cc:98 : INVALID_ARGUMENT: Feature: f_s (data type: float) is required but could not be found.
+2025-11-13 00:45:57.838427: W tensorflow/core/framework/op_kernel.cc:1857] OP_REQUIRES failed at example_parsing_ops.cc:98 : INVALID_ARGUMENT: Feature: f_s (data type: float) is required but could not be found.
+2025-11-13 00:45:57.838462: W tensorflow/core/framework/op_kernel.cc:1857] OP_REQUIRES failed at example_parsing_ops.cc:98 : INVALID_ARGUMENT: Feature: f_s (data type: float) is required but could not be found.
+2025-11-13 00:45:57.838495: W tensorflow/core/framework/op_kernel.cc:1857] OP_REQUIRES failed at example_parsing_ops.cc:98 : INVALID_ARGUMENT: Feature: f_s (data type: float) is required but could not be found.
+2025-11-13 00:45:57.838512: W tensorflow/core/framework/op_kernel.cc:1857] OP_REQUIRES failed at example_parsing_ops.cc:98 : INVALID_ARGUMENT: Feature: f_s (data type: float) is required but could not be found.
+2025-11-13 00:45:57.838652: W tensorflow/core/framework/op_kernel.cc:1857] OP_REQUIRES failed at example_parsing_ops.cc:98 : INVALID_ARGUMENT: Feature: f_s (data type: float) is required but could not be found.
+2025-11-13 00:45:57.838673: W tensorflow/core/framework/op_kernel.cc:1857] OP_REQUIRES failed at example_parsing_ops.cc:98 : INVALID_ARGUMENT: Feature: f_s (data type: float) is required but could not be found.
+Loading dataset from ./csst_catalog/tfrecords/test/
+Traceback (most recent call last):
+2025-11-13 00:45:57.838694: W tensorflow/core/framework/op_kernel.cc:1857] OP_REQUIRES failed at example_parsing_ops.cc:98 : INVALID_ARGUMENT: Feature: f_s (data type: float) is required but could not be found.
+  File "/Users/juananconaflores/Documents/GitHub/lenstronomy_images/test.py", line 86, in <module>
+2025-11-13 00:45:57.838747: W tensorflow/core/framework/op_kernel.cc:1857] OP_REQUIRES failed at example_parsing_ops.cc:98 : INVALID_ARGUMENT: Feature: f_s (data type: float) is required but could not be found.
+2025-11-13 00:45:57.838774: W tensorflow/core/framework/op_kernel.cc:1857] OP_REQUIRES failed at example_parsing_ops.cc:98 : INVALID_ARGUMENT: Feature: f_s (data type: float) is required but could not be found.
+2025-11-13 00:45:57.838796: W tensorflow/core/framework/op_kernel.cc:1857] OP_REQUIRES failed at example_parsing_ops.cc:98 : INVALID_ARGUMENT: Feature: f_s (data type: float) is required but could not be found.
+    all_data = list(dataset.unbatch().take(5000))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/tensorflow/python/data/ops/iterator_ops.py", line 826, in __next__
+2025-11-13 00:45:57.838935: W tensorflow/core/framework/op_kernel.cc:1857] OP_REQUIRES failed at example_parsing_ops.cc:98 : INVALID_ARGUMENT: Feature: f_s (data type: float) is required but could not be found.
+2025-11-13 00:45:57.838964: W tensorflow/core/framework/op_kernel.cc:1857] OP_REQUIRES failed at example_parsing_ops.cc:98 : INVALID_ARGUMENT: Feature: f_s (data type: float) is required but could not be found.
+    return self._next_internal()
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/tensorflow/python/data/ops/iterator_ops.py", line 776, in _next_internal
+    ret = gen_dataset_ops.iterator_get_next(
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/tensorflow/python/ops/gen_dataset_ops.py", line 3086, in iterator_get_next
+2025-11-13 00:45:57.839126: W tensorflow/core/framework/op_kernel.cc:1857] OP_REQUIRES failed at example_parsing_ops.cc:98 : INVALID_ARGUMENT: Feature: f_s (data type: float) is required but could not be found.
+2025-11-13 00:45:57.839172: W tensorflow/core/framework/op_kernel.cc:1857] OP_REQUIRES failed at example_parsing_ops.cc:98 : INVALID_ARGUMENT: Feature: f_s (data type: float) is required but could not be found.
+2025-11-13 00:45:57.839179: W tensorflow/core/framework/op_kernel.cc:1857] OP_REQUIRES failed at example_parsing_ops.cc:98 : INVALID_ARGUMENT: Feature: f_s (data type: float) is required but could not be found.
+2025-11-13 00:45:57.839228: W tensorflow/core/framework/op_kernel.cc:1857] OP_REQUIRES failed at example_parsing_ops.cc:98 : INVALID_ARGUMENT: Feature: f_s (data type: float) is required but could not be found.
+2025-11-13 00:45:57.839245: W tensorflow/core/framework/op_kernel.cc:1857] OP_REQUIRES failed at example_parsing_ops.cc:98 : INVALID_ARGUMENT: Feature: f_s (data type: float) is required but could not be found.
+    _ops.raise_from_not_ok_status(e, name)
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/tensorflow/python/framework/ops.py", line 6006, in raise_from_not_ok_status
+    raise core._status_to_exception(e) from None  # pylint: disable=protected-access
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tensorflow.python.framework.errors_impl.InvalidArgumentError: {{function_node __wrapped__IteratorGetNext_output_types_15_device_/job:localhost/replica:0/task:0/device:CPU:0}} Feature: f_s (data type: float) is required but could not be found.
+	 [[{{node ParseSingleExample/ParseExample/ParseExampleV2}}]] [Op:IteratorGetNext] name: 
+Error during model testing. Check the log file for details.

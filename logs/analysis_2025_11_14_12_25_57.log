@@ -1,0 +1,47 @@
+===============================
+Starting analysis at viernes, 14 de noviembre de 2025, 12:25:57 CST
+===============================
+
+[1/4] Skipping model training.
+
+[2/4] Running test.py for model testing...
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1763144760.669251 26279283 pluggable_device_factory.cc:305] Could not identify NUMA node of platform GPU ID 0, defaulting to 0. Your kernel may not have been built with NUMA support.
+I0000 00:00:1763144760.669290 26279283 pluggable_device_factory.cc:271] Created TensorFlow device (/job:localhost/replica:0/task:0/device:GPU:0 with 0 MB memory) -> physical PluggableDevice (device: 0, name: METAL, pci bus id: <undefined>)
+Loading dataset from ./csst_catalog/tfrecords/test/
+Total Dataset: 5000 muestras
+Loading model from ./csst_catalog/test10/alexnet_3/alexnet_paper_3.keras
+Making predictions...
+[1m  1/157[0m [37m━━━━━━━━━━━━━━━━━━━━[0m [1m20s[0m 130ms/step[1m  7/157[0m [37m━━━━━━━━━━━━━━━━━━━━[0m [1m1s[0m 9ms/step   [1m 14/157[0m [32m━[0m[37m━━━━━━━━━━━━━━━━━━━[0m [1m1s[0m 8ms/step[1m 22/157[0m [32m━━[0m[37m━━━━━━━━━━━━━━━━━━[0m [1m1s[0m 8ms/step[1m 31/157[0m [32m━━━[0m[37m━━━━━━━━━━━━━━━━━[0m [1m0s[0m 7ms/step[1m 40/157[0m [32m━━━━━[0m[37m━━━━━━━━━━━━━━━[0m [1m0s[0m 7ms/step[1m 48/157[0m [32m━━━━━━[0m[37m━━━━━━━━━━━━━━[0m [1m0s[0m 7ms/step[1m 56/157[0m [32m━━━━━━━[0m[37m━━━━━━━━━━━━━[0m [1m0s[0m 7ms/step[1m 65/157[0m [32m━━━━━━━━[0m[37m━━━━━━━━━━━━[0m [1m0s[0m 7ms/step[1m 74/157[0m [32m━━━━━━━━━[0m[37m━━━━━━━━━━━[0m [1m0s[0m 6ms/step[1m 83/157[0m [32m━━━━━━━━━━[0m[37m━━━━━━━━━━[0m [1m0s[0m 6ms/step[1m 92/157[0m [32m━━━━━━━━━━━[0m[37m━━━━━━━━━[0m [1m0s[0m 6ms/step[1m101/157[0m [32m━━━━━━━━━━━━[0m[37m━━━━━━━━[0m [1m0s[0m 6ms/step[1m110/157[0m [32m━━━━━━━━━━━━━━[0m[37m━━━━━━[0m [1m0s[0m 6ms/step[1m119/157[0m [32m━━━━━━━━━━━━━━━[0m[37m━━━━━[0m [1m0s[0m 6ms/step[1m128/157[0m [32m━━━━━━━━━━━━━━━━[0m[37m━━━━[0m [1m0s[0m 6ms/step[1m137/157[0m [32m━━━━━━━━━━━━━━━━━[0m[37m━━━[0m [1m0s[0m 6ms/step[1m146/157[0m [32m━━━━━━━━━━━━━━━━━━[0m[37m━━[0m [1m0s[0m 6ms/step[1m155/157[0m [32m━━━━━━━━━━━━━━━━━━━[0m[37m━[0m [1m0s[0m 6ms/step[1m157/157[0m [32m━━━━━━━━━━━━━━━━━━━━[0m[37m[0m [1m0s[0m 7ms/step[1m157/157[0m [32m━━━━━━━━━━━━━━━━━━━━[0m[37m[0m [1m1s[0m 7ms/step
+CSV saved in ./csst_catalog/test10/alexnet_3/test/predictions_vs_real.csv
+  0%|          | 0/5000 [00:00<?, ?it/s]  0%|          | 1/5000 [00:00<14:14,  5.85it/s]  2%|▏         | 89/5000 [00:00<00:12, 403.76it/s]  4%|▎         | 178/5000 [00:00<00:08, 594.82it/s]  5%|▌         | 268/5000 [00:00<00:06, 701.97it/s]  7%|▋         | 357/5000 [00:00<00:06, 764.70it/s]  9%|▉         | 446/5000 [00:00<00:05, 804.70it/s] 11%|█         | 535/5000 [00:00<00:05, 831.36it/s] 12%|█▏        | 624/5000 [00:00<00:05, 849.46it/s] 14%|█▍        | 712/5000 [00:00<00:04, 857.68it/s] 16%|█▌        | 801/5000 [00:01<00:04, 867.54it/s] 18%|█▊        | 890/5000 [00:01<00:04, 874.14it/s] 20%|█▉        | 980/5000 [00:01<00:04, 879.01it/s] 21%|██▏       | 1070/5000 [00:01<00:04, 882.61it/s] 23%|██▎       | 1160/5000 [00:01<00:04, 885.03it/s] 25%|██▍       | 1249/5000 [00:01<00:04, 886.36it/s] 27%|██▋       | 1339/5000 [00:01<00:04, 887.46it/s] 29%|██▊       | 1429/5000 [00:01<00:04, 888.25it/s] 30%|███       | 1518/5000 [00:01<00:03, 888.31it/s] 32%|███▏      | 1607/5000 [00:01<00:03, 888.15it/s] 34%|███▍      | 1696/5000 [00:02<00:03, 888.17it/s] 36%|███▌      | 1785/5000 [00:02<00:03, 888.03it/s] 37%|███▋      | 1874/5000 [00:02<00:03, 888.09it/s] 39%|███▉      | 1963/5000 [00:02<00:03, 888.35it/s] 41%|████      | 2052/5000 [00:02<00:03, 888.64it/s] 43%|████▎     | 2141/5000 [00:02<00:03, 888.34it/s] 45%|████▍     | 2230/5000 [00:02<00:03, 888.55it/s] 46%|████▋     | 2319/5000 [00:02<00:03, 888.46it/s] 48%|████▊     | 2408/5000 [00:02<00:02, 887.23it/s] 50%|████▉     | 2497/5000 [00:02<00:02, 887.40it/s] 52%|█████▏    | 2586/5000 [00:03<00:02, 887.71it/s] 54%|█████▎    | 2675/5000 [00:03<00:02, 887.72it/s] 55%|█████▌    | 2764/5000 [00:03<00:02, 888.26it/s] 57%|█████▋    | 2853/5000 [00:03<00:02, 888.71it/s] 59%|█████▉    | 2942/5000 [00:03<00:02, 888.41it/s] 61%|██████    | 3031/5000 [00:03<00:02, 887.64it/s] 62%|██████▏   | 3120/5000 [00:03<00:02, 887.91it/s] 64%|██████▍   | 3209/5000 [00:03<00:02, 886.11it/s] 66%|██████▌   | 3298/5000 [00:03<00:01, 882.29it/s] 68%|██████▊   | 3387/5000 [00:03<00:01, 880.00it/s] 70%|██████▉   | 3476/5000 [00:04<00:01, 878.62it/s] 71%|███████▏  | 3564/5000 [00:04<00:01, 877.75it/s] 73%|███████▎  | 3652/5000 [00:04<00:01, 877.24it/s] 75%|███████▍  | 3740/5000 [00:04<00:01, 876.16it/s] 77%|███████▋  | 3828/5000 [00:04<00:01, 876.05it/s] 78%|███████▊  | 3916/5000 [00:04<00:01, 875.40it/s] 80%|████████  | 4004/5000 [00:04<00:01, 875.42it/s] 82%|████████▏ | 4092/5000 [00:04<00:01, 875.54it/s] 84%|████████▎ | 4180/5000 [00:04<00:00, 875.57it/s] 85%|████████▌ | 4268/5000 [00:04<00:00, 876.07it/s] 87%|████████▋ | 4356/5000 [00:05<00:00, 876.01it/s] 89%|████████▉ | 4444/5000 [00:05<00:00, 875.96it/s] 91%|█████████ | 4532/5000 [00:05<00:00, 875.97it/s] 92%|█████████▏| 4620/5000 [00:05<00:00, 876.38it/s] 94%|█████████▍| 4708/5000 [00:05<00:00, 876.34it/s] 96%|█████████▌| 4796/5000 [00:05<00:00, 875.78it/s] 98%|█████████▊| 4884/5000 [00:05<00:00, 876.00it/s] 99%|█████████▉| 4972/5000 [00:05<00:00, 876.15it/s]100%|██████████| 5000/5000 [00:05<00:00, 857.65it/s]
+Generando comparativas:   0%|          | 0/9 [00:00<?, ?it/s]Generando comparativas:  11%|█         | 1/9 [00:00<00:01,  4.24it/s]Generando comparativas:  33%|███▎      | 3/9 [00:00<00:00,  9.51it/s]Generando comparativas:  56%|█████▌    | 5/9 [00:00<00:00, 12.08it/s]Generando comparativas:  78%|███████▊  | 7/9 [00:00<00:00, 13.77it/s]Generando comparativas: 100%|██████████| 9/9 [00:00<00:00, 14.86it/s]Generando comparativas: 100%|██████████| 9/9 [00:00<00:00, 12.63it/s]
+Saved 9 comparative images in: ./csst_catalog/test10/alexnet_3/test
+TFRecord saved: ./csst_catalog/test10/alexnet_3/test/original/lenses_original.tfrecord
+TFRecord saved: ./csst_catalog/test10/alexnet_3/test/predictions/lenses_predicted.tfrecord
+All done! TFRecords and images saved successfully.
+Model testing completed successfully.
+
+[3/4] Running results_paper.py for results...
+Reading CSV: ./csst_catalog/test10/alexnet_3/predictions_vs_real.csv
+Traceback (most recent call last):
+  File "/Users/juananconaflores/Documents/GitHub/lenstronomy_images/results_paper.py", line 38, in <module>
+    df = pd.read_csv(CSV_PATH)
+         ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/pandas/io/parsers/readers.py", line 1026, in read_csv
+    return _read(filepath_or_buffer, kwds)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/pandas/io/parsers/readers.py", line 620, in _read
+    parser = TextFileReader(filepath_or_buffer, **kwds)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/pandas/io/parsers/readers.py", line 1620, in __init__
+    self._engine = self._make_engine(f, self.engine)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/pandas/io/parsers/readers.py", line 1880, in _make_engine
+    self.handles = get_handle(
+                   ^^^^^^^^^^^
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/pandas/io/common.py", line 873, in get_handle
+    handle = open(
+             ^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: './csst_catalog/test10/alexnet_3/predictions_vs_real.csv'
+Error during results calculation. Check the log file for details.

@@ -1,0 +1,12 @@
+===============================
+Starting analysis at miércoles, 12 de noviembre de 2025, 20:16:28 CST
+===============================
+
+[1/4] Skipping model training.
+
+[2/4] Running test.py for model testing...
+Traceback (most recent call last):
+  File "/Users/juananconaflores/Documents/GitHub/lenstronomy_images/test.py", line 1, in <module>
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+Error during model testing. Check the log file for details.

@@ -1,0 +1,27 @@
+-e {YELLOW}==============================={NC}
+-e {YELLOW}Starting analysis at viernes, 28 de noviembre de 2025, 09:31:40 -03{NC}
+-e {YELLOW}==============================={NC}
+
+[1/4] Running model_test.py for model training...
+Traceback (most recent call last):
+  File "/Users/juananconaflores/Documents/GitHub/lenstronomy_images/alexnet_test.py", line 10, in <module>
+    from sklearn.model_selection import train_test_split
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/sklearn/model_selection/__init__.py", line 5, in <module>
+    from ._classification_threshold import (
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/sklearn/model_selection/_classification_threshold.py", line 14, in <module>
+    from ..metrics import (
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/sklearn/metrics/__init__.py", line 3, in <module>
+    from . import cluster
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/sklearn/metrics/cluster/__init__.py", line 25, in <module>
+    from ._unsupervised import (
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/sklearn/metrics/cluster/_unsupervised.py", line 23, in <module>
+    from ..pairwise import _VALID_METRICS, pairwise_distances, pairwise_distances_chunked
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/sklearn/metrics/pairwise.py", line 50, in <module>
+    from ._pairwise_distances_reduction import ArgKmin
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/sklearn/metrics/_pairwise_distances_reduction/__init__.py", line 94, in <module>
+    from ._dispatcher import (
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/sklearn/metrics/_pairwise_distances_reduction/_dispatcher.py", line 13, in <module>
+    from ._argkmin import (
+  File "sklearn/metrics/_pairwise_distances_reduction/_argkmin.pyx", line 1, in init sklearn.metrics._pairwise_distances_reduction._argkmin
+  File "<frozen importlib._bootstrap>", line 405, in parent
+KeyboardInterrupt

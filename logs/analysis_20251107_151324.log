@@ -1,0 +1,13 @@
+===============================
+Starting analysis at viernes,  7 de noviembre de 2025, 15:13:24 CST
+===============================
+-e 
+[1/3] Skipping model training.
+-e 
+[2/3] Running test.py for model testing...
+Usando 8 procesos.
+Traceback (most recent call last):
+  File "/Users/juananconaflores/Documents/GitHub/lenstronomy_images/test.py", line 113, in <module>
+    list(pool.imap_unordered(process_image, args_list), total = TEST_IMAGES)
+TypeError: list() takes no keyword arguments
+Error during model testing. Check the log file for details.

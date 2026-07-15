@@ -1,0 +1,47 @@
+-e {YELLOW}==============================={NC}
+-e {YELLOW}Starting analysis at jueves, 27 de noviembre de 2025, 08:25:39 -03{NC}
+-e {YELLOW}==============================={NC}
+
+[1/4] Skipping model training.
+
+[2/4] Running test.py for model testing...
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1764242743.095635 1682762 pluggable_device_factory.cc:305] Could not identify NUMA node of platform GPU ID 0, defaulting to 0. Your kernel may not have been built with NUMA support.
+I0000 00:00:1764242743.095677 1682762 pluggable_device_factory.cc:271] Created TensorFlow device (/job:localhost/replica:0/task:0/device:GPU:0 with 0 MB memory) -> physical PluggableDevice (device: 0, name: METAL, pci bus id: <undefined>)
+Loading dataset from ./csst_catalog/tfrecords/test/
+Total Dataset: 5000
+Loading model from ./csst_catalog/test14/alexnet_1/alexnet_paper_1.keras
+Traceback (most recent call last):
+  File "/Users/juananconaflores/Documents/GitHub/lenstronomy_images/test.py", line 121, in <module>
+    model = load_model(model_path, custom_objects={'loss': custom_loss})
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/keras/src/saving/saving_api.py", line 189, in load_model
+    return saving_lib.load_model(
+           ^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/keras/src/saving/saving_lib.py", line 367, in load_model
+    return _load_model_from_fileobj(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/keras/src/saving/saving_lib.py", line 444, in _load_model_from_fileobj
+    model = _model_from_config(
+            ^^^^^^^^^^^^^^^^^^^
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/keras/src/saving/saving_lib.py", line 433, in _model_from_config
+    model = deserialize_keras_object(
+            ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/keras/src/saving/serialization_lib.py", line 734, in deserialize_keras_object
+    instance.compile_from_config(compile_config)
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/keras/src/trainers/trainer.py", line 971, in compile_from_config
+    config = serialization_lib.deserialize_keras_object(config)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/keras/src/saving/serialization_lib.py", line 594, in deserialize_keras_object
+    return {
+           ^
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/keras/src/saving/serialization_lib.py", line 595, in <dictcomp>
+    key: deserialize_keras_object(
+         ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/keras/src/saving/serialization_lib.py", line 678, in deserialize_keras_object
+    return _retrieve_class_or_fn(
+           ^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/keras/src/saving/serialization_lib.py", line 810, in _retrieve_class_or_fn
+    raise TypeError(
+TypeError: Could not locate function 'weighted_mse'. Make sure custom classes are decorated with `@keras.saving.register_keras_serializable()`. Full object config: {'module': 'builtins', 'class_name': 'function', 'config': 'weighted_mse', 'registered_name': 'function'}
+-e {RED}Error during model testing. Check the log file for details.{NC}

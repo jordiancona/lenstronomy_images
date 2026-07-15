@@ -1,0 +1,49 @@
+-e {YELLOW}==============================={NC}
+-e {YELLOW}Starting analysis at viernes, 28 de noviembre de 2025, 09:27:15 -03{NC}
+-e {YELLOW}==============================={NC}
+
+[1/4] Skipping model training.
+
+[2/4] Running test.py for model testing...
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1764332838.853579 2124548 pluggable_device_factory.cc:305] Could not identify NUMA node of platform GPU ID 0, defaulting to 0. Your kernel may not have been built with NUMA support.
+I0000 00:00:1764332838.853619 2124548 pluggable_device_factory.cc:271] Created TensorFlow device (/job:localhost/replica:0/task:0/device:GPU:0 with 0 MB memory) -> physical PluggableDevice (device: 0, name: METAL, pci bus id: <undefined>)
+Loading dataset from ./csst_catalog/tfrecords/test/
+Total Dataset: 5000
+Loading model from ./csst_catalog/test14/alexnet_1/alexnet_paper_1.keras
+Making predictions...
+[1m 1/79[0m [37m━━━━━━━━━━━━━━━━━━━━[0m [1m9s[0m 116ms/step[1m 5/79[0m [32m━[0m[37m━━━━━━━━━━━━━━━━━━━[0m [1m1s[0m 14ms/step [1m10/79[0m [32m━━[0m[37m━━━━━━━━━━━━━━━━━━[0m [1m0s[0m 13ms/step[1m15/79[0m [32m━━━[0m[37m━━━━━━━━━━━━━━━━━[0m [1m0s[0m 12ms/step[1m20/79[0m [32m━━━━━[0m[37m━━━━━━━━━━━━━━━[0m [1m0s[0m 12ms/step[1m25/79[0m [32m━━━━━━[0m[37m━━━━━━━━━━━━━━[0m [1m0s[0m 12ms/step[1m30/79[0m [32m━━━━━━━[0m[37m━━━━━━━━━━━━━[0m [1m0s[0m 11ms/step[1m35/79[0m [32m━━━━━━━━[0m[37m━━━━━━━━━━━━[0m [1m0s[0m 11ms/step[1m40/79[0m [32m━━━━━━━━━━[0m[37m━━━━━━━━━━[0m [1m0s[0m 11ms/step[1m45/79[0m [32m━━━━━━━━━━━[0m[37m━━━━━━━━━[0m [1m0s[0m 11ms/step[1m50/79[0m [32m━━━━━━━━━━━━[0m[37m━━━━━━━━[0m [1m0s[0m 11ms/step[1m55/79[0m [32m━━━━━━━━━━━━━[0m[37m━━━━━━━[0m [1m0s[0m 11ms/step[1m60/79[0m [32m━━━━━━━━━━━━━━━[0m[37m━━━━━[0m [1m0s[0m 11ms/step[1m65/79[0m [32m━━━━━━━━━━━━━━━━[0m[37m━━━━[0m [1m0s[0m 11ms/step[1m70/79[0m [32m━━━━━━━━━━━━━━━━━[0m[37m━━━[0m [1m0s[0m 11ms/step[1m75/79[0m [32m━━━━━━━━━━━━━━━━━━[0m[37m━━[0m [1m0s[0m 11ms/step[1m79/79[0m [32m━━━━━━━━━━━━━━━━━━━━[0m[37m[0m [1m0s[0m 12ms/step[1m79/79[0m [32m━━━━━━━━━━━━━━━━━━━━[0m[37m[0m [1m1s[0m 12ms/step
+CSV saved in ./csst_catalog/test14/alexnet_1/predictions_vs_real.csv
+  0%|          | 0/5000 [00:00<?, ?it/s]  0%|          | 10/5000 [00:00<00:50, 99.77it/s]  2%|▏         | 100/5000 [00:00<00:08, 566.57it/s]  4%|▍         | 190/5000 [00:00<00:06, 715.41it/s]  6%|▌         | 280/5000 [00:00<00:06, 785.56it/s]  7%|▋         | 370/5000 [00:00<00:05, 824.33it/s]  9%|▉         | 460/5000 [00:00<00:05, 847.89it/s] 11%|█         | 550/5000 [00:00<00:05, 862.65it/s] 13%|█▎        | 640/5000 [00:00<00:04, 872.35it/s] 15%|█▍        | 730/5000 [00:00<00:04, 879.15it/s] 16%|█▋        | 820/5000 [00:01<00:04, 883.04it/s] 18%|█▊        | 909/5000 [00:01<00:04, 880.27it/s] 20%|█▉        | 998/5000 [00:01<00:04, 878.90it/s] 22%|██▏       | 1086/5000 [00:01<00:04, 877.97it/s] 23%|██▎       | 1174/5000 [00:01<00:04, 877.60it/s] 25%|██▌       | 1262/5000 [00:01<00:04, 877.44it/s] 27%|██▋       | 1350/5000 [00:01<00:04, 876.92it/s] 29%|██▉       | 1438/5000 [00:01<00:04, 876.80it/s] 31%|███       | 1526/5000 [00:01<00:03, 877.15it/s] 32%|███▏      | 1614/5000 [00:01<00:03, 877.12it/s] 34%|███▍      | 1702/5000 [00:02<00:03, 877.29it/s] 36%|███▌      | 1790/5000 [00:02<00:03, 877.87it/s] 38%|███▊      | 1878/5000 [00:02<00:03, 878.32it/s] 39%|███▉      | 1966/5000 [00:02<00:03, 878.57it/s] 41%|████      | 2054/5000 [00:02<00:03, 878.76it/s] 43%|████▎     | 2142/5000 [00:02<00:03, 878.86it/s] 45%|████▍     | 2230/5000 [00:02<00:03, 879.07it/s] 46%|████▋     | 2318/5000 [00:02<00:03, 879.04it/s] 48%|████▊     | 2406/5000 [00:02<00:02, 879.18it/s] 50%|████▉     | 2494/5000 [00:02<00:02, 879.25it/s] 52%|█████▏    | 2582/5000 [00:03<00:02, 879.03it/s] 53%|█████▎    | 2670/5000 [00:03<00:02, 878.66it/s] 55%|█████▌    | 2758/5000 [00:03<00:02, 878.84it/s] 57%|█████▋    | 2846/5000 [00:03<00:02, 878.63it/s] 59%|█████▊    | 2934/5000 [00:03<00:02, 878.76it/s] 60%|██████    | 3022/5000 [00:03<00:02, 878.86it/s] 62%|██████▏   | 3110/5000 [00:03<00:02, 878.61it/s] 64%|██████▍   | 3198/5000 [00:03<00:02, 878.73it/s] 66%|██████▌   | 3286/5000 [00:03<00:01, 878.90it/s] 67%|██████▋   | 3374/5000 [00:03<00:01, 878.78it/s] 69%|██████▉   | 3462/5000 [00:04<00:01, 878.80it/s] 71%|███████   | 3550/5000 [00:04<00:01, 878.95it/s] 73%|███████▎  | 3638/5000 [00:04<00:01, 878.79it/s] 75%|███████▍  | 3726/5000 [00:04<00:01, 879.02it/s] 76%|███████▋  | 3815/5000 [00:04<00:01, 879.47it/s] 78%|███████▊  | 3903/5000 [00:04<00:01, 879.33it/s] 80%|███████▉  | 3992/5000 [00:04<00:01, 880.15it/s] 82%|████████▏ | 4082/5000 [00:04<00:01, 884.52it/s] 83%|████████▎ | 4172/5000 [00:04<00:00, 886.50it/s] 85%|████████▌ | 4262/5000 [00:04<00:00, 888.29it/s] 87%|████████▋ | 4352/5000 [00:05<00:00, 888.96it/s] 89%|████████▉ | 4442/5000 [00:05<00:00, 889.55it/s] 91%|█████████ | 4532/5000 [00:05<00:00, 890.53it/s] 92%|█████████▏| 4622/5000 [00:05<00:00, 891.30it/s] 94%|█████████▍| 4712/5000 [00:05<00:00, 891.72it/s] 96%|█████████▌| 4802/5000 [00:05<00:00, 891.99it/s] 98%|█████████▊| 4892/5000 [00:05<00:00, 892.05it/s]100%|█████████▉| 4982/5000 [00:05<00:00, 888.20it/s]100%|██████████| 5000/5000 [00:05<00:00, 869.48it/s]
+Generando comparativas:   0%|          | 0/9 [00:00<?, ?it/s]Generando comparativas:  11%|█         | 1/9 [00:00<00:01,  4.61it/s]Generando comparativas:  33%|███▎      | 3/9 [00:00<00:00,  9.81it/s]Generando comparativas:  56%|█████▌    | 5/9 [00:00<00:00, 12.30it/s]Generando comparativas:  78%|███████▊  | 7/9 [00:00<00:00, 13.87it/s]Generando comparativas: 100%|██████████| 9/9 [00:00<00:00, 14.93it/s]Generando comparativas: 100%|██████████| 9/9 [00:00<00:00, 12.85it/s]
+Saved 9 comparative images in: ./csst_catalog/test14/alexnet_1/
+TFRecord saved: ./csst_catalog/test14/alexnet_1/original/lenses_original.tfrecord
+TFRecord saved: ./csst_catalog/test14/alexnet_1/predictions/lenses_predicted.tfrecord
+All done! TFRecords and images saved successfully.
+Model testing completed successfully.
+
+[3/4] Running results_paper.py for results...
+Reading CSV: ./csst_catalog/test14/alexnet_1/predictions_vs_real.csv
+Traceback (most recent call last):
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/pandas/core/indexes/base.py", line 3805, in get_loc
+    return self._engine.get_loc(casted_key)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "index.pyx", line 167, in pandas._libs.index.IndexEngine.get_loc
+  File "index.pyx", line 196, in pandas._libs.index.IndexEngine.get_loc
+  File "pandas/_libs/hashtable_class_helper.pxi", line 7081, in pandas._libs.hashtable.PyObjectHashTable.get_item
+  File "pandas/_libs/hashtable_class_helper.pxi", line 7089, in pandas._libs.hashtable.PyObjectHashTable.get_item
+KeyError: 'thetaE_true'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/juananconaflores/Documents/GitHub/lenstronomy_images/results_paper.py", line 82, in <module>
+    original_values = {'thetaE': df['thetaE_true'],
+                                 ~~^^^^^^^^^^^^^^^
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/pandas/core/frame.py", line 4102, in __getitem__
+    indexer = self.columns.get_loc(key)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/pandas/core/indexes/base.py", line 3812, in get_loc
+    raise KeyError(key) from err
+KeyError: 'thetaE_true'
+-e {RED}Error during results calculation. Check the log file for details.{NC}

@@ -1,0 +1,48 @@
+-e {YELLOW}==============================={NC}
+-e {YELLOW}Starting analysis at viernes, 28 de noviembre de 2025, 03:18:10 -03{NC}
+-e {YELLOW}==============================={NC}
+
+[1/4] Skipping model training.
+
+[2/4] Running test.py for model testing...
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1764310694.365209 1960308 pluggable_device_factory.cc:305] Could not identify NUMA node of platform GPU ID 0, defaulting to 0. Your kernel may not have been built with NUMA support.
+I0000 00:00:1764310694.365254 1960308 pluggable_device_factory.cc:271] Created TensorFlow device (/job:localhost/replica:0/task:0/device:GPU:0 with 0 MB memory) -> physical PluggableDevice (device: 0, name: METAL, pci bus id: <undefined>)
+Loading dataset from ./csst_catalog/tfrecords/test/
+Total Dataset: 5000
+Loading model from ./csst_catalog/test15/alexnet_1/train_alexnetWeighted_model1_pal10_100x100.keras
+Making predictions...
+[1m 1/79[0m [37m━━━━━━━━━━━━━━━━━━━━[0m [1m9s[0m 123ms/step[1m 5/79[0m [32m━[0m[37m━━━━━━━━━━━━━━━━━━━[0m [1m1s[0m 15ms/step [1m10/79[0m [32m━━[0m[37m━━━━━━━━━━━━━━━━━━[0m [1m0s[0m 13ms/step[1m15/79[0m [32m━━━[0m[37m━━━━━━━━━━━━━━━━━[0m [1m0s[0m 12ms/step[1m20/79[0m [32m━━━━━[0m[37m━━━━━━━━━━━━━━━[0m [1m0s[0m 12ms/step[1m25/79[0m [32m━━━━━━[0m[37m━━━━━━━━━━━━━━[0m [1m0s[0m 11ms/step[1m30/79[0m [32m━━━━━━━[0m[37m━━━━━━━━━━━━━[0m [1m0s[0m 11ms/step[1m35/79[0m [32m━━━━━━━━[0m[37m━━━━━━━━━━━━[0m [1m0s[0m 11ms/step[1m40/79[0m [32m━━━━━━━━━━[0m[37m━━━━━━━━━━[0m [1m0s[0m 11ms/step[1m45/79[0m [32m━━━━━━━━━━━[0m[37m━━━━━━━━━[0m [1m0s[0m 11ms/step[1m50/79[0m [32m━━━━━━━━━━━━[0m[37m━━━━━━━━[0m [1m0s[0m 11ms/step[1m55/79[0m [32m━━━━━━━━━━━━━[0m[37m━━━━━━━[0m [1m0s[0m 11ms/step[1m60/79[0m [32m━━━━━━━━━━━━━━━[0m[37m━━━━━[0m [1m0s[0m 11ms/step[1m65/79[0m [32m━━━━━━━━━━━━━━━━[0m[37m━━━━[0m [1m0s[0m 11ms/step[1m70/79[0m [32m━━━━━━━━━━━━━━━━━[0m[37m━━━[0m [1m0s[0m 11ms/step[1m75/79[0m [32m━━━━━━━━━━━━━━━━━━[0m[37m━━[0m [1m0s[0m 11ms/step[1m79/79[0m [32m━━━━━━━━━━━━━━━━━━━━[0m[37m[0m [1m0s[0m 12ms/step[1m79/79[0m [32m━━━━━━━━━━━━━━━━━━━━[0m[37m[0m [1m1s[0m 12ms/step
+CSV saved in ./csst_catalog/test15/alexnet_1/predictions_vs_real.csv
+Model testing completed successfully.
+
+[3/4] Running results_paper.py for results...
+Reading CSV: ./csst_catalog/test15/alexnet_1/predictions_vs_real.csv
+-------- R² values --------
+thetaE: 0.9493
+f: 0.9575
+e1: 0.9722
+e2: 0.8404
+Analysis complete. All plots and metrics saved.
+-e {GREEN}Results calculation completed successfully.{NC}
+
+[4/4] Running compare_images.py for PSNR comparison...
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1764310704.756941 1961134 pluggable_device_factory.cc:305] Could not identify NUMA node of platform GPU ID 0, defaulting to 0. Your kernel may not have been built with NUMA support.
+I0000 00:00:1764310704.756980 1961134 pluggable_device_factory.cc:271] Created TensorFlow device (/job:localhost/replica:0/task:0/device:GPU:0 with 0 MB memory) -> physical PluggableDevice (device: 0, name: METAL, pci bus id: <undefined>)
+Image: 2019 from ./csst_catalog/test15/alexnet_1/original/lenses_original.tfrecord
+========== Results from image 2019 ==========
+--- Robust Z-score ---
+--- Robust Min-Max (p1–p99) ---
+--- Robust Affine (img2→img1) ---
+MSE Z-score: 540.195
+MSE Min-Max: 0.0440162
+MSE Affine:  477.966 
+
+Image saved in ./csst_catalog/test15/alexnet_1/
+
+-e {GREEN}PSNR comparison completed successfully.{NC}
+-e 
+{YELLOW}==============================={NC}
+-e {YELLOW}Analysis completed at viernes, 28 de noviembre de 2025, 03:18:27 -03{NC}
+-e {YELLOW}==============================={NC}

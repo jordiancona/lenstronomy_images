@@ -1,0 +1,39 @@
+[1;33m===============================[0m
+[1;33mStarting analysis at lunes,  1 de diciembre de 2025, 13:57:21 CST[0m
+[1;33m===============================[0m
+
+[1/4] Skipping model training.
+
+[2/4] Skipping model testing.
+
+[3/4] Running results_paper.py for results...
+Reading CSV: ./csst_catalog/test14/alexnet_3/predictions_vs_real.csv
+-------- R² values --------
+theta_E: 0.4599
+f_axis: 0.4067
+e1: 0.3712
+e2: -0.2573
+Analysis complete. All plots and metrics saved.
+[0;32mResults calculation completed successfully.[0m
+
+[4/4] Running compare_images.py for PSNR comparison...
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1764619049.685974 2890363 pluggable_device_factory.cc:305] Could not identify NUMA node of platform GPU ID 0, defaulting to 0. Your kernel may not have been built with NUMA support.
+I0000 00:00:1764619049.686007 2890363 pluggable_device_factory.cc:271] Created TensorFlow device (/job:localhost/replica:0/task:0/device:GPU:0 with 0 MB memory) -> physical PluggableDevice (device: 0, name: METAL, pci bus id: <undefined>)
+[33mComparing images...[0m
+Image: 2000 from ./csst_catalog/test14/alexnet_3/original/lenses_original.tfrecord
+========== Results from image 2000 ==========
+--- Robust Z-score ---
+--- Robust Min-Max (p1–p99) ---
+--- Robust Affine (img2→img1) ---
+[36mMSE Z-score:[0m 10.905
+[36mMSE Min-Max: 0.034305[0m
+[36mMSE Affine:  11726.1[0m 
+
+Image saved in ./csst_catalog/test14/alexnet_3/
+
+[0;32mPSNR comparison completed successfully.[0m
+
+[1;33m===============================[0m
+[1;33mAnalysis completed at lunes,  1 de diciembre de 2025, 13:57:32 CST[0m
+[1;33m===============================[0m

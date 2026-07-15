@@ -1,0 +1,61 @@
+-e [1;33m===============================[0m
+-e [1;33mStarting analysis at lunes,  1 de diciembre de 2025, 10:14:11 CST[0m
+-e [1;33m===============================[0m
+
+[1/4] Skipping model training.
+
+[2/4] Skipping model testing.
+
+[3/4] Skipping results calculation.
+
+[4/4] Running compare_images.py for PSNR comparison...
+Traceback (most recent call last):
+  File "/Users/juananconaflores/Documents/GitHub/lenstronomy_images/compare_images.py", line 8, in <module>
+    from lenstronomy.LensModel.lens_model import LensModel
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/lenstronomy/LensModel/lens_model.py", line 4, in <module>
+    from lenstronomy.LensModel.MultiPlane.multi_plane import MultiPlane
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/lenstronomy/LensModel/MultiPlane/multi_plane.py", line 5, in <module>
+    from lenstronomy.Util.cosmo_util import get_astropy_cosmology
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/lenstronomy/Util/cosmo_util.py", line 1, in <module>
+    from astropy.cosmology import FlatLambdaCDM
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/astropy/cosmology/__init__.py", line 10, in <module>
+    from . import realizations, units
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/astropy/cosmology/realizations.py", line 30, in <module>
+    from . import _io  # Ensure IO methods are registered, to read realizations # noqa: F401
+    ^^^^^^^^^^^^^^^^^
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/astropy/cosmology/_io/__init__.py", line 8, in <module>
+    from . import cosmology, ecsv, html, latex, mapping, model, row, table, yaml
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/astropy/cosmology/_io/cosmology.py", line 105, in <module>
+    convert_registry.register_reader("astropy.cosmology", Cosmology, from_cosmology)
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/astropy/io/registry/core.py", line 108, in register_reader
+    self._update__doc__(data_class, "read")
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/astropy/io/registry/base.py", line 440, in _update__doc__
+    format_table = self.get_formats(data_class, readwrite.capitalize())
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/astropy/io/registry/core.py", line 422, in get_formats
+    return super().get_formats(data_class, readwrite)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/astropy/io/registry/base.py", line 86, in get_formats
+    from astropy.table import Table
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/astropy/table/__init__.py", line 119, in <module>
+    import astropy.io.fits.connect
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/astropy/io/fits/connect.py", line 15, in <module>
+    from astropy.time import Time
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/astropy/time/__init__.py", line 5, in <module>
+    class Conf(_config.ConfigNamespace):
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/astropy/time/__init__.py", line 10, in Conf
+    use_fast_parser = _config.ConfigItem(
+                      ^^^^^^^^^^^^^^^^^^^
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/astropy/config/configuration.py", line 289, in __init__
+    module = find_current_module(2)
+             ^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/astropy/utils/introspection.py", line 264, in find_current_module
+    return _get_module_from_frame(frm)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/astropy/utils/introspection.py", line 276, in _get_module_from_frame
+    mod = inspect.getmodule(frm)
+          ^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/juananconaflores/.pyenv/versions/3.11.10/lib/python3.11/inspect.py", line 988, in getmodule
+    if ismodule(module) and hasattr(module, '__file__'):
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+KeyboardInterrupt

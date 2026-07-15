@@ -1,0 +1,28 @@
+===============================
+Starting analysis at jueves, 20 de noviembre de 2025, 17:36:39 CST
+===============================
+
+[1/4] Skipping model training.
+
+[2/4] Skipping model testing.
+
+[3/4] Running results_paper.py for results...
+Reading CSV: ./csst_catalog/test13/alexnet_1/predictions_vs_real.csv
+-------- R² values --------
+theta_E: 0.9456
+f_axis: 0.8732
+e1: 0.9158
+e2: 0.8514
+Traceback (most recent call last):
+  File "/Users/juananconaflores/Documents/GitHub/lenstronomy_images/results_paper.py", line 177, in <module>
+    ax.set_ylim(df[["theta_E", "f_axis", "e1", "e2"]].min().min() * 0.5,
+                ~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/pandas/core/frame.py", line 4108, in __getitem__
+    indexer = self.columns._get_indexer_strict(key, "columns")[1]
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/pandas/core/indexes/base.py", line 6200, in _get_indexer_strict
+    self._raise_if_missing(keyarr, indexer, axis_name)
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/pandas/core/indexes/base.py", line 6249, in _raise_if_missing
+    raise KeyError(f"None of [{key}] are in the [{axis_name}]")
+KeyError: "None of [Index(['theta_E', 'f_axis', 'e1', 'e2'], dtype='object')] are in the [columns]"
+Error during results calculation. Check the log file for details.

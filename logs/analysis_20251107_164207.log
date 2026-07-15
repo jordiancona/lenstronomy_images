@@ -1,0 +1,7 @@
+===============================
+Starting analysis at viernes,  7 de noviembre de 2025, 16:42:07 CST
+===============================
+-e 
+[1/3] Running model_test.py for model training...
+/Users/juananconaflores/.pyenv/versions/project/bin/python: can't open file '/Users/juananconaflores/Documents/GitHub/lenstronomy_images/alexnet_model.py': [Errno 2] No such file or directory
+Error during model training. Check the log file for details.

@@ -1,0 +1,17 @@
+===============================
+Starting analysis at domingo, 16 de noviembre de 2025, 22:16:48 CST
+===============================
+
+[1/4] Skipping model training.
+
+[2/4] Skipping model testing.
+
+[3/4] Running results_paper.py for results...
+Reading CSV: ./csst_catalog/test12/alexnet_2/predictions_vs_real.csv
+-------- R² values --------
+Traceback (most recent call last):
+  File "/Users/juananconaflores/Documents/GitHub/lenstronomy_images/results_paper.py", line 103, in <module>
+    print(f'{LABELS[idx]}: {val:.4f}')
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ValueError: Unknown format code 'f' for object of type 'str'
+Error during results calculation. Check the log file for details.

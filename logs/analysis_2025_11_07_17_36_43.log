@@ -1,0 +1,13 @@
+===============================
+Starting analysis at viernes,  7 de noviembre de 2025, 17:36:43 CST
+===============================
+-e 
+[1/3] Running model_test.py for model training...
+Traceback (most recent call last):
+  File "/Users/juananconaflores/Documents/GitHub/lenstronomy_images/alexnet_test.py", line 43, in <module>
+    PRUEBA = int(main_config['CONFIG']['prueba'])
+                 ~~~~~~~~~~~^^^^^^^^^^
+  File "/Users/juananconaflores/.pyenv/versions/3.11.10/lib/python3.11/configparser.py", line 979, in __getitem__
+    raise KeyError(key)
+KeyError: 'CONFIG'
+Error during model training. Check the log file for details.

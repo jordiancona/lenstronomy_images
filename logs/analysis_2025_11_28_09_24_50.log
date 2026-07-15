@@ -1,0 +1,46 @@
+-e {YELLOW}==============================={NC}
+-e {YELLOW}Starting analysis at viernes, 28 de noviembre de 2025, 09:24:50 -03{NC}
+-e {YELLOW}==============================={NC}
+
+[1/4] Skipping model training.
+
+[2/4] Running test.py for model testing...
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1764332694.221707 2119923 pluggable_device_factory.cc:305] Could not identify NUMA node of platform GPU ID 0, defaulting to 0. Your kernel may not have been built with NUMA support.
+I0000 00:00:1764332694.221748 2119923 pluggable_device_factory.cc:271] Created TensorFlow device (/job:localhost/replica:0/task:0/device:GPU:0 with 0 MB memory) -> physical PluggableDevice (device: 0, name: METAL, pci bus id: <undefined>)
+Loading dataset from ./csst_catalog/tfrecords/test/
+Total Dataset: 5000
+Loading model from ./csst_catalog/test14/alexnet_1/alexnet_paper_1.keras
+Making predictions...
+[1m 1/79[0m [37m━━━━━━━━━━━━━━━━━━━━[0m [1m9s[0m 121ms/step[1m 5/79[0m [32m━[0m[37m━━━━━━━━━━━━━━━━━━━[0m [1m1s[0m 14ms/step [1m 9/79[0m [32m━━[0m[37m━━━━━━━━━━━━━━━━━━[0m [1m0s[0m 14ms/step[1m13/79[0m [32m━━━[0m[37m━━━━━━━━━━━━━━━━━[0m [1m0s[0m 13ms/step[1m18/79[0m [32m━━━━[0m[37m━━━━━━━━━━━━━━━━[0m [1m0s[0m 13ms/step[1m23/79[0m [32m━━━━━[0m[37m━━━━━━━━━━━━━━━[0m [1m0s[0m 12ms/step[1m28/79[0m [32m━━━━━━━[0m[37m━━━━━━━━━━━━━[0m [1m0s[0m 12ms/step[1m33/79[0m [32m━━━━━━━━[0m[37m━━━━━━━━━━━━[0m [1m0s[0m 12ms/step[1m38/79[0m [32m━━━━━━━━━[0m[37m━━━━━━━━━━━[0m [1m0s[0m 12ms/step[1m43/79[0m [32m━━━━━━━━━━[0m[37m━━━━━━━━━━[0m [1m0s[0m 12ms/step[1m48/79[0m [32m━━━━━━━━━━━━[0m[37m━━━━━━━━[0m [1m0s[0m 11ms/step[1m53/79[0m [32m━━━━━━━━━━━━━[0m[37m━━━━━━━[0m [1m0s[0m 11ms/step[1m58/79[0m [32m━━━━━━━━━━━━━━[0m[37m━━━━━━[0m [1m0s[0m 11ms/step[1m63/79[0m [32m━━━━━━━━━━━━━━━[0m[37m━━━━━[0m [1m0s[0m 11ms/step[1m68/79[0m [32m━━━━━━━━━━━━━━━━━[0m[37m━━━[0m [1m0s[0m 11ms/step[1m73/79[0m [32m━━━━━━━━━━━━━━━━━━[0m[37m━━[0m [1m0s[0m 11ms/step[1m78/79[0m [32m━━━━━━━━━━━━━━━━━━━[0m[37m━[0m [1m0s[0m 11ms/step[1m79/79[0m [32m━━━━━━━━━━━━━━━━━━━━[0m[37m[0m [1m0s[0m 12ms/step[1m79/79[0m [32m━━━━━━━━━━━━━━━━━━━━[0m[37m[0m [1m1s[0m 12ms/step
+CSV saved in ./csst_catalog/test14/alexnet_1/predictions_vs_real.csv
+  0%|          | 0/5000 [00:00<?, ?it/s]  0%|          | 0/5000 [00:00<?, ?it/s]
+Traceback (most recent call last):
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/pandas/core/indexes/base.py", line 3805, in get_loc
+    return self._engine.get_loc(casted_key)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "index.pyx", line 167, in pandas._libs.index.IndexEngine.get_loc
+  File "index.pyx", line 196, in pandas._libs.index.IndexEngine.get_loc
+  File "pandas/_libs/hashtable_class_helper.pxi", line 7081, in pandas._libs.hashtable.PyObjectHashTable.get_item
+  File "pandas/_libs/hashtable_class_helper.pxi", line 7089, in pandas._libs.hashtable.PyObjectHashTable.get_item
+KeyError: 'thetaE_true'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/juananconaflores/Documents/GitHub/lenstronomy_images/test.py", line 234, in <module>
+    imgs_true.append(generate_lens_image(df.loc[i, 'thetaE_true'], df.loc[i, 'f_s'],
+                                         ~~~~~~^^^^^^^^^^^^^^^^^^
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/pandas/core/indexing.py", line 1183, in __getitem__
+    return self.obj._get_value(*key, takeable=self._takeable)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/pandas/core/frame.py", line 4214, in _get_value
+    series = self._get_item_cache(col)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/pandas/core/frame.py", line 4638, in _get_item_cache
+    loc = self.columns.get_loc(item)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/pandas/core/indexes/base.py", line 3812, in get_loc
+    raise KeyError(key) from err
+KeyError: 'thetaE_true'
+-e {RED}Error during model testing. Check the log file for details.{NC}

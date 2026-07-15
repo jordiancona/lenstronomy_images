@@ -1,0 +1,21 @@
+===============================
+Starting analysis at sábado, 15 de noviembre de 2025, 10:34:30 CST
+===============================
+
+[1/4] Skipping model training.
+
+[2/4] Running test.py for model testing...
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1763224475.263850 26693529 pluggable_device_factory.cc:305] Could not identify NUMA node of platform GPU ID 0, defaulting to 0. Your kernel may not have been built with NUMA support.
+I0000 00:00:1763224475.263882 26693529 pluggable_device_factory.cc:271] Created TensorFlow device (/job:localhost/replica:0/task:0/device:GPU:0 with 0 MB memory) -> physical PluggableDevice (device: 0, name: METAL, pci bus id: <undefined>)
+Loading dataset from ./csst_catalog/tfrecords/test/
+Total Dataset: 5000 muestras
+Loading model from ./csst_catalog/test11/alexnet_1/alexnet_paper_1.keras
+Traceback (most recent call last):
+  File "/Users/juananconaflores/Documents/GitHub/lenstronomy_images/test.py", line 101, in <module>
+    model = load_model(model_path)#, custom_objects={'loss': custom_loss})
+            ^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/keras/src/saving/saving_api.py", line 200, in load_model
+    raise ValueError(
+ValueError: File not found: filepath=./csst_catalog/test11/alexnet_1/alexnet_paper_1.keras. Please ensure the file is an accessible `.keras` zip file.
+Error during model testing. Check the log file for details.

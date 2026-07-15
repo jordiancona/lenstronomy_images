@@ -1,0 +1,31 @@
+[1;33m===============================[0m
+[1;33mStarting analysis at lunes,  1 de diciembre de 2025, 10:18:15 CST[0m
+[1;33m===============================[0m
+
+[1/4] Skipping model training.
+
+[2/4] Skipping model testing.
+
+[3/4] Skipping results calculation.
+
+[4/4] Running compare_images.py for PSNR comparison...
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1764605898.554563 2727668 pluggable_device_factory.cc:305] Could not identify NUMA node of platform GPU ID 0, defaulting to 0. Your kernel may not have been built with NUMA support.
+I0000 00:00:1764605898.554602 2727668 pluggable_device_factory.cc:271] Created TensorFlow device (/job:localhost/replica:0/task:0/device:GPU:0 with 0 MB memory) -> physical PluggableDevice (device: 0, name: METAL, pci bus id: <undefined>)
+[33mComparing images...[0m
+Image: 2000 from ./csst_catalog/test14/alexnet_1/original/lenses_original.tfrecord
+========== Results from image 2000 ==========
+--- Robust Z-score ---
+--- Robust Min-Max (p1–p99) ---
+--- Robust Affine (img2→img1) ---
+[36mMSE Z-score:[0m 5.59788
+[36mMSE Min-Max: 0.018056[0m
+[36mMSE Affine:  6860.69[0m 
+
+Image saved in ./csst_catalog/test14/alexnet_1/
+
+[0;32mPSNR comparison completed successfully.[0m
+
+[1;33m===============================[0m
+[1;33mAnalysis completed at lunes,  1 de diciembre de 2025, 10:18:21 CST[0m
+[1;33m===============================[0m

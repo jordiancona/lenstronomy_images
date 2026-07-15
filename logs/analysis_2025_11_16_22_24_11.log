@@ -1,0 +1,60 @@
+===============================
+Starting analysis at domingo, 16 de noviembre de 2025, 22:24:11 CST
+===============================
+
+[1/4] Skipping model training.
+
+[2/4] Skipping model testing.
+
+[3/4] Running results_paper.py for results...
+Traceback (most recent call last):
+  File "/Users/juananconaflores/Documents/GitHub/lenstronomy_images/results_paper.py", line 5, in <module>
+    import tensorflow as tf
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/tensorflow/__init__.py", line 49, in <module>
+    from tensorflow._api.v2 import __internal__
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/tensorflow/_api/v2/__internal__/__init__.py", line 8, in <module>
+    from tensorflow._api.v2.__internal__ import autograph
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/tensorflow/_api/v2/__internal__/autograph/__init__.py", line 8, in <module>
+    from tensorflow.python.autograph.core.ag_ctx import control_status_ctx # line: 34
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/tensorflow/python/autograph/core/ag_ctx.py", line 21, in <module>
+    from tensorflow.python.autograph.utils import ag_logging
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/tensorflow/python/autograph/utils/__init__.py", line 17, in <module>
+    from tensorflow.python.autograph.utils.context_managers import control_dependency_on_returns
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/tensorflow/python/autograph/utils/context_managers.py", line 19, in <module>
+    from tensorflow.python.framework import ops
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/tensorflow/python/framework/ops.py", line 62, in <module>
+    from tensorflow.python.framework import tensor as tensor_lib
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/tensorflow/python/framework/tensor.py", line 139, in <module>
+    class Tensor(internal.NativeObject, core_tf_types.Symbol):
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/tensorflow/python/framework/tensor.py", line 758, in Tensor
+    self, dtype: Optional[dtypes.DType] = None, name: Optional[str] = None
+                 ~~~~~~~~^^^^^^^^^^^^^^
+  File "/Users/juananconaflores/.pyenv/versions/3.11.10/lib/python3.11/typing.py", line 376, in inner
+    return cached(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/juananconaflores/.pyenv/versions/3.11.10/lib/python3.11/typing.py", line 502, in __getitem__
+    return self._getitem(self, parameters)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/juananconaflores/.pyenv/versions/3.11.10/lib/python3.11/typing.py", line 727, in Optional
+    return Union[arg, type(None)]
+           ~~~~~^^^^^^^^^^^^^^^^^
+  File "/Users/juananconaflores/.pyenv/versions/3.11.10/lib/python3.11/typing.py", line 376, in inner
+    return cached(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/juananconaflores/.pyenv/versions/3.11.10/lib/python3.11/typing.py", line 502, in __getitem__
+    return self._getitem(self, parameters)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/juananconaflores/.pyenv/versions/3.11.10/lib/python3.11/typing.py", line 720, in Union
+    return _UnionGenericAlias(self, parameters, name="Optional")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/juananconaflores/.pyenv/versions/3.11.10/lib/python3.11/typing.py", line 1381, in __init__
+    self.__args__ = tuple(... if a is _TypingEllipsis else
+    ^^^^^^^^^^^^^
+  File "/Users/juananconaflores/.pyenv/versions/3.11.10/lib/python3.11/typing.py", line 1321, in __setattr__
+    if _is_dunder(attr) or attr in {'_name', '_inst', '_nparams',
+       ^^^^^^^^^^^^^^^^
+  File "/Users/juananconaflores/.pyenv/versions/3.11.10/lib/python3.11/typing.py", line 1267, in _is_dunder
+    return attr.startswith('__') and attr.endswith('__')
+           ^^^^^^^^^^^^^^^^^^^^^
+KeyboardInterrupt

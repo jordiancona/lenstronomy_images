@@ -1,0 +1,50 @@
+-e {YELLOW}==============================={NC}
+-e {YELLOW}Starting analysis at viernes, 28 de noviembre de 2025, 09:25:45 -03{NC}
+-e {YELLOW}==============================={NC}
+
+[1/4] Skipping model training.
+
+[2/4] Running test.py for model testing...
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1764332748.957225 2121983 pluggable_device_factory.cc:305] Could not identify NUMA node of platform GPU ID 0, defaulting to 0. Your kernel may not have been built with NUMA support.
+I0000 00:00:1764332748.957271 2121983 pluggable_device_factory.cc:271] Created TensorFlow device (/job:localhost/replica:0/task:0/device:GPU:0 with 0 MB memory) -> physical PluggableDevice (device: 0, name: METAL, pci bus id: <undefined>)
+Loading dataset from ./csst_catalog/tfrecords/test/
+Total Dataset: 5000
+Loading model from ./csst_catalog/test14/alexnet_1/alexnet_paper_1.keras
+Making predictions...
+[1m 1/79[0m [37m━━━━━━━━━━━━━━━━━━━━[0m [1m9s[0m 119ms/step[1m 5/79[0m [32m━[0m[37m━━━━━━━━━━━━━━━━━━━[0m [1m1s[0m 14ms/step [1m10/79[0m [32m━━[0m[37m━━━━━━━━━━━━━━━━━━[0m [1m0s[0m 12ms/step[1m15/79[0m [32m━━━[0m[37m━━━━━━━━━━━━━━━━━[0m [1m0s[0m 12ms/step[1m20/79[0m [32m━━━━━[0m[37m━━━━━━━━━━━━━━━[0m [1m0s[0m 12ms/step[1m25/79[0m [32m━━━━━━[0m[37m━━━━━━━━━━━━━━[0m [1m0s[0m 12ms/step[1m30/79[0m [32m━━━━━━━[0m[37m━━━━━━━━━━━━━[0m [1m0s[0m 12ms/step[1m35/79[0m [32m━━━━━━━━[0m[37m━━━━━━━━━━━━[0m [1m0s[0m 12ms/step[1m40/79[0m [32m━━━━━━━━━━[0m[37m━━━━━━━━━━[0m [1m0s[0m 12ms/step[1m45/79[0m [32m━━━━━━━━━━━[0m[37m━━━━━━━━━[0m [1m0s[0m 12ms/step[1m50/79[0m [32m━━━━━━━━━━━━[0m[37m━━━━━━━━[0m [1m0s[0m 12ms/step[1m55/79[0m [32m━━━━━━━━━━━━━[0m[37m━━━━━━━[0m [1m0s[0m 12ms/step[1m60/79[0m [32m━━━━━━━━━━━━━━━[0m[37m━━━━━[0m [1m0s[0m 11ms/step[1m65/79[0m [32m━━━━━━━━━━━━━━━━[0m[37m━━━━[0m [1m0s[0m 11ms/step[1m70/79[0m [32m━━━━━━━━━━━━━━━━━[0m[37m━━━[0m [1m0s[0m 11ms/step[1m75/79[0m [32m━━━━━━━━━━━━━━━━━━[0m[37m━━[0m [1m0s[0m 12ms/step[1m79/79[0m [32m━━━━━━━━━━━━━━━━━━━━[0m[37m[0m [1m0s[0m 13ms/step[1m79/79[0m [32m━━━━━━━━━━━━━━━━━━━━[0m[37m[0m [1m1s[0m 13ms/step
+CSV saved in ./csst_catalog/test14/alexnet_1/predictions_vs_real.csv
+  0%|          | 0/5000 [00:00<?, ?it/s]  0%|          | 1/5000 [00:00<14:03,  5.92it/s]  2%|▏         | 90/5000 [00:00<00:11, 411.15it/s]  4%|▎         | 179/5000 [00:00<00:08, 599.76it/s]  5%|▌         | 268/5000 [00:00<00:06, 704.10it/s]  7%|▋         | 357/5000 [00:00<00:06, 764.94it/s]  9%|▉         | 447/5000 [00:00<00:05, 807.21it/s] 11%|█         | 536/5000 [00:00<00:05, 832.94it/s] 12%|█▎        | 625/5000 [00:00<00:05, 849.96it/s] 14%|█▍        | 714/5000 [00:00<00:04, 861.56it/s] 16%|█▌        | 802/5000 [00:01<00:05, 733.87it/s] 18%|█▊        | 887/5000 [00:01<00:05, 764.61it/s] 19%|█▉        | 972/5000 [00:01<00:05, 788.14it/s] 21%|██        | 1061/5000 [00:01<00:04, 815.65it/s] 23%|██▎       | 1151/5000 [00:01<00:04, 838.35it/s] 25%|██▍       | 1237/5000 [00:01<00:04, 833.83it/s] 26%|██▋       | 1323/5000 [00:01<00:04, 839.25it/s] 28%|██▊       | 1408/5000 [00:01<00:04, 837.84it/s] 30%|██▉       | 1493/5000 [00:01<00:04, 838.85it/s] 32%|███▏      | 1578/5000 [00:02<00:04, 840.56it/s] 33%|███▎      | 1663/5000 [00:02<00:03, 843.25it/s] 35%|███▍      | 1749/5000 [00:02<00:03, 845.42it/s] 37%|███▋      | 1834/5000 [00:02<00:03, 846.37it/s] 38%|███▊      | 1919/5000 [00:02<00:03, 838.12it/s] 40%|████      | 2003/5000 [00:02<00:03, 826.42it/s] 42%|████▏     | 2089/5000 [00:02<00:03, 834.82it/s] 44%|████▎     | 2175/5000 [00:02<00:03, 841.32it/s] 45%|████▌     | 2261/5000 [00:02<00:03, 846.18it/s] 47%|████▋     | 2346/5000 [00:02<00:03, 845.04it/s] 49%|████▊     | 2433/5000 [00:03<00:03, 850.15it/s] 50%|█████     | 2519/5000 [00:03<00:02, 850.82it/s] 52%|█████▏    | 2607/5000 [00:03<00:02, 858.74it/s] 54%|█████▍    | 2694/5000 [00:03<00:02, 862.01it/s] 56%|█████▌    | 2781/5000 [00:03<00:02, 864.06it/s] 57%|█████▋    | 2868/5000 [00:03<00:02, 865.49it/s] 59%|█████▉    | 2955/5000 [00:03<00:02, 866.65it/s] 61%|██████    | 3043/5000 [00:03<00:02, 867.92it/s] 63%|██████▎   | 3131/5000 [00:03<00:02, 868.62it/s] 64%|██████▍   | 3218/5000 [00:03<00:02, 843.70it/s] 66%|██████▌   | 3307/5000 [00:04<00:01, 854.64it/s] 68%|██████▊   | 3396/5000 [00:04<00:01, 863.24it/s] 70%|██████▉   | 3485/5000 [00:04<00:01, 869.35it/s] 71%|███████▏  | 3574/5000 [00:04<00:01, 873.51it/s] 73%|███████▎  | 3663/5000 [00:04<00:01, 876.50it/s] 75%|███████▌  | 3752/5000 [00:04<00:01, 878.42it/s] 77%|███████▋  | 3840/5000 [00:04<00:01, 878.62it/s] 79%|███████▊  | 3928/5000 [00:04<00:01, 875.63it/s] 80%|████████  | 4016/5000 [00:04<00:01, 873.04it/s] 82%|████████▏ | 4104/5000 [00:04<00:01, 871.77it/s] 84%|████████▍ | 4192/5000 [00:05<00:00, 870.78it/s] 86%|████████▌ | 4280/5000 [00:05<00:00, 870.45it/s] 87%|████████▋ | 4368/5000 [00:05<00:00, 870.38it/s] 89%|████████▉ | 4456/5000 [00:05<00:00, 820.36it/s] 91%|█████████ | 4543/5000 [00:05<00:00, 832.28it/s] 93%|█████████▎| 4627/5000 [00:05<00:00, 803.89it/s] 94%|█████████▍| 4714/5000 [00:05<00:00, 821.90it/s] 96%|█████████▌| 4803/5000 [00:05<00:00, 839.12it/s] 98%|█████████▊| 4891/5000 [00:05<00:00, 849.31it/s]100%|█████████▉| 4979/5000 [00:06<00:00, 856.39it/s]100%|██████████| 5000/5000 [00:06<00:00, 827.27it/s]
+Generando comparativas:   0%|          | 0/9 [00:00<?, ?it/s]Generando comparativas:  11%|█         | 1/9 [00:00<00:01,  4.15it/s]Generando comparativas:  33%|███▎      | 3/9 [00:00<00:00,  9.22it/s]Generando comparativas:  56%|█████▌    | 5/9 [00:00<00:00, 11.53it/s]Generando comparativas:  78%|███████▊  | 7/9 [00:00<00:00, 13.09it/s]Generando comparativas: 100%|██████████| 9/9 [00:00<00:00, 13.87it/s]Generando comparativas: 100%|██████████| 9/9 [00:00<00:00, 11.97it/s]
+Saved 9 comparative images in: ./csst_catalog/test14/alexnet_1/
+Traceback (most recent call last):
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/pandas/core/indexes/base.py", line 3805, in get_loc
+    return self._engine.get_loc(casted_key)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "index.pyx", line 167, in pandas._libs.index.IndexEngine.get_loc
+  File "index.pyx", line 196, in pandas._libs.index.IndexEngine.get_loc
+  File "pandas/_libs/hashtable_class_helper.pxi", line 7081, in pandas._libs.hashtable.PyObjectHashTable.get_item
+  File "pandas/_libs/hashtable_class_helper.pxi", line 7089, in pandas._libs.hashtable.PyObjectHashTable.get_item
+KeyError: 'id'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/juananconaflores/Documents/GitHub/lenstronomy_images/test.py", line 290, in <module>
+    write_tfrecord(imgs_true, df, False, tfrecord_original_path)
+  File "/Users/juananconaflores/Documents/GitHub/lenstronomy_images/test.py", line 211, in write_tfrecord
+    'image_idx': _int_feature(int(df_params.loc[i, 'id'])),
+                                  ~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/pandas/core/indexing.py", line 1183, in __getitem__
+    return self.obj._get_value(*key, takeable=self._takeable)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/pandas/core/frame.py", line 4214, in _get_value
+    series = self._get_item_cache(col)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/pandas/core/frame.py", line 4638, in _get_item_cache
+    loc = self.columns.get_loc(item)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/pandas/core/indexes/base.py", line 3812, in get_loc
+    raise KeyError(key) from err
+KeyError: 'id'
+-e {RED}Error during model testing. Check the log file for details.{NC}

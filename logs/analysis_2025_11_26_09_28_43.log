@@ -1,0 +1,14 @@
+creating directory: ./csst_catalog/test14/original
+creating directory: ./csst_catalog/test14/predictions
+-e {YELLOW}==============================={NC}
+-e {YELLOW}Starting analysis at miércoles, 26 de noviembre de 2025, 09:28:43 -03{NC}
+-e {YELLOW}==============================={NC}
+
+[1/4] Skipping model training.
+
+[2/4] Running test.py for model testing...
+Traceback (most recent call last):
+  File "/Users/juananconaflores/Documents/GitHub/lenstronomy_images/test.py", line 7, in <module>
+    import tensorflow as tf
+ModuleNotFoundError: No module named 'tensorflow'
+-e {RED}Error during model testing. Check the log file for details.{NC}

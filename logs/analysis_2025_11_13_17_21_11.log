@@ -1,0 +1,57 @@
+===============================
+Starting analysis at jueves, 13 de noviembre de 2025, 17:21:11 CST
+===============================
+
+[1/4] Skipping model training.
+
+[2/4] Running test.py for model testing...
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1763076075.408692 25881909 pluggable_device_factory.cc:305] Could not identify NUMA node of platform GPU ID 0, defaulting to 0. Your kernel may not have been built with NUMA support.
+I0000 00:00:1763076075.408737 25881909 pluggable_device_factory.cc:271] Created TensorFlow device (/job:localhost/replica:0/task:0/device:GPU:0 with 0 MB memory) -> physical PluggableDevice (device: 0, name: METAL, pci bus id: <undefined>)
+Loading dataset from ./csst_catalog/tfrecords/test/
+Total Dataset: 5000 muestras
+Loading model from ./csst_catalog/test9/alexnet_1/alexnet_paper_1.keras
+Making predictions...
+[1m  1/157[0m [37m━━━━━━━━━━━━━━━━━━━━[0m [1m20s[0m 132ms/step[1m  7/157[0m [37m━━━━━━━━━━━━━━━━━━━━[0m [1m1s[0m 10ms/step  [1m 15/157[0m [32m━[0m[37m━━━━━━━━━━━━━━━━━━━[0m [1m1s[0m 8ms/step [1m 24/157[0m [32m━━━[0m[37m━━━━━━━━━━━━━━━━━[0m [1m0s[0m 7ms/step[1m 33/157[0m [32m━━━━[0m[37m━━━━━━━━━━━━━━━━[0m [1m0s[0m 7ms/step[1m 42/157[0m [32m━━━━━[0m[37m━━━━━━━━━━━━━━━[0m [1m0s[0m 7ms/step[1m 51/157[0m [32m━━━━━━[0m[37m━━━━━━━━━━━━━━[0m [1m0s[0m 6ms/step[1m 60/157[0m [32m━━━━━━━[0m[37m━━━━━━━━━━━━━[0m [1m0s[0m 6ms/step[1m 69/157[0m [32m━━━━━━━━[0m[37m━━━━━━━━━━━━[0m [1m0s[0m 6ms/step[1m 78/157[0m [32m━━━━━━━━━[0m[37m━━━━━━━━━━━[0m [1m0s[0m 6ms/step[1m 87/157[0m [32m━━━━━━━━━━━[0m[37m━━━━━━━━━[0m [1m0s[0m 6ms/step[1m 96/157[0m [32m━━━━━━━━━━━━[0m[37m━━━━━━━━[0m [1m0s[0m 6ms/step[1m105/157[0m [32m━━━━━━━━━━━━━[0m[37m━━━━━━━[0m [1m0s[0m 6ms/step[1m114/157[0m [32m━━━━━━━━━━━━━━[0m[37m━━━━━━[0m [1m0s[0m 6ms/step[1m123/157[0m [32m━━━━━━━━━━━━━━━[0m[37m━━━━━[0m [1m0s[0m 6ms/step[1m132/157[0m [32m━━━━━━━━━━━━━━━━[0m[37m━━━━[0m [1m0s[0m 6ms/step[1m141/157[0m [32m━━━━━━━━━━━━━━━━━[0m[37m━━━[0m [1m0s[0m 6ms/step[1m150/157[0m [32m━━━━━━━━━━━━━━━━━━━[0m[37m━[0m [1m0s[0m 6ms/step[1m157/157[0m [32m━━━━━━━━━━━━━━━━━━━━[0m[37m[0m [1m0s[0m 7ms/step[1m157/157[0m [32m━━━━━━━━━━━━━━━━━━━━[0m[37m[0m [1m1s[0m 7ms/step
+CSV saved in ./csst_catalog/test9/alexnet_1/predictions_vs_real.csv
+  0%|          | 0/5000 [00:00<?, ?it/s]  0%|          | 1/5000 [00:00<11:47,  7.07it/s]  2%|▏         | 90/5000 [00:00<00:10, 448.60it/s]  4%|▎         | 179/5000 [00:00<00:07, 632.17it/s]  5%|▌         | 267/5000 [00:00<00:06, 722.91it/s]  7%|▋         | 355/5000 [00:00<00:05, 776.15it/s]  9%|▉         | 443/5000 [00:00<00:05, 809.59it/s] 11%|█         | 531/5000 [00:00<00:05, 831.65it/s] 12%|█▏        | 620/5000 [00:00<00:05, 847.79it/s] 14%|█▍        | 710/5000 [00:00<00:04, 861.46it/s] 16%|█▌        | 800/5000 [00:01<00:04, 870.70it/s] 18%|█▊        | 890/5000 [00:01<00:04, 877.21it/s] 20%|█▉        | 979/5000 [00:01<00:04, 880.90it/s] 21%|██▏       | 1068/5000 [00:01<00:04, 883.37it/s] 23%|██▎       | 1157/5000 [00:01<00:04, 885.10it/s] 25%|██▍       | 1247/5000 [00:01<00:04, 886.70it/s] 27%|██▋       | 1336/5000 [00:01<00:04, 886.91it/s] 28%|██▊       | 1425/5000 [00:01<00:04, 887.51it/s] 30%|███       | 1514/5000 [00:01<00:03, 887.19it/s] 32%|███▏      | 1604/5000 [00:01<00:03, 888.50it/s] 34%|███▍      | 1694/5000 [00:02<00:03, 889.27it/s] 36%|███▌      | 1784/5000 [00:02<00:03, 889.66it/s] 37%|███▋      | 1874/5000 [00:02<00:03, 889.97it/s] 39%|███▉      | 1964/5000 [00:02<00:03, 889.18it/s] 41%|████      | 2054/5000 [00:02<00:03, 889.69it/s] 43%|████▎     | 2144/5000 [00:02<00:03, 890.03it/s] 45%|████▍     | 2234/5000 [00:02<00:03, 890.48it/s] 46%|████▋     | 2324/5000 [00:02<00:03, 890.70it/s] 48%|████▊     | 2414/5000 [00:02<00:02, 890.98it/s] 50%|█████     | 2504/5000 [00:02<00:02, 891.05it/s] 52%|█████▏    | 2594/5000 [00:03<00:02, 891.25it/s] 54%|█████▎    | 2684/5000 [00:03<00:02, 891.16it/s] 55%|█████▌    | 2774/5000 [00:03<00:02, 891.18it/s] 57%|█████▋    | 2864/5000 [00:03<00:02, 887.94it/s] 59%|█████▉    | 2953/5000 [00:03<00:02, 883.46it/s] 61%|██████    | 3042/5000 [00:03<00:02, 880.87it/s] 63%|██████▎   | 3131/5000 [00:03<00:02, 878.74it/s] 64%|██████▍   | 3219/5000 [00:03<00:02, 877.63it/s] 66%|██████▌   | 3307/5000 [00:03<00:01, 875.55it/s] 68%|██████▊   | 3395/5000 [00:03<00:01, 875.28it/s] 70%|██████▉   | 3483/5000 [00:04<00:01, 874.71it/s] 71%|███████▏  | 3572/5000 [00:04<00:01, 878.79it/s] 73%|███████▎  | 3662/5000 [00:04<00:01, 882.20it/s] 75%|███████▌  | 3751/5000 [00:04<00:01, 884.43it/s] 77%|███████▋  | 3841/5000 [00:04<00:01, 886.50it/s] 79%|███████▊  | 3931/5000 [00:04<00:01, 888.00it/s] 80%|████████  | 4021/5000 [00:04<00:01, 888.86it/s] 82%|████████▏ | 4111/5000 [00:04<00:00, 889.72it/s] 84%|████████▍ | 4200/5000 [00:04<00:00, 888.93it/s] 86%|████████▌ | 4290/5000 [00:04<00:00, 889.66it/s] 88%|████████▊ | 4380/5000 [00:05<00:00, 890.40it/s] 89%|████████▉ | 4470/5000 [00:05<00:00, 890.70it/s] 91%|█████████ | 4560/5000 [00:05<00:00, 890.76it/s] 93%|█████████▎| 4650/5000 [00:05<00:00, 891.19it/s] 95%|█████████▍| 4740/5000 [00:05<00:00, 891.13it/s] 97%|█████████▋| 4830/5000 [00:05<00:00, 891.06it/s] 98%|█████████▊| 4920/5000 [00:05<00:00, 891.11it/s]100%|██████████| 5000/5000 [00:05<00:00, 865.33it/s]
+Generando comparativas:   0%|          | 0/9 [00:00<?, ?it/s]Generando comparativas:  11%|█         | 1/9 [00:00<00:01,  4.20it/s]Generando comparativas:  33%|███▎      | 3/9 [00:00<00:00,  9.28it/s]Generando comparativas:  56%|█████▌    | 5/9 [00:00<00:00, 12.00it/s]Generando comparativas:  78%|███████▊  | 7/9 [00:00<00:00, 13.55it/s]Generando comparativas: 100%|██████████| 9/9 [00:00<00:00, 14.73it/s]Generando comparativas: 100%|██████████| 9/9 [00:00<00:00, 12.48it/s]
+Saved 9 comparative images in: ./csst_catalog/test9/alexnet_1/
+TFRecord saved: ./csst_catalog/test9/alexnet_1/original/lenses_original.tfrecord
+TFRecord saved: ./csst_catalog/test9/alexnet_1/predictions/lenses_predicted.tfrecord
+All done! TFRecords and images saved successfully.
+Model testing completed successfully.
+
+[3/4] Running results_paper.py for results...
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1763076089.141545 25882384 pluggable_device_factory.cc:305] Could not identify NUMA node of platform GPU ID 0, defaulting to 0. Your kernel may not have been built with NUMA support.
+I0000 00:00:1763076089.141578 25882384 pluggable_device_factory.cc:271] Created TensorFlow device (/job:localhost/replica:0/task:0/device:GPU:0 with 0 MB memory) -> physical PluggableDevice (device: 0, name: METAL, pci bus id: <undefined>)
+Reading CSV: ./csst_catalog/test9/alexnet_1/predictions_vs_real.csv
+-------- R² values --------
+theta_E: 0.9202
+f_axis: 0.8272
+e1: 0.6703
+e2: -1.2232
+Analysis complete. All plots and metrics saved.
+Results calculation completed successfully.
+
+[4/4] Running compare_images.py for PSNR comparison...
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1763076094.234937 25882660 pluggable_device_factory.cc:305] Could not identify NUMA node of platform GPU ID 0, defaulting to 0. Your kernel may not have been built with NUMA support.
+I0000 00:00:1763076094.234970 25882660 pluggable_device_factory.cc:271] Created TensorFlow device (/job:localhost/replica:0/task:0/device:GPU:0 with 0 MB memory) -> physical PluggableDevice (device: 0, name: METAL, pci bus id: <undefined>)
+Image: 1838 from ./csst_catalog/test9/alexnet_1/original/lenses_original.tfrecord
+========== Results from image 1838 ==========
+--- Robust Z-score ---
+--- Robust Min-Max (p1–p99) ---
+--- Robust Affine (img2→img1) ---
+MSE Z-score: 1105.13
+MSE Min-Max: 0.0229029
+MSE Affine:  15.2184 
+
+Image saved in ./csst_catalog/test9/alexnet_1/
+
+PSNR comparison completed successfully.
+
+===============================
+Analysis completed at jueves, 13 de noviembre de 2025, 17:21:36 CST
+===============================

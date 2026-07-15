@@ -16,6 +16,10 @@ import astropy.io.fits as fits
 from astropy.constants import c
 from scipy.optimize import brentq
 from dataclasses import dataclass
+from astropy.table import Table
+
+NUM_PIX = 100  # Número de píxeles
+DELTA_PIX = 0.05  # Tamaño del píxel en arcsec
 
 class sie_lens():
     def __init__(self,co, zl = 0.3, zs = 2.0, sigmav = 200,f = 0.6,pa = 45.0):
@@ -167,147 +171,85 @@ class sie_lens():
 @dataclass
 class Lenses:
     @classmethod
-    def makelens(self, n, f, thetaE, e1, e2, gamma1, gamma2, center_x, center_y, pa):
-        self.file_name = f'lens{n+1}'
+    def makelens(self, n, idx, f, thetaE, e1, e2, center_x, center_y):
+        self.file_name = f'lens_{n+1}'
         
         self.f = f
         self.thetaE = thetaE
-        self.e1, self.e2 = e1, e2
-        self.gamma1 = gamma1
-        self.gamma2 = gamma2
-        self.center_x = center_x
-        self.center_y = center_y
-        self.pa = pa
-
+        self.e1_s, self.e2_s = e1, e2
+        self.x_s = center_x
+        self.y_s = center_y
+        
+        pa_l = 0.0
+        e = (1 - self.f)/(1 + self.f)
+        self.e1_l, self.e2_l = e*np.cos(2*pa_l), e*np.sin(2*pa_l)
         # specify the choice of lens models #
-        lens_model_list = ['SIE', 'SHEAR']
-
-        # setup lens model class with the list of lens models #
-        lensModel = LensModel(lens_model_list = lens_model_list)
-
-        # define parameter values of lens models #
-        kwargs_spep = {'theta_E': self.thetaE, 
-                       'e1': self.e1, 
-                       'e2': self.e2, 
-                       'center_x': center_x, 
-                       'center_y': center_y}
+        x, y = np.meshgrid(np.linspace(-NUM_PIX/2 * DELTA_PIX, NUM_PIX/2 * DELTA_PIX, NUM_PIX),
+                           np.linspace(-NUM_PIX/2 * DELTA_PIX, NUM_PIX/2 * DELTA_PIX, NUM_PIX))
         
-        kwargs_shear = {'gamma1': gamma1, 'gamma2': gamma2}
-        kwargs_lens = [kwargs_spep, kwargs_shear]
+        lens_model_list = ['SIE']
+        lens_model = LensModel(lens_model_list)
+        lens_samples = Table.read('./csst_catalog/csst_wf_single.csv')
+        lens = lens_samples[idx]
 
-        # image plane coordinate #
-        # image plane coordinate #
-        theta_ra, theta_dec = 1.,.5
-        beta_ra, beta_dec = lensModel.ray_shooting(theta_ra, theta_dec, kwargs_lens)
-        # Fermat potential #
-        fermat_pot = lensModel.fermat_potential(x_image = theta_ra, y_image = theta_dec, x_source = beta_ra, y_source=beta_dec, kwargs_lens = kwargs_lens)
-
-        # Magnification #
-        mag = lensModel.magnification(theta_ra, theta_dec, kwargs_lens)
-
-        # specifiy the lens model class to deal with #
-        solver = LensEquationSolver(lensModel)
-
-        # solve for image positions provided a lens model and the source position #
-        theta_ra, theta_dec = solver.image_position_from_source(beta_ra, beta_dec, kwargs_lens)
-
-        # the magnification of the point source images #
-        mag = lensModel.magnification(theta_ra, theta_dec, kwargs_lens)
-
-        # set up the list of light models to be used #
-        source_light_model_list = ['SERSIC']
-        lightModel_source = LightModel(light_model_list=source_light_model_list)
-
+        re_s = lens['re_s0']
+        re_l = lens['re_l']
+        
+        # Parámetros de la lente
+        lens_kwargs = [{
+            'theta_E': self.thetaE,
+            'e1': self.e1_l,                
+            'e2': self.e2_l,               
+            'center_x': 0.0,          
+            'center_y': 0.0           
+        }]
+        
+        # LUZ DE LA LENTE
         lens_light_model_list = ['SERSIC_ELLIPSE']
-        lightModel_lens = LightModel(light_model_list=lens_light_model_list)
-
-        # define the parameters #
-        kwargs_light_source = [{'amp': 50,
-                                'R_sersic': 0.1,
-                                'n_sersic': 1.5, 
-                                'center_x': beta_ra, 
-                                'center_y': beta_dec}]
-
-        ##e1, e2 = param_util.phi_q2_ellipticity(phi=0.5, q=0.7)
-        kwargs_light_lens = [{'amp': 1000,
-                              'R_sersic': 0.1,
-                              'n_sersic': 2.5,
-                              'e1': self.e1,
-                              'e2': self.e2,
-                              'center_x': center_x,
-                              'center_y': center_y}]
-
-        # evaluate surface brightness at a specific position #
-        flux = lightModel_lens.surface_brightness(x = 1, y = 1, kwargs_list = kwargs_light_lens)
-
-        # unlensed source positon #
-        point_source_model_list = ['SOURCE_POSITION']
-        pointSource = PointSource(point_source_type_list = point_source_model_list,
-                                  lens_model = lensModel,
-                                  fixed_magnification_list = [True])
-
-        kwargs_ps = [{'ra_source': beta_ra, 'dec_source': beta_dec, 'source_amp': 10}]
-        # return image positions and amplitudes #
-        x_pos, y_pos = pointSource.image_position(kwargs_ps = kwargs_ps, kwargs_lens = kwargs_lens)
-        point_amp = pointSource.image_amplitude(kwargs_ps = kwargs_ps, kwargs_lens = kwargs_lens)
-
-        # lensed image positions (solution of the lens equation) #
-        point_source_model_list = ['LENSED_POSITION']
-        pointSource = PointSource(point_source_type_list = point_source_model_list,
-                                  lens_model = lensModel,
-                                  fixed_magnification_list = [False])
-
-        kwargs_ps = [{'ra_image': theta_ra, 'dec_image': theta_dec, 'point_amp': np.abs(mag)*10}]
-        # return image positions and amplitudes #
-        x_pos, y_pos = pointSource.image_position(kwargs_ps = kwargs_ps, kwargs_lens = kwargs_lens)
-        point_amp = pointSource.image_amplitude(kwargs_ps = kwargs_ps, kwargs_lens = kwargs_lens)
-
-        deltaPix = 0.05  # size of pixel in angular coordinates #
-
-        im_dim = 100
-        # setup the keyword arguments to create the Data() class #
-        ra_at_xy_0, dec_at_xy_0 = -im_dim*deltaPix/2., -im_dim*deltaPix/2. # coordinate in angles (RA/DEC) at the position of the pixel edge (0,0)
-        transform_pix2angle = np.array([[1, 0], [0, 1]]) * deltaPix  # linear translation matrix of a shift in pixel in a shift in coordinates
-        kwargs_pixel = {'nx': im_dim, 
-                        'ny': im_dim,  # number of pixels per axis
-                        'ra_at_xy_0': ra_at_xy_0,  # RA at pixel (0,0)
-                        'dec_at_xy_0': dec_at_xy_0,  # DEC at pixel (0,0)
-                        'transform_pix2angle': transform_pix2angle} 
-
-        pixel_grid = PixelGrid(**kwargs_pixel)
-        # return the list of pixel coordinates #
-        x_coords, y_coords = pixel_grid.pixel_coordinates
-        # compute pixel value of a coordinate position #
-        x_pos, y_pos = pixel_grid.map_coord2pix(ra = 0, dec = 0)
-        # compute the coordinate value of a pixel position #
-        ra_pos, dec_pos = pixel_grid.map_pix2coord(x = 20, y = 10)
-
-        # PSF
-        kwargs_psf = {'psf_type': 'GAUSSIAN',  # type of PSF model (supports 'GAUSSIAN' and 'PIXEL')
-                    'fwhm': 0.1,  # full width at half maximum of the Gaussian PSF (in angular units)
-                    'pixel_size': deltaPix  # angular scale of a pixel (required for a Gaussian PSF to translate the FWHM into a pixel scale)
-                    }
-
-        psf = PSF(psf_type = 'NONE')#PSF(**kwargs_psf)
-        # return the pixel kernel corresponding to a point source # 
-        kernel = psf.kernel_point_source
-
-        # define the numerics #
-        kwargs_numerics = {'supersampling_factor': 1, # each pixel gets super-sampled (in each axis direction) 
-                        'supersampling_convolution': False}
-        # initialize the Image model class by combining the modules we created above #
-        imageModel = ImageModel(data_class = pixel_grid,
-                                psf_class = psf,
-                                lens_model_class = lensModel,
-                                source_model_class = lightModel_source,
-                                lens_light_model_class = lightModel_lens,
-                                point_source_class = None, # in this example, we do not simulate point source.
-                                kwargs_numerics = kwargs_numerics)
+        lens_light_model = LightModel(lens_light_model_list)
         
-        # simulate image with the parameters we have defined above #
-        self.image = imageModel.image(kwargs_lens = kwargs_lens, kwargs_source = kwargs_light_source,
-                                      kwargs_lens_light = kwargs_light_lens, kwargs_ps = kwargs_ps)
-
+        # Parámetros de la luz de la lente
+        lens_light_kwargs = [{
+            'amp': 8.,
+            'R_sersic': re_l,
+            'n_sersic': 4.0,
+            'e1': self.e1_l,
+            'e2': self.e2_l,
+            'center_x': 0.0,
+            'center_y': 0.0
+        }]
+        
+        source_light_model_list = ['SERSIC_ELLIPSE']
+        source_light_model = LightModel(source_light_model_list)
+        
+        # Parámetros del perfil Sersic para la fuente
+        source_kwargs = [{
+            'amp': 50.0,             
+            'R_sersic': re_s,          
+            'n_sersic': 2.0,          
+            'e1': self.e1_s,               
+            'e2': self.e2_s,               
+            'center_x': self.x_s,          
+            'center_y': self.y_s           
+        }]
+        
+        # 1. Calcular la luz de la lente (directa, sin lenteado)
+        lens_light_brightness = lens_light_model.surface_brightness(x, y, lens_light_kwargs)
+        image_lens_light = lens_light_brightness.reshape(NUM_PIX, NUM_PIX)
+        
+        # 2. Calcular las posiciones de la fuente lentadas
+        x_lensed, y_lensed = lens_model.ray_shooting(x, y, lens_kwargs)
+        
+        # 3. Calcular el brillo de la fuente en las posiciones lentadas
+        source_brightness_lensed = source_light_model.surface_brightness(x_lensed, y_lensed, source_kwargs)
+        image_source_lensed = source_brightness_lensed.reshape(NUM_PIX, NUM_PIX)
+        
+        # 4. CALCULAR LA SUMA CORRECTA: Luz de lente + Fuente lentada
+        self.image = image_lens_light + image_source_lensed
+        
+        # 5. Imagen de la fuente sin lente para comparación
+        source_brightness_unlensed = source_light_model.surface_brightness(x, y, source_kwargs)
+        image_source_unlensed = source_brightness_unlensed.reshape(NUM_PIX, NUM_PIX)
         # image with noise
         exp_time = 100  # exposure time to quantify the Poisson noise level
         background_rms = 0.1  # background rms value
@@ -335,18 +277,13 @@ class Lenses:
         # Lens parameters
         c1 = fits.Card('theta_E', self.thetaE, 'Einstein Radius')
         c2 = fits.Card('f_axis', self.f, 'axial radio')
-        c3 = fits.Card('e1', self.e1, 'elipticity1')
-        c4 = fits.Card('e2', self.e2, 'elipticity2')
-
-        # Shear components
-        c5 = fits.Card('gamma1', self.gamma1, 'lens coordinate x')
-        c6 = fits.Card('gamma2', self.gamma2, 'lens coordinate y')
+        c3 = fits.Card('e1', self.e1_s, 'source elipticity1')
+        c4 = fits.Card('e2', self.e2_s, 'source elipticity2')
 
         # Lens Coordinates
-        c7 = fits.Card('center_x', self.center_x, 'x coordinate')
-        c8 = fits.Card('center_y', self.center_y, 'y coordinate')
-        c9 = fits.Card('pa_lens', self.pa, 'position angle')
-        parameters = [c1, c2, c3, c4, c5, c6, c7, c8, c9]
+        c5 = fits.Card('center_x', self.x_s, 'x coordinate')
+        c6 = fits.Card('center_y', self.y_s, 'y coordinate')
+        parameters = [c1, c2, c3, c4, c5, c6]
 
         for parameter in parameters:
             outhdr.append(parameter, end = True)

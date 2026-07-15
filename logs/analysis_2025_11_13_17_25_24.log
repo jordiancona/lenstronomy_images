@@ -1,0 +1,40 @@
+===============================
+Starting analysis at jueves, 13 de noviembre de 2025, 17:25:24 CST
+===============================
+
+[1/4] Running model_test.py for model training...
+Traceback (most recent call last):
+  File "/Users/juananconaflores/Documents/GitHub/lenstronomy_images/alexnet_test.py", line 6, in <module>
+    import tensorflow as tf
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/tensorflow/__init__.py", line 49, in <module>
+    from tensorflow._api.v2 import __internal__
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/tensorflow/_api/v2/__internal__/__init__.py", line 8, in <module>
+    from tensorflow._api.v2.__internal__ import autograph
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/tensorflow/_api/v2/__internal__/autograph/__init__.py", line 9, in <module>
+    from tensorflow.python.autograph.impl.api import tf_convert # line: 493
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/tensorflow/python/autograph/impl/api.py", line 25, in <module>
+    from tensorflow.python.autograph import operators
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/tensorflow/python/autograph/operators/__init__.py", line 36, in <module>
+    from tensorflow.python.autograph.operators.conditional_expressions import if_exp
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/tensorflow/python/autograph/operators/conditional_expressions.py", line 18, in <module>
+    from tensorflow.python.autograph.operators import control_flow
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/tensorflow/python/autograph/operators/control_flow.py", line 64, in <module>
+    from tensorflow.python.autograph.operators import py_builtins
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/tensorflow/python/autograph/operators/py_builtins.py", line 29, in <module>
+    from tensorflow.python.ops import cond
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/tensorflow/python/ops/cond.py", line 25, in <module>
+    from tensorflow.python.ops import cond_v2
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/tensorflow/python/ops/cond_v2.py", line 42, in <module>
+    from tensorflow.python.ops import control_flow_util_v2 as util
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/tensorflow/python/ops/control_flow_util_v2.py", line 20, in <module>
+    from tensorflow.python.eager.polymorphic_function import atomic_function
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/tensorflow/python/eager/polymorphic_function/atomic_function.py", line 25, in <module>
+    from tensorflow.core.function.polymorphism import function_type as function_type_lib
+  File "<frozen importlib._bootstrap>", line 1176, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1147, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 690, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 936, in exec_module
+  File "<frozen importlib._bootstrap_external>", line 1069, in get_code
+  File "<frozen importlib._bootstrap_external>", line 729, in _compile_bytecode
+KeyboardInterrupt

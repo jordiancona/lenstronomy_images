@@ -1,0 +1,59 @@
+===============================
+Starting analysis at lunes, 10 de noviembre de 2025, 11:33:20 CST
+===============================
+-e 
+[1/3] Running model_test.py for model training...
+Error loading FITS data: name 'tqdm' is not defined
+Model training completed successfully.
+-e 
+[2/3] Running test.py for model testing...
+Usando 8 procesos.
+Modelo 1:   0%|          | 0/5000 [00:00<?, ?it/s]Traceback (most recent call last):
+  File "<frozen importlib._bootstrap_external>", line 1440, in _path_importer_cache
+KeyError: '/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/scipy/stats/_unuran'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+  File "/Users/juananconaflores/.pyenv/versions/3.11.10/lib/python3.11/multiprocessing/spawn.py", line 122, in spawn_main
+Traceback (most recent call last):
+Traceback (most recent call last):
+Traceback (most recent call last):
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+Modelo 1:   0%|          | 0/5000 [00:01<?, ?it/s]
+  File "/Users/juananconaflores/.pyenv/versions/3.11.10/lib/python3.11/multiprocessing/spawn.py", line 122, in spawn_main
+  File "<string>", line 1, in <module>
+  File "/Users/juananconaflores/.pyenv/versions/3.11.10/lib/python3.11/multiprocessing/spawn.py", line 122, in spawn_main
+  File "<string>", line 1, in <module>
+  File "/Users/juananconaflores/.pyenv/versions/3.11.10/lib/python3.11/multiprocessing/spawn.py", line 122, in spawn_main
+  File "<string>", line 1, in <module>
+  File "/Users/juananconaflores/.pyenv/versions/3.11.10/lib/python3.11/multiprocessing/spawn.py", line 122, in spawn_main
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+  File "/Users/juananconaflores/.pyenv/versions/3.11.10/lib/python3.11/multiprocessing/spawn.py", line 122, in spawn_main
+    exitcode = _main(fd, parent_sentinel)
+    exitcode = _main(fd, parent_sentinel)
+    exitcode = _main(fd, parent_sentinel)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/juananconaflores/.pyenv/versions/3.11.10/lib/python3.11/multiprocessing/spawn.py", line 131, in _main
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+Traceback (most recent call last):
+  File "/Users/juananconaflores/.pyenv/versions/3.11.10/lib/python3.11/multiprocessing/pool.py", line 856, in next
+    item = self._items.popleft()
+           ^^^^^^^^^^^^^^^^^^^^^
+IndexError: pop from an empty deque
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/juananconaflores/Documents/GitHub/lenstronomy_images/test.py", line 118, in <module>
+    list(tqdm(pool.imap_unordered(process_image, args_list),
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/tqdm/std.py", line 1181, in __iter__
+    for obj in iterable:
+  File "/Users/juananconaflores/.pyenv/versions/3.11.10/lib/python3.11/multiprocessing/pool.py", line 861, in next
+    self._cond.wait(timeout)
+  File "/Users/juananconaflores/.pyenv/versions/3.11.10/lib/python3.11/threading.py", line 327, in wait
+    waiter.acquire()
+KeyboardInterrupt

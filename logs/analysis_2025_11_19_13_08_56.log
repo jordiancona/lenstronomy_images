@@ -1,0 +1,65 @@
+===============================
+Starting analysis at miércoles, 19 de noviembre de 2025, 13:08:56 CST
+===============================
+
+[1/4] Running model_test.py for model training...
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1763579340.241203 29056741 pluggable_device_factory.cc:305] Could not identify NUMA node of platform GPU ID 0, defaulting to 0. Your kernel may not have been built with NUMA support.
+I0000 00:00:1763579340.241247 29056741 pluggable_device_factory.cc:271] Created TensorFlow device (/job:localhost/replica:0/task:0/device:GPU:0 with 0 MB memory) -> physical PluggableDevice (device: 0, name: METAL, pci bus id: <undefined>)
+Loading datasets from ./csst_catalog/tfrecords/train/ and ./csst_catalog/tfrecords/test/
+Número total de ejemplos de entrenamiento: 70000
+Número total de ejemplos de prueba: 6396
+steps_per_epoch = 1093.75
+validation_steps = 17500.0
+Traceback (most recent call last):
+  File "/Users/juananconaflores/Documents/GitHub/lenstronomy_images/alexnet_test.py", line 148, in main
+    .take(num_train_total * TRAIN_SPLIT)
+     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/tensorflow/python/data/ops/dataset_ops.py", line 1593, in take
+    return take_op._take(self, count, name=name)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/tensorflow/python/data/ops/take_op.py", line 24, in _take
+    return _TakeDataset(self, count, name=name)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/tensorflow/python/data/ops/take_op.py", line 33, in __init__
+    self._count = ops.convert_to_tensor(count, dtype=dtypes.int64, name="count")
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/tensorflow/python/profiler/trace.py", line 183, in wrapped
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/tensorflow/python/framework/ops.py", line 736, in convert_to_tensor
+    return tensor_conversion_registry.convert(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/tensorflow/python/framework/tensor_conversion_registry.py", line 234, in convert
+    ret = conversion_func(value, dtype=dtype, name=name, as_ref=as_ref)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/tensorflow/python/framework/constant_tensor_conversion.py", line 29, in _constant_tensor_conversion_function
+    return constant_op.constant(v, dtype=dtype, name=name)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/tensorflow/python/ops/weak_tensor_ops.py", line 142, in wrapper
+    return op(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/tensorflow/python/framework/constant_op.py", line 276, in constant
+    return _constant_impl(value, dtype, shape, name, verify_shape=False,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/tensorflow/python/framework/constant_op.py", line 289, in _constant_impl
+    return _constant_eager_impl(ctx, value, dtype, shape, verify_shape)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/tensorflow/python/framework/constant_op.py", line 301, in _constant_eager_impl
+    t = convert_to_eager_tensor(value, ctx, dtype)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/tensorflow/python/framework/constant_op.py", line 108, in convert_to_eager_tensor
+    return ops.EagerTensor(value, ctx.device_name, dtype)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: Cannot convert 56000.0 to EagerTensor of dtype int64
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/juananconaflores/Documents/GitHub/lenstronomy_images/alexnet_test.py", line 217, in <module>
+    main()
+  File "/Users/juananconaflores/Documents/GitHub/lenstronomy_images/alexnet_test.py", line 214, in main
+    print(f'Error: in line {sys.exc_info()[2].tb_lineno} - {e}')
+                            ^^^
+NameError: name 'sys' is not defined
+Error during model training. Check the log file for details.

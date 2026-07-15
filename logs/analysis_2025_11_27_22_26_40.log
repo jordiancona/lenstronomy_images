@@ -1,0 +1,54 @@
+-e {YELLOW}==============================={NC}
+-e {YELLOW}Starting analysis at jueves, 27 de noviembre de 2025, 22:26:40 -03{NC}
+-e {YELLOW}==============================={NC}
+
+[1/4] Skipping model training.
+
+[2/4] Running test.py for model testing...
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1764293204.129354 1837417 pluggable_device_factory.cc:305] Could not identify NUMA node of platform GPU ID 0, defaulting to 0. Your kernel may not have been built with NUMA support.
+I0000 00:00:1764293204.129399 1837417 pluggable_device_factory.cc:271] Created TensorFlow device (/job:localhost/replica:0/task:0/device:GPU:0 with 0 MB memory) -> physical PluggableDevice (device: 0, name: METAL, pci bus id: <undefined>)
+Loading dataset from ./csst_catalog/tfrecords/test/
+Total Dataset: 5000
+Loading model from ./csst_catalog/test15/alexnet_1/train_alexnetWeighted_model1_pal10_100x100.keras
+Making predictions...
+[1m 1/79[0m [37m━━━━━━━━━━━━━━━━━━━━[0m [1m14s[0m 191ms/step[1m 5/79[0m [32m━[0m[37m━━━━━━━━━━━━━━━━━━━[0m [1m0s[0m 13ms/step  [1m10/79[0m [32m━━[0m[37m━━━━━━━━━━━━━━━━━━[0m [1m0s[0m 12ms/step[1m15/79[0m [32m━━━[0m[37m━━━━━━━━━━━━━━━━━[0m [1m0s[0m 11ms/step[1m20/79[0m [32m━━━━━[0m[37m━━━━━━━━━━━━━━━[0m [1m0s[0m 11ms/step[1m25/79[0m [32m━━━━━━[0m[37m━━━━━━━━━━━━━━[0m [1m0s[0m 11ms/step[1m30/79[0m [32m━━━━━━━[0m[37m━━━━━━━━━━━━━[0m [1m0s[0m 11ms/step[1m35/79[0m [32m━━━━━━━━[0m[37m━━━━━━━━━━━━[0m [1m0s[0m 11ms/step[1m40/79[0m [32m━━━━━━━━━━[0m[37m━━━━━━━━━━[0m [1m0s[0m 11ms/step[1m45/79[0m [32m━━━━━━━━━━━[0m[37m━━━━━━━━━[0m [1m0s[0m 11ms/step[1m50/79[0m [32m━━━━━━━━━━━━[0m[37m━━━━━━━━[0m [1m0s[0m 11ms/step[1m55/79[0m [32m━━━━━━━━━━━━━[0m[37m━━━━━━━[0m [1m0s[0m 11ms/step[1m60/79[0m [32m━━━━━━━━━━━━━━━[0m[37m━━━━━[0m [1m0s[0m 11ms/step[1m65/79[0m [32m━━━━━━━━━━━━━━━━[0m[37m━━━━[0m [1m0s[0m 11ms/step[1m70/79[0m [32m━━━━━━━━━━━━━━━━━[0m[37m━━━[0m [1m0s[0m 11ms/step[1m75/79[0m [32m━━━━━━━━━━━━━━━━━━[0m[37m━━[0m [1m0s[0m 11ms/step[1m79/79[0m [32m━━━━━━━━━━━━━━━━━━━━[0m[37m[0m [1m0s[0m 16ms/step[1m79/79[0m [32m━━━━━━━━━━━━━━━━━━━━[0m[37m[0m [1m1s[0m 16ms/step
+CSV saved in ./csst_catalog/test15/alexnet_1/predictions_vs_real.csv
+  0%|          | 0/5000 [00:00<?, ?it/s]  0%|          | 8/5000 [00:00<01:02, 79.24it/s]  2%|▏         | 97/5000 [00:00<00:08, 553.52it/s]  4%|▎         | 186/5000 [00:00<00:06, 706.38it/s]  6%|▌         | 276/5000 [00:00<00:06, 779.28it/s]  7%|▋         | 365/5000 [00:00<00:05, 817.68it/s]  9%|▉         | 454/5000 [00:00<00:05, 840.95it/s] 11%|█         | 543/5000 [00:00<00:05, 856.73it/s] 13%|█▎        | 633/5000 [00:00<00:05, 867.41it/s] 14%|█▍        | 723/5000 [00:00<00:04, 874.92it/s] 16%|█▋        | 813/5000 [00:01<00:04, 880.11it/s] 18%|█▊        | 903/5000 [00:01<00:04, 883.41it/s] 20%|█▉        | 993/5000 [00:01<00:04, 885.47it/s] 22%|██▏       | 1082/5000 [00:01<00:04, 886.68it/s] 23%|██▎       | 1172/5000 [00:01<00:04, 888.15it/s] 25%|██▌       | 1262/5000 [00:01<00:04, 889.17it/s] 27%|██▋       | 1352/5000 [00:01<00:04, 889.45it/s] 29%|██▉       | 1442/5000 [00:01<00:03, 890.05it/s] 31%|███       | 1532/5000 [00:01<00:03, 890.68it/s] 32%|███▏      | 1622/5000 [00:01<00:03, 891.31it/s] 34%|███▍      | 1712/5000 [00:02<00:03, 891.73it/s] 36%|███▌      | 1802/5000 [00:02<00:03, 892.23it/s] 38%|███▊      | 1892/5000 [00:02<00:03, 892.04it/s] 40%|███▉      | 1982/5000 [00:02<00:03, 891.09it/s] 41%|████▏     | 2072/5000 [00:02<00:03, 890.32it/s] 43%|████▎     | 2162/5000 [00:02<00:03, 890.28it/s] 45%|████▌     | 2252/5000 [00:02<00:03, 890.33it/s] 47%|████▋     | 2342/5000 [00:02<00:02, 890.14it/s] 49%|████▊     | 2432/5000 [00:02<00:02, 889.74it/s] 50%|█████     | 2521/5000 [00:02<00:02, 889.78it/s] 52%|█████▏    | 2610/5000 [00:03<00:02, 889.80it/s] 54%|█████▍    | 2700/5000 [00:03<00:02, 890.01it/s] 56%|█████▌    | 2790/5000 [00:03<00:02, 889.76it/s] 58%|█████▊    | 2879/5000 [00:03<00:02, 889.61it/s] 59%|█████▉    | 2968/5000 [00:03<00:02, 889.56it/s] 61%|██████    | 3058/5000 [00:03<00:02, 890.29it/s] 63%|██████▎   | 3148/5000 [00:03<00:02, 890.24it/s] 65%|██████▍   | 3238/5000 [00:03<00:01, 890.29it/s] 67%|██████▋   | 3328/5000 [00:03<00:01, 890.39it/s] 68%|██████▊   | 3418/5000 [00:03<00:01, 890.71it/s] 70%|███████   | 3508/5000 [00:04<00:01, 890.60it/s] 72%|███████▏  | 3598/5000 [00:04<00:01, 890.43it/s] 74%|███████▍  | 3688/5000 [00:04<00:01, 890.14it/s] 76%|███████▌  | 3778/5000 [00:04<00:01, 890.28it/s] 77%|███████▋  | 3868/5000 [00:04<00:01, 890.90it/s] 79%|███████▉  | 3958/5000 [00:04<00:01, 891.09it/s] 81%|████████  | 4048/5000 [00:04<00:01, 891.22it/s] 83%|████████▎ | 4138/5000 [00:04<00:00, 891.28it/s] 85%|████████▍ | 4228/5000 [00:04<00:00, 891.79it/s] 86%|████████▋ | 4318/5000 [00:04<00:00, 892.01it/s] 88%|████████▊ | 4408/5000 [00:05<00:00, 892.21it/s] 90%|████████▉ | 4498/5000 [00:05<00:00, 891.26it/s] 92%|█████████▏| 4588/5000 [00:05<00:00, 891.81it/s] 94%|█████████▎| 4678/5000 [00:05<00:00, 891.71it/s] 95%|█████████▌| 4768/5000 [00:05<00:00, 892.20it/s] 97%|█████████▋| 4858/5000 [00:05<00:00, 892.59it/s] 99%|█████████▉| 4948/5000 [00:05<00:00, 892.61it/s]100%|██████████| 5000/5000 [00:05<00:00, 876.33it/s]
+Generando comparativas:   0%|          | 0/9 [00:00<?, ?it/s]Generando comparativas:  11%|█         | 1/9 [00:00<00:01,  4.35it/s]Generando comparativas:  33%|███▎      | 3/9 [00:00<00:00,  9.63it/s]Generando comparativas:  56%|█████▌    | 5/9 [00:00<00:00, 12.11it/s]Generando comparativas:  78%|███████▊  | 7/9 [00:00<00:00, 13.60it/s]Generando comparativas: 100%|██████████| 9/9 [00:00<00:00, 14.63it/s]Generando comparativas: 100%|██████████| 9/9 [00:00<00:00, 12.57it/s]
+Saved 9 comparative images in: ./csst_catalog/test15/alexnet_1/
+TFRecord saved: ./csst_catalog/test15/alexnet_1/original/lenses_original.tfrecord
+TFRecord saved: ./csst_catalog/test15/alexnet_1/predictions/lenses_predicted.tfrecord
+All done! TFRecords and images saved successfully.
+Model testing completed successfully.
+
+[3/4] Running results_paper.py for results...
+Reading CSV: ./csst_catalog/test15/alexnet_1/predictions_vs_real.csv
+-------- R² values --------
+theta_E: -227.4472
+f_axis: -5199.4886
+e1: -1097.8510
+e2: -239.8757
+Analysis complete. All plots and metrics saved.
+-e {GREEN}Results calculation completed successfully.{NC}
+
+[4/4] Running compare_images.py for PSNR comparison...
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1764293223.360862 1838253 pluggable_device_factory.cc:305] Could not identify NUMA node of platform GPU ID 0, defaulting to 0. Your kernel may not have been built with NUMA support.
+I0000 00:00:1764293223.360898 1838253 pluggable_device_factory.cc:271] Created TensorFlow device (/job:localhost/replica:0/task:0/device:GPU:0 with 0 MB memory) -> physical PluggableDevice (device: 0, name: METAL, pci bus id: <undefined>)
+Image: 2019 from ./csst_catalog/test15/alexnet_1/original/lenses_original.tfrecord
+========== Results from image 2019 ==========
+--- Robust Z-score ---
+--- Robust Min-Max (p1–p99) ---
+--- Robust Affine (img2→img1) ---
+MSE Z-score: 571.384
+MSE Min-Max: 0.102454
+MSE Affine:  656.54 
+
+Image saved in ./csst_catalog/test15/alexnet_1/
+
+-e {GREEN}PSNR comparison completed successfully.{NC}
+-e 
+{YELLOW}==============================={NC}
+-e {YELLOW}Analysis completed at jueves, 27 de noviembre de 2025, 22:27:05 -03{NC}
+-e {YELLOW}==============================={NC}

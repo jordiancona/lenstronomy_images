@@ -1,0 +1,45 @@
+===============================
+Starting analysis at lunes, 17 de noviembre de 2025, 00:25:39 CST
+===============================
+
+[1/4] Skipping model training.
+
+[2/4] Skipping model testing.
+
+[3/4] Running results_paper.py for results...
+Reading CSV: ./csst_catalog/test11/alexnet_1/predictions_vs_real.csv
+-------- R² values --------
+theta_E: 0.9043
+f_axis: 0.6785
+e1: 0.7136
+e2: 0.7557
+Analysis complete. All plots and metrics saved.
+Results calculation completed successfully.
+
+[4/4] Running compare_images.py for PSNR comparison...
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1763360747.509946 27465351 pluggable_device_factory.cc:305] Could not identify NUMA node of platform GPU ID 0, defaulting to 0. Your kernel may not have been built with NUMA support.
+I0000 00:00:1763360747.509982 27465351 pluggable_device_factory.cc:271] Created TensorFlow device (/job:localhost/replica:0/task:0/device:GPU:0 with 0 MB memory) -> physical PluggableDevice (device: 0, name: METAL, pci bus id: <undefined>)
+Traceback (most recent call last):
+  File "/Users/juananconaflores/Documents/GitHub/lenstronomy_images/compare_images.py", line 208, in <module>
+    main()
+  File "/Users/juananconaflores/Documents/GitHub/lenstronomy_images/compare_images.py", line 173, in main
+    original_dataset = load_tfrecord(original_file)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/juananconaflores/Documents/GitHub/lenstronomy_images/compare_images.py", line 57, in load_tfrecord
+    return list(dataset)
+           ^^^^^^^^^^^^^
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/tensorflow/python/data/ops/iterator_ops.py", line 826, in __next__
+    return self._next_internal()
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/tensorflow/python/data/ops/iterator_ops.py", line 776, in _next_internal
+    ret = gen_dataset_ops.iterator_get_next(
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/tensorflow/python/ops/gen_dataset_ops.py", line 3086, in iterator_get_next
+    _ops.raise_from_not_ok_status(e, name)
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/tensorflow/python/framework/ops.py", line 6006, in raise_from_not_ok_status
+    raise core._status_to_exception(e) from None  # pylint: disable=protected-access
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tensorflow.python.framework.errors_impl.InvalidArgumentError: {{function_node __wrapped__IteratorGetNext_output_types_12_device_/job:localhost/replica:0/task:0/device:CPU:0}} Error in user-defined function passed to MapDataset:2 transformation with iterator: Iterator::Root::ParallelMapV2: Input to reshape is a tensor with 10000 values, but the requested shape has 40000
+	 [[{{node Reshape}}]] [Op:IteratorGetNext] name: 
+Error during PSNR comparison. Check the log file for details.

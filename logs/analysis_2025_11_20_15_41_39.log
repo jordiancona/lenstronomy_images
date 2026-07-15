@@ -1,0 +1,53 @@
+===============================
+Starting analysis at jueves, 20 de noviembre de 2025, 15:41:39 CST
+===============================
+
+[1/4] Running model_test.py for model training...
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1763674903.480237 29795313 pluggable_device_factory.cc:305] Could not identify NUMA node of platform GPU ID 0, defaulting to 0. Your kernel may not have been built with NUMA support.
+I0000 00:00:1763674903.480275 29795313 pluggable_device_factory.cc:271] Created TensorFlow device (/job:localhost/replica:0/task:0/device:GPU:0 with 0 MB memory) -> physical PluggableDevice (device: 0, name: METAL, pci bus id: <undefined>)
+Loading datasets from ./csst_catalog/tfrecords/train/ and ./csst_catalog/tfrecords/test/
+Número total de ejemplos de entrenamiento: 70000
+Número total de ejemplos de prueba: 6396
+steps_per_epoch = 546
+validation_steps = 109
+
+Training with 546 steps and 109 validation steps
+
+Epoch 1/50
+Traceback (most recent call last):
+  File "/Users/juananconaflores/Documents/GitHub/lenstronomy_images/alexnet_test.py", line 189, in main
+    history = model.fit(train_dataset,
+              ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/keras/src/utils/traceback_utils.py", line 122, in error_handler
+    raise e.with_traceback(filtered_tb) from None
+  File "/Users/juananconaflores/.pyenv/versions/project/lib/python3.11/site-packages/tensorflow/python/eager/execute.py", line 53, in quick_execute
+    tensors = pywrap_tfe.TFE_Py_Execute(ctx._handle, device_name, op_name,
+  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tensorflow.python.framework.errors_impl.InvalidArgumentError: Graph execution error:
+
+Detected at node Reshape defined at (most recent call last):
+<stack traces unavailable>
+Detected at node Reshape defined at (most recent call last):
+<stack traces unavailable>
+2 root error(s) found.
+  (0) INVALID_ARGUMENT:  Error in user-defined function passed to MapDataset:34 transformation with iterator: Iterator::Root::Prefetch::ForeverRepeat[0]::Prefetch::BatchV2::Shuffle::FiniteTake::ParallelMapV2: Input to reshape is a tensor with 10000 values, but the requested shape has 40000
+	 [[{{node Reshape}}]]
+	 [[IteratorGetNext]]
+	 [[StatefulPartitionedCall/nadam/Add_94/_264]]
+  (1) INVALID_ARGUMENT:  Error in user-defined function passed to MapDataset:34 transformation with iterator: Iterator::Root::Prefetch::ForeverRepeat[0]::Prefetch::BatchV2::Shuffle::FiniteTake::ParallelMapV2: Input to reshape is a tensor with 10000 values, but the requested shape has 40000
+	 [[{{node Reshape}}]]
+	 [[IteratorGetNext]]
+0 successful operations.
+0 derived errors ignored. [Op:__inference_multi_step_on_iterator_84605]
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/juananconaflores/Documents/GitHub/lenstronomy_images/alexnet_test.py", line 219, in <module>
+    main()
+  File "/Users/juananconaflores/Documents/GitHub/lenstronomy_images/alexnet_test.py", line 216, in main
+    print(f'Error: in line {sys.exc_info()[2].tb_lineno} - {e}')
+                            ^^^
+NameError: name 'sys' is not defined
+Error during model training. Check the log file for details.

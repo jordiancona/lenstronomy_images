@@ -4,10 +4,12 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import tensorflow as tf
-from keras.metrics import R2Score
-from models import alexnet, resnet
+from models import cnn_hog
+from tensorflow.keras import layers, models, Input # type: ignore
 from tensorflow.keras.optimizers import Adam, Nadam # type: ignore
 from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau # type: ignore
+from skimage.feature import hog
+from skimage import color
 from sklearn.model_selection import train_test_split
 from astropy.io import fits
 from tqdm import tqdm
@@ -41,7 +43,7 @@ BATCH_SIZE = int(main_config['MODEL']['batch_size'])
 EPOCHS = int(main_config['MODEL']['epochs'])
 TRAIN_SPLIT = float(main_config['MODEL']['train_split'])
 VAL_SPLIT = float(main_config['MODEL']['val_split'])
-PRUEBA = int(main_config['MODEL']['prueba'])
+PRUEBA = int(main_config['CONFIG']['prueba'])
 INPUT_SHAPE = (NUM_PIX, NUM_PIX, CHANNLES)
 
 losses = []
@@ -55,6 +57,9 @@ os.environ['PYTHONHASHSEED'] = str(seed_value)
 random.seed(seed_value)
 np.random.seed(seed_value)
 tf.random.set_seed(seed_value)
+
+def relative_error_porcentual(y_true, y_pred):
+    return tf.reduce_mean(tf.abs((y_true - y_pred) / (y_true + 1e-8))*100.0)
 
 def weighted_mse_loss(weights):
     '''
@@ -100,7 +105,7 @@ def plot_training_results(metrics, metric_names, path):
     '''
     for metric_name in metric_names:
         dp1, dp2 = DROPOUTS
-        plt.plot(metrics['train'][metric_name][n], lw=0.8, label=f'd1: {dp1} d2: {dp2}')
+        plt.plot(metrics['train'][metric_name], lw=0.8, label=f'd1: {dp1} d2: {dp2}')
         plt.title(f'{metric_name.upper()} through training')
         plt.gca().set(xlabel='epoch', ylabel=metric_name)
         plt.legend()
@@ -108,7 +113,7 @@ def plot_training_results(metrics, metric_names, path):
         plt.close()
 
         dp1, dp2 = DROPOUTS
-        plt.plot(metrics['val'][metric_name][n], lw=0.8, label=f'd1: {dp1} d2: {dp2}')
+        plt.plot(metrics['val'][metric_name], lw=0.8, label=f'd1: {dp1} d2: {dp2}')
         plt.title(f'{metric_name.upper()} through validation')
         plt.gca().set(xlabel='epoch', ylabel=metric_name)
         plt.legend()
@@ -154,7 +159,7 @@ def main():
         print(f"File {FITS_PATH} not found.")
 
     X_train, X_test, y_train, y_test = train_test_split(train_images, train_lbs, test_size = TRAIN_SPLIT, random_state = 42, shuffle = True)
-    X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size = TEST_SPLIT, random_state = 42)
+    X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size = VAL_SPLIT, random_state = 42)
 
     early_stopping = EarlyStopping(monitor = 'val_loss', start_from_epoch = 4, patience = 3)
     reduce_lr = ReduceLROnPlateau(monitor = 'val_loss', factor = 0.1, patience = 4, min_lr = 1e-5)
@@ -165,25 +170,32 @@ def main():
     print(f'Dropout 1: {dp1}, Dropout 2: {dp2}\n')
     print(f'Input Shape: {INPUT_SHAPE}\n')
     print(f'Epochs: {EPOCHS}\n')
-    print(f'Model path: {path}\n')
+    print(f'Model path: {MODEL_PATH}\n')
     print(f'Learning Rate: {LEARNING_RATE}\n')
 
     weights = [1.0, 1.0, 2.5, 2.5]
     loss_fn = weighted_mse_loss(weights)
     optimizer = Nadam(learning_rate = LEARNING_RATE) # Optimizador y LR
 
-    model = alexnet.AlexNet(input_shape = INPUT_SHAPE, classes = CLASSES, dp1 = dp1, dp2 = dp2)
-    model.compile(optimizer = optimizer, loss = loss_fn, metrics = ['mae'])
+    # se extraen las características HOG
+    X_train_hog = cnn_hog.extract_hog_features(X_train)
+    X_val_hog = cnn_hog.extract_hog_features(X_val)
+    X_test_hog = cnn_hog.extract_hog_features(X_test)
+
+    # se construye el modelo con las características HOG
+    cnn_encoder = cnn_hog.build_cnn_encoder(INPUT_SHAPE)
+    model = build_hog_cnn_model(cnn_encoder, hog_dim = X_train_hog.shape[1], output_dim = 4, dp1 = dp1, dp2 = dp2)
+    model.compile(optimizer = optimizer, loss = 'mse', metrics = ['mae', relative_error_porcentual])
 
     print(f'Imágenes de entrenamiento: {len(X_train)}')
     print(f'Imágenes de validación: {len(X_val)}')
     print(f'Imágenes de prueba: {len(X_test)}')
 
     start = time.time()
-    history = model.fit(X_train,
+    history = model.fit([X_train, X_train_hog],
                         y_train,
                         epochs = EPOCHS,
-                        validation_data = (X_val, y_val),
+                        validation_data = ([X_val, X_val_hog], y_val),
                         callbacks = [reduce_lr],
                         batch_size = BATCH_SIZE)
     
@@ -203,7 +215,7 @@ def main():
 
     start = time.time()
     test_n = 5000
-    test_loss, test_mae = model.evaluate(X_test[:test_n], y_test[:test_n], batch_size = 64)
+    test_loss, test_mae = model.evaluate([X_test[:test_n], X_test_hog[:test_n]], y_test[:test_n], batch_size = 64)
     end = time.time()
     test_time = end - start
     print(f'Test Loss: {test_loss:.4f}, Test MAE: {test_mae:.4f}')
@@ -211,7 +223,7 @@ def main():
     train_time = int(train_time // 60) if train_time > 60 > 0 else train_time
     test_time = int(test_time // 60) if test_time > 60 > 0 else test_time
     print(f'training time: {train_time} min - test_time: {test_time:.4f} seconds')
-    model.save(MODEL_PATH + f'alexnet_paper_{PRUEBA}.keras')
+    model.save(MODEL_PATH + f'cnn_hog_{PRUEBA}.keras')
 
 # Call the function to plot results
 metrics = {'train': {'mae': maes, 'loss': losses},
