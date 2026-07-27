@@ -12,7 +12,7 @@ def read_config():
 main_config = read_config()
 PRUEBA = main_config['CONFIG']['prueba']
 MAIN_PATH = main_config['PATHS']['main_path']
-PATH = os.path.join(MAIN_PATH, f'alexnet_{PRUEBA}/')
+PATH = os.path.join(MAIN_PATH, f'{PRUEBA}/')
 
 df = pd.read_csv(PATH + f'training_history_{PRUEBA}.csv')
 
