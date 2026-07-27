@@ -5,8 +5,8 @@ import matplotlib.colors as colors
 import matplotlib.patches as patches
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 import tensorflow as tf
-from lenstronomy.LensModel.lens_model import LensModel
-from lenstronomy.Plots import lens_plot
+from lenstronomy.LensModel.lens_model import LensModel # pyrefly: ignore [missing-import]
+from lenstronomy.Plots import lens_plot # pyrefly: ignore [missing-import]
 import configparser
 import sys
 import os
