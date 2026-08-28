@@ -395,15 +395,15 @@ with plt.rc_context({'font.size': 18,
         g = sns.JointGrid(x=y_true, y=residuals, space=0, height=8, ratio=5)
 
         # 2. Gráfico Central: Dispersión de Residuos (Gris Oxford/Azul Marino Académico)
-        g.ax_joint.scatter(y_true, residuals, alpha=0.3, color='#4a5568', edgecolors='none', s=25, label='Residuos')
+        g.ax_joint.scatter(y_true, residuals, alpha=0.3, color='#4a5568', edgecolors='none', s=22, label='Residuos')
         g.ax_joint.axhline(y=0, color='#e53e3e', linestyle='--', linewidth=2.5, label=r'$\epsilon = 0$')
         
         # Ajustes del gráfico central
-        g.ax_joint.set_xlabel(f'Valor original de {plot_label[0]} ({plot_label[1]})', labelpad=12)
+        g.ax_joint.set_xlabel(f'Valor original de {plot_label[0]}', labelpad=20)
         if n == 0 or n == 2:  # Mantener consistencia en la escala si compartes páneles
-            g.ax_joint.set_ylabel(r'Residuos ($\epsilon$)', labelpad=12)
+            g.ax_joint.set_ylabel(r'Residuos ($\epsilon$)', labelpad=20)
         else:
-            g.ax_joint.set_ylabel(r'Residuos ($\epsilon$)', labelpad=12)
+            g.ax_joint.set_ylabel(r'Residuos ($\epsilon$)', labelpad=20)
             
         g.ax_joint.grid(True, linestyle=':', alpha=0.6, color='gray')
 
@@ -424,6 +424,11 @@ with plt.rc_context({'font.size': 18,
         # Ajuste de curva Gaussiana Teórica sobre los residuos reales
         y_axis = np.linspace(residuals.min(), residuals.max(), 200)
         mu_res, std_res = stats.norm.fit(residuals)
+        
+        # Asimetría por percentiles (Bowley/Robust skewness basada en P25, P50 y P75)
+        q25, q50, q75 = np.percentile(residuals, [25, 50, 75])
+        denom = q75 - q25
+        skew_res = ((q75 - q50) - (q50 - q25)) / denom if denom != 0 else 0.0
         #g.ax_marg_y.plot(stats.norm.pdf(y_axis, mu_res, std_res), y_axis, color='#1a365d', linewidth=2.5, label='Ajuste Normal')
 
         # Limpieza del panel marginal
@@ -434,11 +439,12 @@ with plt.rc_context({'font.size': 18,
         # 4. Cuadro Estadístico de Rigor Flotante
         texto_metricas = (
             f"$\mu_{{err}} = {mu_res:.4f}$\n"
-            f"$\sigma_{{err}} = {std_res:.4f}$"
+            f"$\sigma_{{err}} = {std_res:.4f}$\n"
+            f"$\mathrm{{SK_B}} = {skew_res:.4f}$"
         )
-        props = dict(boxstyle='round,pad=0.6', facecolor='#f7fafc', edgecolor='#cbd5e0', alpha=0.9)
+        props = dict(boxstyle='round,pad=0.6', facecolor='#f7fafc', edgecolor='#cbd5e0', alpha=0.8)
         g.ax_joint.text(0.05, 0.05, texto_metricas, transform=g.ax_joint.transAxes,
-                        verticalalignment='bottom', horizontalalignment='left', bbox=props, fontsize=16)
+                        verticalalignment='bottom', horizontalalignment='left', bbox=props, fontsize=20)
 
         # Guardar gráfico individual de alta calidad por parámetro
         plt.savefig(os.path.join(MODEL_PATH, f'residual_marginal_{label}_{PRUEBA}.pdf'), bbox_inches='tight', dpi=200)
@@ -446,15 +452,18 @@ with plt.rc_context({'font.size': 18,
 
 print(f"{GREEN}Gráficos de residuos con histograma marginal guardados individualmente.{ENDC}")
 
-# Prueba de Kolmogorov-Smirnov para evaluar la normalidad de los residuos
-print(f"\n{YELLOW}======== Prueba de Kolmogorov-Smirnov (Residuos) ========{ENDC}")
+# Prueba de Kolmogorov-Smirnov y Skewness para evaluar la normalidad de los residuos
+print(f"\n{YELLOW}======== Prueba de Kolmogorov-Smirnov y Skewness por Percentiles (Residuos) ========{ENDC}")
 for label in LABELS:
     y_true = np.array(original_values[label])
     y_pred = np.array(predicted_values[label])
     residuals = y_true - y_pred
     mu_res, std_res = stats.norm.fit(residuals)
+    q16, q50, q84 = np.percentile(residuals, [16, 50, 84])
+    denom = q84 - q16
+    skew_res = ((q84 - q50) - (q50 - q16)) / denom if denom != 0 else 0.0
     ks_stat, ks_pvalue = stats.kstest(residuals, 'norm', args=(mu_res, std_res))
-    print(f"{CYAN}{label} | KS statistic:{ENDC} {ks_stat:.4f} {CYAN}| p-value:{ENDC} {ks_pvalue:.4e}")
+    print(f"{CYAN}{label} | Skewness (percentil):{ENDC} {skew_res:.4f} {CYAN}| KS statistic:{ENDC} {ks_stat:.4f} {CYAN}| p-value:{ENDC} {ks_pvalue:.4e}")
 
 print(f"\n{GREEN}Analysis complete. All plots and metrics saved.{ENDC}")
 
