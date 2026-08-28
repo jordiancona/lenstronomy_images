@@ -88,13 +88,13 @@ df = pd.read_csv(CSV_PATH)
 
 # Separate original and predicted values
 original_values = {'theta_E': df['theta_E_true'],
-                   'f_axis': df['f_axis_true'],
+                   'f_axis': df['f_true'],
                    'e1': df['e1_true'],
                    'e2': df['e2_true']
                    }
 
 predicted_values = {'theta_E': df['theta_E_pred'],
-                    'f_axis': df['f_axis_pred'],
+                    'f_axis': df['f_pred'],
                     'e1': df['e1_pred'],
                     'e2': df['e2_pred']
                     }
@@ -156,7 +156,7 @@ with open(output_file, "w") as f:
 
 # Plot results - Original vs Predicted and Residuals
 labels_for_plot = {'theta_E': (r'$\theta_E$', 'Radio de Einstein'),
-                   'f_axis': (r'$f$', 'Relación axial'),
+                   'f': (r'$f$', 'Relación axial'),
                    'e1': (r'$\epsilon_x$', 'Elipticidad x'),
                    'e2': (r'$\epsilon_y$', 'Elipticidad y')}
 
@@ -167,7 +167,7 @@ def plot_scatter_enhanced():
     ensemble_mean = np.mean(predictions_stacked, axis=0)
     ensemble_std = np.std(predictions_stacked, axis=0, ddof=1)
 
-    labels = ['theta_E', 'f_axis', 'e1', 'e2']
+    labels = ['theta_E', 'f', 'e1', 'e2']
     fig, axes = plt.subplots(1, len(labels), figsize=(30, 8))
     #plt.suptitle(f"Model {PRUEBA}", fontsize=36)
     for i, label in enumerate(labels):
@@ -446,4 +446,15 @@ with plt.rc_context({'font.size': 18,
 
 print(f"{GREEN}Gráficos de residuos con histograma marginal guardados individualmente.{ENDC}")
 
+# Prueba de Kolmogorov-Smirnov para evaluar la normalidad de los residuos
+print(f"\n{YELLOW}======== Prueba de Kolmogorov-Smirnov (Residuos) ========{ENDC}")
+for label in LABELS:
+    y_true = np.array(original_values[label])
+    y_pred = np.array(predicted_values[label])
+    residuals = y_true - y_pred
+    mu_res, std_res = stats.norm.fit(residuals)
+    ks_stat, ks_pvalue = stats.kstest(residuals, 'norm', args=(mu_res, std_res))
+    print(f"{CYAN}{label} | KS statistic:{ENDC} {ks_stat:.4f} {CYAN}| p-value:{ENDC} {ks_pvalue:.4e}")
+
 print(f"\n{GREEN}Analysis complete. All plots and metrics saved.{ENDC}")
+
