@@ -43,9 +43,9 @@ import os
 # ─────────────────────────────────────────────
 #  Configuración de tamaño de letra
 # ─────────────────────────────────────────────
-plt.rc('axes',  labelsize=16)
-plt.rc('xtick', labelsize=14)
-plt.rc('ytick', labelsize=14)
+plt.rc('axes',  labelsize=18)
+plt.rc('xtick', labelsize=18)
+plt.rc('ytick', labelsize=18)
 
 # ─────────────────────────────────────────────
 #  Configuración de colores
