@@ -6,5 +6,5 @@
   -El archivo "test2.py" genera mocks utilizando imágenes de galaxias.
 
 ## Módulos y Sub-proyectos
-* [Sub-proyecto](./kaggle_runs/) El script `run_training.sh` automatiza el entrenamiento de modelos en Kaggle. Revisa la documentación para obtener más información (./kaggle_runs/README.md).
+* [Automatización de Kaggle](./kaggle_runs/) El script `run_training.sh` automatiza el entrenamiento de modelos en Kaggle. Revisa la documentación para obtener más [información](./kaggle_runs/README.md).
 
