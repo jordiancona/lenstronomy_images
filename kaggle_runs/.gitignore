@@ -1,3 +1,4 @@
 # Entornos y dependencias locales
 __pycache__/
 *.log
+output/
