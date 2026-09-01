@@ -48,6 +48,7 @@ pyautolens_test.py
 root.log
 models
 lenses
+kaggle_runs/
 __pycache__/
 results/
 pruebas/*
