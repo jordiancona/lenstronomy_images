@@ -3,8 +3,6 @@
 Este directorio contiene la configuración y scripts para desplegar, ejecutar y monitorear entrenamientos de modelos de lentes gravitacionales en GPU/TPU usando la plataforma Kaggle.
 
 ## Archivos Principales
-
-- **`models-test-lenses.ipynb`**: Notebook principal de Jupyter que define las arquitecturas (AlexNet, ResNet, ConvNeXt), procesa los TFRecords de entrada y ejecuta el entrenamiento con validación cruzada (K-Fold).
 - **`kernel-metadata.json`**: Archivo de metadatos para la CLI de Kaggle (ID del kernel, conjuntos de datos asociados, activación de GPU e internet).
 - **`run_training.sh`**: Script para automatizar el envío del kernel, monitorear el progreso en tiempo real y descargar las salidas.
 
