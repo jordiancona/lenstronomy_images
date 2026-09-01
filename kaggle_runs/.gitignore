@@ -2,3 +2,6 @@
 __pycache__/
 *.log
 output/
+
+# archivos
+models-test-lenses.ipynb
