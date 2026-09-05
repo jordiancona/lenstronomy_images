@@ -1,0 +1,18 @@
+{
+    "id": "username/kernel_name",
+    "title": "Title",
+    "code_file": "code_file.py/code_file.ipynb",
+    "language": "python/R/shell/C++",
+    "kernel_type": "notebook/script",
+    "is_private": "true/false",
+    "enable_gpu": "true/false",
+    "enable_tpu": "true/false",
+    "enable_internet": "true/false",
+    "machine_shape": "",
+    "dataset_sources": [
+        "dataset_sources"
+    ],
+    "competition_sources": [],
+    "kernel_sources": [],
+    "model_sources": []
+}
