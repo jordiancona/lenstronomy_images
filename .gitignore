@@ -62,3 +62,4 @@ alexnet_test_2.py
 main_config.ini
 kernel-metadata.json
 dataset-metadata.json
+normalizacion_imagenes_tesis.txt
