@@ -2,8 +2,8 @@
 import numpy as np
 import random
 import tensorflow as tf
-from lenstronomy.LensModel.lens_model import LensModel
-from lenstronomy.LightModel.light_model import LightModel
+from lenstronomy.LensModel.lens_model import LensModel # pyrefly: ignore [missing-import]
+from lenstronomy.LightModel.light_model import LightModel # pyrefly: ignore [missing-import]
 from astropy.table import Table
 import multiprocessing
 import configparser
@@ -29,7 +29,7 @@ CHANNLES = main_config.getint('MODEL', 'channels')
 DELTA_PIX = main_config.getfloat('MODEL', 'delta_pix')
 TRAIN_OUTPUT_DIR = main_config['PATHS']['tfrecords_path_train']
 TEST_OUTPUT_DIR = main_config['PATHS']['tfrecords_path_test']
-IMGSHAPE = (NUM_PIX, NUM_PIX, CHANNLES)
+IMGSHAPE = (NUM_PIX, NUM_PIX, CHANNLES) # (100,100,1)
 TOTAL_IMAGES = main_config.getint('MODEL', 'total_images')
 TEST_IMAGES = main_config.getint('MODEL', 'test_images')
 
@@ -72,9 +72,9 @@ def write_tfrecord_batch(lens_data_batch, output_path, start_idx = 0):
                 example = tf.train.Example(features=tf.train.Features(feature=feature))
                 writer.write(example.SerializeToString())
             except Exception as e:
-                print(f"Error processing lens data: {e}")
+                print(f"{RED}Error processing lens data: {e}{ENDC}")
 
-    print(f'Wrote {len(lens_data_batch)} lenses to {output_path}')
+    print(f'{GREEN}Wrote {len(lens_data_batch)} lenses to {output_path}{ENDC}')
 
 def generate_lens_image(lens_data):
     '''
@@ -97,7 +97,7 @@ def generate_lens_image(lens_data):
     x, y = np.meshgrid(np.linspace(-NUM_PIX / 2 * DELTA_PIX, NUM_PIX / 2 * DELTA_PIX, NUM_PIX),
                        np.linspace(-NUM_PIX / 2 * DELTA_PIX, NUM_PIX / 2 * DELTA_PIX, NUM_PIX))
 
-    lens_model_list = ['SIE']
+    lens_model_list = ['SIE'] # SIE + SHEAR, NFW, eNFW, etc...
     lens_model = LensModel(lens_model_list)
 
     lens_kwargs = [{
@@ -184,9 +184,9 @@ def main():
 
     try:
         lens_samples = Table.read(FILE)
-        print(f"\033[32mFile {FILE} loaded.\033[0m")
+        print(f"{GREEN}File {FILE} loaded.{ENDC}")
     except FileNotFoundError:
-        print(f"\033[31mError: The file {FILE} was not found.\033[0m")
+        print(f"{RED}Error: The file {FILE} was not found.{ENDC}")
         return
 
     # Dividir en conjuntos de entrenamiento y prueba
@@ -199,13 +199,14 @@ def main():
     test_tasks = [(batch_idx, test_samples[batch_idx * BATCH_SIZE:(batch_idx + 1) * BATCH_SIZE], TEST_OUTPUT_DIR, 70000 + batch_idx * BATCH_SIZE)
                   for batch_idx in range((len(test_samples) + BATCH_SIZE - 1) // BATCH_SIZE)]
 
-    print(f"\033[33mStarting a Pool with {NUM_PROCESSES} processes.\033[0m")
+    print(f"{YELLOW}Starting a Pool with {NUM_PROCESSES} processes.{ENDC}")
 
+    # paralelizar la generación de imágenes
     with multiprocessing.Pool(processes=NUM_PROCESSES) as pool:
         pool.map(process_lens_batch, train_tasks)
         pool.map(process_lens_batch, test_tasks)
 
-    print('\033[32m¡Process completed!\033[0m')
+    print(f"{GREEN}¡Process completed!{ENDC}")
 
 if __name__ == "__main__":
     main()
