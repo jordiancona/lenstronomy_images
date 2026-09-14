@@ -1,4 +1,3 @@
-
 import os
 import configparser
 import numpy as np
@@ -32,14 +31,33 @@ try:
     CHANNELS = main_config.getint('MODEL', 'channels')
     IMGSHAPE = (NUM_PIX, NUM_PIX, CHANNELS)
     MAIN_PATH = main_config['PATHS']['main_path']
-except FileNotFoundError as e:
+    KEY = str(main_config['CONFIG']['prueba'])
+    MODEL_DIR_CFG = main_config['CONFIG'].get('model_dir', '').strip()
+    N_FOLDS = main_config.getint('DEEPENSAMBLE', 'n_folds', fallback=5)
+except Exception as e:
     print(f"{RED}Error cargando configuración: {e}{ENDC}")
-    LABELS = ['theta_E', 'f_axis', 'f_s', 'e1', 'e2', 'x_s', 'y_s']
-    DELTA_PIX = 0.08
-    NUM_PIX = 100 # Ajustar acompañando con tus datos reales
+    LABELS = ['theta_E', 'f_axis', 'e1', 'e2']
+    NUM_PIX = 100
     CHANNELS = 1
     IMGSHAPE = (NUM_PIX, NUM_PIX, CHANNELS)
     MAIN_PATH = './'
+    KEY = 'alexnet_original'
+    MODEL_DIR_CFG = ''
+    N_FOLDS = 5
+
+if MODEL_DIR_CFG and os.path.exists(MODEL_DIR_CFG):
+    OUT_DIR = MODEL_DIR_CFG
+else:
+    possible_paths = [
+        os.path.join(MAIN_PATH, f'{KEY}/'),
+        os.path.join(MAIN_PATH, f'alexnet_{KEY}/'),
+        MAIN_PATH
+    ]
+    OUT_DIR = possible_paths[0]
+    for p in possible_paths:
+        if os.path.exists(p):
+            OUT_DIR = p
+            break
 
 # --- FUNCIONES DE CARGA DE DATOS ---
 def parse_tfrecord(example_proto):
@@ -48,31 +66,23 @@ def parse_tfrecord(example_proto):
         'image': tf.io.FixedLenFeature([], tf.string),
         'theta_E': tf.io.FixedLenFeature([], tf.float32),
         'f_axis': tf.io.FixedLenFeature([], tf.float32),
-        'f_s': tf.io.FixedLenFeature([], tf.float32),
         'e1': tf.io.FixedLenFeature([], tf.float32),
         'e2': tf.io.FixedLenFeature([], tf.float32),
-        'center_x': tf.io.FixedLenFeature([], tf.float32),
-        'center_y': tf.io.FixedLenFeature([], tf.float32),
-        're_s': tf.io.FixedLenFeature([], tf.float32),
-        're_l': tf.io.FixedLenFeature([], tf.float32),
-        'pa_l': tf.io.FixedLenFeature([], tf.float32),
-        'pa_s': tf.io.FixedLenFeature([], tf.float32),
-        'e1_s': tf.io.FixedLenFeature([], tf.float32),
-        'e2_s': tf.io.FixedLenFeature([], tf.float32),
     }
     try:
         parsed_example = tf.io.parse_single_example(example_proto, feature_description)
         image = tf.io.decode_raw(parsed_example['image'], tf.float32)
         image = tf.reshape(image, IMGSHAPE)
         return image
-    except:
+    except Exception:
         return tf.zeros(IMGSHAPE)
 
 def load_tfrecord_dataset(path, batch_size=1):
+    if not os.path.exists(path):
+        return None
     tfrecord_files = sorted([os.path.join(path, f) for f in os.listdir(path) if f.endswith(".tfrecord")])
     if not tfrecord_files:
-        raise FileNotFoundError(f"No se encontraron archivos .tfrecord en {path}")
-    
+        return None
     dataset = tf.data.TFRecordDataset(tfrecord_files, num_parallel_reads=tf.data.AUTOTUNE)
     dataset = dataset.map(parse_tfrecord, num_parallel_calls=tf.data.AUTOTUNE)
     dataset = dataset.batch(batch_size).prefetch(tf.data.AUTOTUNE)
@@ -84,15 +94,6 @@ def namask(*args):
     for a in args:
         m &= np.isfinite(a)
     return m
-
-def robust_stats(x, mask=None):
-    if mask is None: mask = np.isfinite(x)
-    xm = x[mask]
-    if len(xm) == 0: return 0.0, 1.0
-    med = np.median(xm)
-    mad = np.median(np.abs(xm - med))
-    sigma = 1.4826 * mad if mad > 0 else np.std(xm) if len(xm) > 1 else 1.0
-    return med, sigma
 
 def normalize_minmax(img, mask=None, low=0.0, high=1.0, pmin=1, pmax=99):
     if mask is None: mask = np.isfinite(img)
@@ -118,130 +119,113 @@ def psnr(a, b, mask=None):
     return 10 * np.log10((peak**2) / m)
 
 def plot_comparison_histogram(data_dict, xlabel, filename):
-    '''
-    Plotea un histograma comparativo: Individuales vs Ensemble
-    data_dict: {'Model 1': [vals], 'Model 2': [vals], ..., 'Ensemble': [vals]}
-    '''
     plt.figure(figsize=(10, 6))
+    colors = ['skyblue', 'lightgreen', 'lightcoral', 'gold', 'violet']
     
-    # Estilos para diferenciar
-    colors = ['skyblue', 'lightgreen', 'lightcoral']
-    
-    # Plotear modelos individuales (transparente)
     for i, (key, values) in enumerate(data_dict.items()):
         if key == 'Ensemble': continue
         valid_data = [d for d in values if np.isfinite(d)]
+        if not valid_data: continue
         plt.hist(valid_data, bins=40, alpha=0.3, density=True, 
-                 label=f'{key} (Mean: {np.mean(valid_data):.2f})', color=colors[i%3])
+                 label=f'{key} (Mean: {np.mean(valid_data):.2f})', color=colors[i % len(colors)])
 
-    # Plotear Ensemble (más fuerte)
     if 'Ensemble' in data_dict:
         ens_data = [d for d in data_dict['Ensemble'] if np.isfinite(d)]
-        plt.hist(ens_data, bins=40, alpha=0.6, density=True, color='blue', 
-                 histtype='step', linewidth=2, label=f'Ensemble (Mean: {np.mean(ens_data):.2f})')
-        
-        # Linea de la mediana del ensamble
-        plt.axvline(np.median(ens_data), color='blue', linestyle='--', linewidth=2)
+        if ens_data:
+            plt.hist(ens_data, bins=40, alpha=0.6, density=True, color='blue', 
+                     histtype='step', linewidth=2, label=f'Ensemble (Mean: {np.mean(ens_data):.2f})')
+            plt.axvline(np.median(ens_data), color='blue', linestyle='--', linewidth=2)
 
     plt.xlabel(xlabel)
     plt.ylabel('Probability Density')
-    plt.title(f'{xlabel} Comparison: Individual Models vs Deep Ensemble')
+    plt.title(f'{xlabel} Comparison: Models vs Ensemble')
     plt.legend()
     plt.grid(True, alpha=0.3)
-    plt.savefig(os.path.join(MAIN_PATH, filename))
+    plt.savefig(os.path.join(OUT_DIR, filename))
     plt.close()
 
 # --- MAIN ---
 def main():
-    # Estructuras para guardar resultados
-    results_psnr = {'Model 1': [], 'Model 2': [], 'Model 3': [], 'Ensemble': []}
-    results_mse = {'Model 1': [], 'Model 2': [], 'Model 3': [], 'Ensemble': []}
+    results_psnr = {'Ensemble': []}
+    results_mse = {'Ensemble': []}
     
-    # 1. Preparar Datasets
-    # Asumimos que la carpeta 'original' es idéntica en todos, cargamos la del 1
-    path_orig = os.path.join(MAIN_PATH, 'alexnet_1', 'original/')
+    path_orig = os.path.join(OUT_DIR, 'original/')
+    path_pred = os.path.join(OUT_DIR, 'predictions/')
     
-    # Rutas de predicciones para cada miembro del ensamble
-    paths_pred = [os.path.join(MAIN_PATH, f'alexnet_{i+1}', 'predictions/') for i in range(3)]
-    
-    try:
-        ds_original = load_tfrecord_dataset(path_orig)
-        ds_preds = [load_tfrecord_dataset(p) for p in paths_pred]
-        
-        # 2. ZIPEAR DATASETS: Esto alinea (Orig, Pred1, Pred2, Pred3)
-        # Nota: ds_preds se desempaqueta con *
-        combined_dataset = tf.data.Dataset.zip((ds_original, *ds_preds))
-        
-    except Exception as e:
-        print(f"\033[31mError cargando datasets: {e}\033[0m")
+    # Also check if individual fold subdirectories exist
+    fold_dirs = [os.path.join(MAIN_PATH, f'alexnet_{i+1}', 'predictions/') for i in range(N_FOLDS)]
+    valid_fold_dirs = [fd for fd in fold_dirs if os.path.exists(fd)]
+
+    ds_original = load_tfrecord_dataset(path_orig)
+    if ds_original is None:
+        print(f"{RED}Original TFRecord dataset not found in {path_orig}{ENDC}")
         return
 
-    print(f"\033[33mProcesando Deep Ensemble...\033[0m")
-    
-    count = 0
-    # Iteramos sobre la tupla (batch_orig, batch_p1, batch_p2, batch_p3)
-    for data in combined_dataset:
-        # Extraer tensores
-        # data[0] es original, data[1] es pred1, data[2] es pred2...
-        orig_tensor = data[0].numpy()[0]
-        pred_tensors = [d.numpy()[0] for d in data[1:]] # Lista de arrays numpy
-        
-        # Ajuste de dimensiones si es canal 1
-        if orig_tensor.shape[-1] == 1:
-            orig_tensor = orig_tensor.squeeze(-1)
-            pred_tensors = [p.squeeze(-1) for p in pred_tensors]
+    if valid_fold_dirs:
+        for i in range(len(valid_fold_dirs)):
+            results_psnr[f'Model {i+1}'] = []
+            results_mse[f'Model {i+1}'] = []
+        ds_preds = [load_tfrecord_dataset(p) for p in valid_fold_dirs]
+        ds_preds = [dp for dp in ds_preds if dp is not None]
+        combined_dataset = tf.data.Dataset.zip((ds_original, *ds_preds))
+    else:
+        ds_ens = load_tfrecord_dataset(path_pred)
+        if ds_ens is None:
+            print(f"{RED}Prediction TFRecord dataset not found in {path_pred}{ENDC}")
+            return
+        combined_dataset = tf.data.Dataset.zip((ds_original, ds_ens))
 
-        # --- LÓGICA ENSAMBLE ---
-        # 1. Calcular promedio de predicciones (Ensemble Mean)
-        # Stackeamos para tener (3, H, W) y hacemos media en axis 0
-        ensemble_img = np.mean(np.array(pred_tensors), axis=0)
-        
-        # --- NORMALIZACIÓN Y MÉTRICAS ---
-        
-        # Preparamos máscara común (basada en NaNs del original y ensemble)
+    print(f"\033[33mProcessing Deep Ensemble PSNR comparison...\033[0m")
+    count = 0
+
+    for data in combined_dataset:
+        orig_tensor = data[0].numpy()[0]
+        if valid_fold_dirs and len(data) > 2:
+            pred_tensors = [d.numpy()[0] for d in data[1:]]
+            if orig_tensor.shape[-1] == 1:
+                orig_tensor = orig_tensor.squeeze(-1)
+                pred_tensors = [p.squeeze(-1) for p in pred_tensors]
+            ensemble_img = np.mean(np.array(pred_tensors), axis=0)
+        else:
+            ens_tensor = data[1].numpy()[0]
+            if orig_tensor.shape[-1] == 1:
+                orig_tensor = orig_tensor.squeeze(-1)
+                ens_tensor = ens_tensor.squeeze(-1)
+            ensemble_img = ens_tensor
+            pred_tensors = []
+
         mask_common = namask(orig_tensor, ensemble_img)
-        
-        # Normalizamos Original y Ensemble
         orig_norm = normalize_minmax(orig_tensor, mask=mask_common)
         ens_norm = normalize_minmax(ensemble_img, mask=mask_common)
         
-        # Calculamos métricas del ENSAMBLE
         mse_ens = mse(orig_norm, ens_norm, mask=mask_common)
         psnr_ens = psnr(orig_norm, ens_norm, mask=mask_common)
         
         results_mse['Ensemble'].append(mse_ens)
         results_psnr['Ensemble'].append(psnr_ens)
         
-        # (Opcional) Calculamos métricas individuales para comparar
         for i, pred in enumerate(pred_tensors):
             pred_norm = normalize_minmax(pred, mask=mask_common)
             mse_ind = mse(orig_norm, pred_norm, mask=mask_common)
             psnr_ind = psnr(orig_norm, pred_norm, mask=mask_common)
-            
             results_mse[f'Model {i+1}'].append(mse_ind)
             results_psnr[f'Model {i+1}'].append(psnr_ind)
 
         count += 1
-        if count % 50 == 0:
-            print(f"  Procesadas {count} imágenes...", end='\r')
 
-    print(f'\n\033[32mAnálisis completado. Total: {count} imágenes.\033[0m')
+    print(f'\n\033[32mAnalysis completed. Total: {count} images.\033[0m')
 
-    # --- PLOTTING ---
     if len(results_psnr['Ensemble']) > 0:
-        # Plot PSNR Comparison
         plot_comparison_histogram(results_psnr, 'PSNR', 'ensemble_psnr_comparison.pdf')
-        # Plot MSE Comparison
         plot_comparison_histogram(results_mse, 'MSE', 'ensemble_mse_comparison.pdf')
         
-        # Imprimir resumen numérico
         print("\n--- Summary Stats ---")
         ens_mean_psnr = np.mean(results_psnr['Ensemble'])
         print(f"\033[1mEnsemble Mean PSNR: {ens_mean_psnr:.4f}\033[0m")
-        for i in range(3):
-            ind_mean = np.mean(results_psnr[f'Model {i+1}'])
-            print(f"Model {i+1} Mean PSNR: {ind_mean:.4f}")
-            
+        for k in results_psnr:
+            if k != 'Ensemble' and len(results_psnr[k]) > 0:
+                ind_mean = np.mean(results_psnr[k])
+                print(f"{k} Mean PSNR: {ind_mean:.4f}")
     else:
         print("No data gathered.")
 

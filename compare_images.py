@@ -1,15 +1,15 @@
-
 import numpy as np
 from matplotlib import pyplot as plt
 import matplotlib.colors as colors
 import matplotlib.patches as patches
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 import tensorflow as tf
-from lenstronomy.LensModel.lens_model import LensModel # pyrefly: ignore [missing-import]
-from lenstronomy.Plots import lens_plot # pyrefly: ignore [missing-import]
+from lenstronomy.LensModel.lens_model import LensModel
+from lenstronomy.Plots import lens_plot
 import configparser
 import sys
 import os
+
 plt.rc('axes', labelsize=20)
 plt.rc('axes', titlesize=20)
 plt.rc('xtick', labelsize=20)
@@ -30,13 +30,28 @@ def load_config(config_file):
 main_config = load_config('main_config.ini')
 
 IDX = int(main_config['PSNR']['idx'])
-N = main_config['CONFIG']['prueba']
+N = str(main_config['CONFIG']['prueba'])
+MODEL_DIR_CFG = main_config['CONFIG'].get('model_dir', '').strip()
 MAIN_PATH = main_config['PATHS']['main_path']
-PATH = os.path.join(MAIN_PATH, f'{N}/')
+
+if MODEL_DIR_CFG and os.path.exists(MODEL_DIR_CFG):
+    PATH = MODEL_DIR_CFG
+else:
+    possible_paths = [
+        os.path.join(MAIN_PATH, f"{N}/"),
+        os.path.join(MAIN_PATH, f"alexnet_{N}/"),
+        MAIN_PATH
+    ]
+    PATH = possible_paths[0]
+    for p in possible_paths:
+        if os.path.exists(p):
+            PATH = p
+            break
+
 NUM_PIX = int(main_config['MODEL']['num_pix'])
 CHANNELS = int(main_config['MODEL']['channels'])
 INPUT_SHAPE = (NUM_PIX, NUM_PIX, CHANNELS)
-DELTA_PIX = main_config.getfloat('MODEL','delta_pix')
+DELTA_PIX = main_config.getfloat('MODEL', 'delta_pix')
 labels = ['theta_E', 'f_axis', 'e1', 'e2']
 plot_labels = [r'$\theta_E$', r'$f$', r'$e_x$', r'$e_y$']
 
@@ -60,6 +75,8 @@ def parse_tfrecord(example_proto):
     return image, parsed
 
 def load_tfrecord(file_path):
+    if not os.path.exists(file_path):
+        return []
     dataset = tf.data.TFRecordDataset(file_path)
     dataset = dataset.map(parse_tfrecord)
     return list(dataset)
@@ -79,6 +96,8 @@ def robust_stats(x, mask=None):
     if mask is None:
         mask = np.isfinite(x)
     xm = x[mask]
+    if len(xm) == 0:
+        return 0.0, 1.0
     med = np.median(xm)
     mad = np.median(np.abs(xm - med))
     sigma = 1.4826 * mad if mad > 0 else np.std(xm) if len(xm) > 1 else 1.0
@@ -93,9 +112,11 @@ def normalize_minmax(img, mask=None, low=0.0, high=1.0, pmin=1, pmax=99):
     if mask is None:
         mask = np.isfinite(img)
     vals = img[mask]
+    if len(vals) == 0:
+        return img
     vmin, vmax = np.percentile(vals, [pmin, pmax])
     if vmin == vmax:
-        vmax = vmin + 1
+        vmax = vmin + 1e-9
     img_min = vmin
     img_max = vmax
     x = (img - img_min) / (img_max - img_min)
@@ -114,15 +135,17 @@ def mse(a, b, mask=None):
     if mask is None:
         mask = namask(a, b)
     d = (a - b)[mask]
+    if len(d) == 0:
+        return 0.0
     return np.mean(d**2)
 
 def psnr(a, b, mask=None):
     if mask is None:
         mask = namask(a, b)
     m = mse(a, b, mask)
-    if m == 0:
+    if m <= 0:
         return np.inf
-    peak = np.nanmax(a[mask])
+    peak = np.nanmax(a[mask]) if np.any(mask) else 1.0
     return 10 * np.log10((peak**2) / m)
 
 def plot_radius(ax, hdr, ref, radius, edgecolor='green', lw=1.5, linestyle = '-'):
@@ -148,9 +171,8 @@ def compare_and_plot(ref, mov, original_hdr, predicted_hdr, title, plot_title, c
     val_psnr = psnr(ref, mov, m)
 
     fig, ax = plt.subplots(1, 3, figsize=(16.5, 5.5))
-    #plt.suptitle(f'Model {N}', fontsize=20)
 
-    im1 = ax[0].imshow(ref, origin='lower', cmap = 'gray_r')
+    im1 = ax[0].imshow(ref, origin='lower', cmap='gray_r')
     ax[0].set_title(f'Original', fontsize=18)
     ax[0].set_xlabel('píxeles')
     ax[0].set_ylabel('píxeles')
@@ -164,12 +186,12 @@ def compare_and_plot(ref, mov, original_hdr, predicted_hdr, title, plot_title, c
                  color='white', fontsize=12, transform=ax[0].transAxes,
                  bbox=dict(facecolor='black', alpha=0.4, pad=2))
     plot_radius(ax[0], original_hdr, ref, radius=1.0, lw=1.5)
-    plot_radius(ax[0], predicted_hdr, ref, radius=1.0, edgecolor='red', lw=1.5, linestyle = '--')
+    plot_radius(ax[0], predicted_hdr, ref, radius=1.0, edgecolor='red', lw=1.5, linestyle='--')
     divider = make_axes_locatable(ax[0])
     cax1 = divider.append_axes('right', size='5%', pad=0.1)
     plt.colorbar(im1, cax=cax1)
 
-    im2 = ax[1].imshow(mov[:,:,0], origin='lower', cmap = 'gray_r')
+    im2 = ax[1].imshow(mov[:,:,0] if len(mov.shape) == 3 else mov, origin='lower', cmap='gray_r')
     ax[1].set_title(f'Reconstrucción', fontsize=18)
     ax[1].set_xlabel('píxeles')
     ax[1].set_ylabel('píxeles')
@@ -186,7 +208,8 @@ def compare_and_plot(ref, mov, original_hdr, predicted_hdr, title, plot_title, c
     cax2 = divider.append_axes('right', size='5%', pad=0.1)
     plt.colorbar(im2, cax=cax2)
 
-    im3 = ax[2].imshow(diff[:, :, 0], origin='lower', cmap=cmap_diff, vmin=0, vmax=2)
+    diff_img = diff[:, :, 0] if len(diff.shape) == 3 else diff
+    im3 = ax[2].imshow(diff_img, origin='lower', cmap=cmap_diff, vmin=0, vmax=2)
     
     if val_mse == 0:
         val_mse_tex = '0'
@@ -207,7 +230,8 @@ def compare_and_plot(ref, mov, original_hdr, predicted_hdr, title, plot_title, c
     plt.colorbar(im3, cax=cax3, label=r'asinh(|Original - Pred|$\alpha$)')
 
     plt.tight_layout()
-    plt.savefig(PATH + f'{plot_title.lower()}_model_{N}_{IDX}.png', bbox_inches='tight')
+    out_file = os.path.join(PATH, f'{plot_title.lower()}_model_{N}_{IDX}.png')
+    plt.savefig(out_file, bbox_inches='tight')
     plt.close()
     return val_mse
 
@@ -221,37 +245,29 @@ def main():
     original_dataset = load_tfrecord(original_file)
     predicted_dataset = load_tfrecord(prediction_file)
 
-    original_img, original_hdr = original_dataset[IDX]
-    predicted_img, predicted_hdr = predicted_dataset[IDX]
+    if not original_dataset or not predicted_dataset:
+        print(f"{RED}Error: TFRecord files not found in {PATH}{ENDC}")
+        return
+
+    sample_idx = min(IDX, len(original_dataset) - 1)
+
+    original_img, original_hdr = original_dataset[sample_idx]
+    predicted_img, predicted_hdr = predicted_dataset[sample_idx]
 
     img1, img2 = commoon_region(original_img, predicted_img)
     mask0 = namask(img1, img2)
 
-    n1_a = normalize_zscore(img1, mask=mask0)
-    n2_a = normalize_zscore(img2, mask=mask0)
-
     n1_b = normalize_minmax(img1, mask=mask0)
     n2_b = normalize_minmax(img2, mask=mask0)
 
-    n2_C, alpha_C, beta_C = normalize_affine_match(img1, img2, mask=mask0)
-
     print(f'{YELLOW}Comparing images...{ENDC}')
-    print(f'Image: {IDX} from {original_file}\n')
-    print(f'{YELLOW}========== Results from image {IDX} =========={ENDC}')
-    #print('--- Robust Z-score ---')
-    #mse_A = compare_and_plot(n1_a, n2_a, original_hdr, predicted_hdr, 'Z-score', f'robust_Z-score')
+    print(f'Image: {sample_idx} from {original_file}\n')
+    print(f'{YELLOW}========== Results from image {sample_idx} =========={ENDC}')
 
     print('--- Robust Min-Max (p1–p99) ---')
     mse_B = compare_and_plot(n1_b, n2_b, original_hdr, predicted_hdr, 'Robust Min-Max', f'robust_Min-Max')
-
-    #print('--- Robust Affine (img2→img1) ---')
-    #mse_C = compare_and_plot(img1, n2_C, original_hdr, predicted_hdr, f'Affine α={alpha_C:.3g}, β={beta_C:.3g}', f'robust_Affine')
-
-    #print(f'{CYAN}MSE Z-score:{ENDC} {mse_A:.6g}')
     print(f'{CYAN}MSE Min-Max: {ENDC}{mse_B:.6g}')
-    #print(f'{CYAN}MSE Affine: {ENDC} {mse_C:.6g} \n')
-
-    print(f'{GREEN}Image saved in {PATH}{ENDC}\n')
+    print(f'{GREEN}Image comparison saved in {PATH}{ENDC}\n')
 
 if __name__ == '__main__':
     main()
