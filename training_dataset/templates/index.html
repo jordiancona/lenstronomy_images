@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generador & Visualizador de Datasets - Lentes Gravitacionales</title>
+
+    <!-- Google Fonts & FontAwesome -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --bg-dark: #0b0f19;
+            --card-bg: rgba(22, 28, 45, 0.7);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --accent-cyan: #00f2fe;
+            --accent-blue: #4facfe;
+            --accent-purple: #7f00ff;
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-dark);
+            background-image: 
+                radial-gradient(circle at 15% 15%, rgba(0, 242, 254, 0.12) 0%, transparent 40%),
+                radial-gradient(circle at 85% 85%, rgba(127, 0, 255, 0.12) 0%, transparent 40%);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header Navigation */
+        header {
+            background: rgba(11, 15, 25, 0.85);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--card-border);
+            padding: 1.2rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .brand i {
+            font-size: 1.8rem;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .brand h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.4rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .brand span {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-weight: 400;
+            display: block;
+        }
+
+        .stats-strip {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .stat-badge {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--card-border);
+            padding: 0.4rem 0.9rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .stat-badge i {
+            color: var(--accent-cyan);
+        }
+
+        .stat-val {
+            font-weight: 700;
+            color: #fff;
+        }
+
+        /* Main Container & Tabs */
+        main {
+            max-width: 1400px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 2rem;
+            flex: 1;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid var(--card-border);
+            padding-bottom: 0.8rem;
+        }
+
+        .tab-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-family: 'Outfit', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            padding: 0.8rem 1.4rem;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        .tab-btn:hover {
+            color: var(--text-main);
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .tab-btn.active {
+            color: #fff;
+            background: linear-gradient(135deg, rgba(0, 242, 254, 0.2), rgba(127, 0, 255, 0.2));
+            border: 1px solid rgba(0, 242, 254, 0.4);
+            box-shadow: 0 4px 20px rgba(0, 242, 254, 0.15);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.4s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Grid Layout & Cards */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        .card {
+            background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 1.8rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .card-header {
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .card-header i {
+            font-size: 1.3rem;
+            color: var(--accent-cyan);
+        }
+
+        .card-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+
+        /* Forms & Inputs */
+        .form-group {
+            margin-bottom: 1.4rem;
+        }
+
+        label {
+            display: block;
+            font-size: 0.88rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+        }
+
+        input[type="number"],
+        input[type="text"],
+        select {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            background: rgba(11, 15, 25, 0.6);
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            color: #fff;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.95rem;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        input:focus, select:focus {
+            border-color: var(--accent-cyan);
+            box-shadow: 0 0 12px rgba(0, 242, 254, 0.2);
+        }
+
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.8rem;
+            margin-top: 0.5rem;
+        }
+
+        .checkbox-item {
+            background: rgba(11, 15, 25, 0.5);
+            border: 1px solid var(--card-border);
+            padding: 0.6rem 0.8rem;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            font-size: 0.85rem;
+            cursor: pointer;
+        }
+
+        .checkbox-item input {
+            accent-color: var(--accent-cyan);
+            cursor: pointer;
+        }
+
+        /* Buttons */
+        .btn {
+            width: 100%;
+            padding: 0.9rem 1.5rem;
+            border: none;
+            border-radius: 10px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.7rem;
+            color: #fff;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
+            box-shadow: 0 4px 15px rgba(0, 242, 254, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(0, 242, 254, 0.5);
+        }
+
+        .btn-purple {
+            background: linear-gradient(135deg, #7f00ff, #e100ff);
+            box-shadow: 0 4px 15px rgba(127, 0, 255, 0.3);
+        }
+
+        .btn-purple:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(127, 0, 255, 0.5);
+        }
+
+        /* Live Terminal Log Console */
+        .console-card {
+            background: #060911;
+            border: 1px solid rgba(0, 242, 254, 0.2);
+            border-radius: 14px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 480px;
+        }
+
+        .console-header {
+            background: #0d1322;
+            padding: 0.8rem 1.2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        .console-title {
+            font-family: 'Fira Code', monospace;
+            font-size: 0.85rem;
+            color: var(--accent-cyan);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .console-body {
+            padding: 1.2rem;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.85rem;
+            color: #e2e8f0;
+            overflow-y: auto;
+            flex: 1;
+            white-space: pre-wrap;
+            line-height: 1.6;
+        }
+
+        /* Gallery Grid */
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .gallery-card {
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .gallery-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--accent-cyan);
+            box-shadow: 0 8px 30px rgba(0, 242, 254, 0.2);
+        }
+
+        .gallery-card img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .gallery-info {
+            padding: 1rem;
+            font-size: 0.85rem;
+        }
+
+        .gallery-title {
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 0.3rem;
+            word-break: break-all;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+        }
+
+        .modal-content {
+            max-width: 1100px;
+            width: 100%;
+            background: var(--bg-dark);
+            border: 1px solid var(--accent-cyan);
+            border-radius: 16px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 1rem; right: 1.2rem;
+            font-size: 1.8rem;
+            color: #fff;
+            cursor: pointer;
+            z-index: 10;
+        }
+
+        .modal img {
+            width: 100%;
+            max-height: 80vh;
+            object-fit: contain;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="brand">
+            <i class="fa-solid fa-atom"></i>
+            <div>
+                <h1>Lenstronomy Dataset Studio</h1>
+                <span>Base de Datos Gravitacional (DECam / HST / Mocks Melo et al. 2025)</span>
+            </div>
+        </div>
+        <div class="stats-strip">
+            <div class="stat-badge">
+                <i class="fa-solid fa-cube"></i> TFRecords: <span class="stat-val" id="stat-tfrecords">-</span>
+            </div>
+            <div class="stat-badge">
+                <i class="fa-solid fa-layer-group"></i> Tensors NPY: <span class="stat-val" id="stat-tensors">-</span>
+            </div>
+            <div class="stat-badge">
+                <i class="fa-solid fa-image"></i> PNGs Generados: <span class="stat-val" id="stat-pngs">-</span>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="nav-tabs">
+            <button class="tab-btn active" onclick="switchTab('mocks')">
+                <i class="fa-solid fa-wand-magic-sparkles"></i> Base Sintética (Mocks)
+            </button>
+            <button class="tab-btn" onclick="switchTab('real')">
+                <i class="fa-solid fa-telescope"></i> Base Real (DECam/HST)
+            </button>
+            <button class="tab-btn" onclick="switchTab('converter')">
+                <i class="fa-solid fa-file-export"></i> Convertir TFRecords a PNG
+            </button>
+            <button class="tab-btn" onclick="switchTab('gallery')">
+                <i class="fa-solid fa-photo-film"></i> Galería de Previsualización
+            </button>
+        </div>
+
+        <!-- TAB 1: Mocks Sintéticos -->
+        <div id="tab-mocks" class="tab-content active">
+            <div class="grid-2">
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fa-solid fa-sliders"></i>
+                        <div class="card-title">Parámetros de Simulación (Lenstronomy)</div>
+                    </div>
+                    <form id="form-mocks" onsubmit="runGenerateMocks(event)">
+                        <div class="form-group">
+                            <label>Número de Mocks a Generar:</label>
+                            <input type="number" id="num-mocks" value="10" min="1" max="5000">
+                        </div>
+                        <div class="form-group">
+                            <label>Formato de Salida del Dataset:</label>
+                            <select id="mock-fmt">
+                                <option value="both" selected>TFRecord (.tfrecord) y NumPy (.npy)</option>
+                                <option value="tfrecord">Solo TFRecord (.tfrecord)</option>
+                                <option value="npy">Solo NumPy (.npy)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Modelado Físico (Lenstronomy):</label>
+                            <input type="text" value="Modelo Lente: SIE | Fuente: Sersic Ellipse | FOV: 10''x10'' (200x200 px)" disabled readonly style="opacity: 0.7;">
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fa-solid fa-rocket"></i> Generar Base Sintética Mocks
+                        </button>
+                    </form>
+                </div>
+
+                <div class="console-card">
+                    <div class="console-header">
+                        <div class="console-title"><i class="fa-solid fa-terminal"></i> Terminal Log - Simulación Mocks</div>
+                        <span id="status-mocks" style="font-size: 0.75rem; color: #10b981;">Listo</span>
+                    </div>
+                    <div class="console-body" id="log-mocks">Sistemas de simulación inicializados. Presiona 'Generar Base Sintética Mocks' para iniciar.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 2: Base Real Catálogos -->
+        <div id="tab-real" class="tab-content">
+            <div class="grid-2">
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fa-solid fa-satellite-dish"></i>
+                        <div class="card-title">Descarga de Catálogos Astronómicos</div>
+                    </div>
+                    <form id="form-real" onsubmit="runDownloadReal(event)">
+                        <div class="form-group">
+                            <label>Seleccionar Catálogos (VizieR):</label>
+                            <div class="checkbox-group">
+                                <label class="checkbox-item"><input type="checkbox" name="catalogs" value="SLACS" checked> SLACS</label>
+                                <label class="checkbox-item"><input type="checkbox" name="catalogs" value="BELLS" checked> BELLS</label>
+                                <label class="checkbox-item"><input type="checkbox" name="catalogs" value="DES" checked> DES</label>
+                                <label class="checkbox-item"><input type="checkbox" name="catalogs" value="SUGOHI"> SUGOHI</label>
+                                <label class="checkbox-item"><input type="checkbox" name="catalogs" value="SQLS"> SQLS</label>
+                                <label class="checkbox-item"><input type="checkbox" name="catalogs" value="CLASS"> CLASS</label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Límite de Objetos por Catálogo (0 para Todo):</label>
+                            <input type="number" id="real-limit" value="10" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label>Origen de Imágenes Cutout:</label>
+                            <select id="real-source">
+                                <option value="both" selected>DECam / DECaLS + HST MAST</option>
+                                <option value="decam">Solo DECam / DECaLS (óptico terrestre g, r, z)</option>
+                                <option value="hst">Solo HST (Hubble espacial F814W)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Formato de Salida del Dataset:</label>
+                            <select id="real-fmt">
+                                <option value="both" selected>TFRecord (.tfrecord) y NumPy (.npy)</option>
+                                <option value="tfrecord">Solo TFRecord (.tfrecord)</option>
+                                <option value="npy">Solo NumPy (.npy)</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-purple">
+                            <i class="fa-solid fa-cloud-arrow-down"></i> Descargar y Procesar Catálogos Reales
+                        </button>
+                    </form>
+                </div>
+
+                <div class="console-card">
+                    <div class="console-header">
+                        <div class="console-title"><i class="fa-solid fa-terminal"></i> Terminal Log - Descarga Real</div>
+                        <span id="status-real" style="font-size: 0.75rem; color: #10b981;">Listo</span>
+                    </div>
+                    <div class="console-body" id="log-real">Conexión con VizieR, Legacy Survey y MAST lista. Presiona 'Descargar y Procesar Catálogos Reales' para iniciar.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 3: Convertidor TFRecord -> PNG -->
+        <div id="tab-converter" class="tab-content">
+            <div class="grid-2">
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fa-solid fa-images"></i>
+                        <div class="card-title">Convertir TFRecords a PNGs</div>
+                    </div>
+                    <form id="form-converter" onsubmit="runConvertTFRecords(event)">
+                        <div class="form-group">
+                            <label>Filtrar por Nombre o Catálogo (Opcional):</label>
+                            <input type="text" id="convert-pattern" placeholder="Ej. DES, MOCK, SLACS (dejar en blanco para TODOS)">
+                        </div>
+                        <div class="form-group">
+                            <label>Directorio de Salida de los PNGs:</label>
+                            <input type="text" id="convert-outdir" value="./training_dataset/tfrecords_pngs">
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i> Renderizar y Guardar PNGs
+                        </button>
+                    </form>
+                </div>
+
+                <div class="console-card">
+                    <div class="console-header">
+                        <div class="console-title"><i class="fa-solid fa-terminal"></i> Terminal Log - Renderizado PNG</div>
+                        <span id="status-converter" style="font-size: 0.75rem; color: #10b981;">Listo</span>
+                    </div>
+                    <div class="console-body" id="log-converter">Visualizador headless configurado con Matplotlib.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 4: Galería -->
+        <div id="tab-gallery" class="tab-content">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <h2 style="font-family: 'Outfit'; font-size: 1.4rem;">Previsualización de TFRecords Renderizados</h2>
+                <button class="btn btn-primary" onclick="loadGallery()" style="width: auto; padding: 0.6rem 1.2rem;">
+                    <i class="fa-solid fa-rotate"></i> Actualizar Galería
+                </button>
+            </div>
+            <div class="gallery-grid" id="gallery-container">
+                <p style="color: var(--text-muted);">Cargando imágenes de previsualización...</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Image Modal -->
+    <div class="modal" id="image-modal" onclick="closeModal()">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <span class="modal-close" onclick="closeModal()">&times;</span>
+            <img id="modal-img" src="" alt="Vista previa">
+        </div>
+    </div>
+
+    <script>
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            event.currentTarget.classList.add('active');
+            document.getElementById('tab-' + tabId).classList.add('active');
+
+            if (tabId === 'gallery') {
+                loadGallery();
+            }
+        }
+
+        function updateStats() {
+            fetch('/api/dataset_stats')
+                .then(r => r.json())
+                .then(data => {
+                    document.getElementById('stat-tfrecords').innerText = data.tfrecords;
+                    document.getElementById('stat-tensors').innerText = data.tensors;
+                    document.getElementById('stat-pngs').innerText = data.pngs;
+                });
+        }
+
+        function runGenerateMocks(e) {
+            e.preventDefault();
+            const numMocks = document.getElementById('num-mocks').value;
+            const fmt = document.getElementById('mock-fmt').value;
+            const logElem = document.getElementById('log-mocks');
+            const statusElem = document.getElementById('status-mocks');
+
+            logElem.innerText = '🚀 Iniciando simulación de Mocks con Lenstronomy...\n';
+            statusElem.innerText = 'Ejecutando...';
+            statusElem.style.color = '#f59e0b';
+
+            fetch('/api/generate_mocks', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({num_mocks: numMocks, dataset_fmt: fmt})
+            }).then(r => r.json()).then(data => {
+                startLogStream('log-mocks', 'status-mocks');
+            });
+        }
+
+        function runDownloadReal(e) {
+            e.preventDefault();
+            const checkboxes = document.querySelectorAll('input[name="catalogs"]:checked');
+            const catalogs = Array.from(checkboxes).map(cb => cb.value);
+            const limit = document.getElementById('real-limit').value;
+            const source = document.getElementById('real-source').value;
+            const fmt = document.getElementById('real-fmt').value;
+            const logElem = document.getElementById('log-real');
+            const statusElem = document.getElementById('status-real');
+
+            if (catalogs.length === 0) {
+                alert('Selecciona al menos un catálogo para descargar.');
+                return;
+            }
+
+            logElem.innerText = '📡 Consultando VizieR y MAST para descargas...\n';
+            statusElem.innerText = 'Ejecutando...';
+            statusElem.style.color = '#f59e0b';
+
+            fetch('/api/download_real', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({catalogs: catalogs, limit: limit, source: source, dataset_fmt: fmt})
+            }).then(r => r.json()).then(data => {
+                startLogStream('log-real', 'status-real');
+            });
+        }
+
+        function runConvertTFRecords(e) {
+            e.preventDefault();
+            const pattern = document.getElementById('convert-pattern').value;
+            const outdir = document.getElementById('convert-outdir').value;
+            const logElem = document.getElementById('log-converter');
+            const statusElem = document.getElementById('status-converter');
+
+            logElem.innerText = '🎨 Iniciando conversión de TFRecords a PNG...\n';
+            statusElem.innerText = 'Ejecutando...';
+            statusElem.style.color = '#f59e0b';
+
+            fetch('/api/convert_tfrecords', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({pattern: pattern, outdir: outdir})
+            }).then(r => r.json()).then(data => {
+                startLogStream('log-converter', 'status-converter');
+            });
+        }
+
+        function startLogStream(logElemId, statusElemId) {
+            const logElem = document.getElementById(logElemId);
+            const statusElem = document.getElementById(statusElemId);
+            const eventSource = new EventSource('/api/stream_logs');
+
+            eventSource.onmessage = function(e) {
+                if (e.data === '[LOG_END]') {
+                    eventSource.close();
+                    statusElem.innerText = 'Completado';
+                    statusElem.style.color = '#10b981';
+                    updateStats();
+                } else {
+                    logElem.innerText += e.data + '\n';
+                    logElem.scrollTop = logElem.scrollHeight;
+                }
+            };
+
+            eventSource.onerror = function() {
+                eventSource.close();
+                statusElem.innerText = 'Finalizado';
+                statusElem.style.color = '#10b981';
+                updateStats();
+            };
+        }
+
+        function loadGallery() {
+            const container = document.getElementById('gallery-container');
+            container.innerHTML = '<p style="color: var(--text-muted);">Cargando imágenes de previsualización...</p>';
+
+            fetch('/api/gallery')
+                .then(r => r.json())
+                .then(images => {
+                    if (images.length === 0) {
+                        container.innerHTML = '<p style="color: var(--text-muted);">No se encontraron imágenes PNG renderizadas en ./training_dataset/tfrecords_pngs. Dirígete a la pestaña "Convertir TFRecords a PNG" para generar las vistas previas.</p>';
+                        return;
+                    }
+                    container.innerHTML = '';
+                    images.forEach(imgName => {
+                        const card = document.createElement('div');
+                        card.className = 'gallery-card';
+                        card.onclick = () => openModal('/api/png/' + imgName);
+                        card.innerHTML = `
+                            <img src="/api/png/${imgName}" alt="${imgName}">
+                            <div class="gallery-info">
+                                <div class="gallery-title">${imgName}</div>
+                            </div>
+                        `;
+                        container.appendChild(card);
+                    });
+                });
+        }
+
+        function openModal(src) {
+            document.getElementById('modal-img').src = src;
+            document.getElementById('image-modal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('image-modal').style.display = 'none';
+        }
+
+        // Initialize Stats on page load
+        updateStats();
+    </script>
+</body>
+</html>
